@@ -3,7 +3,7 @@
 from manim import *
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
-from .smart_tex import SmartColorizeStatic
+from .smart_tex import *
 
 # Common settings
 BACKGROUND_COLOR = "#121212"

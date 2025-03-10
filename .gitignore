@@ -4,39 +4,55 @@ __pycache__/
 *$py.class
 *.so
 .Python
-venv/
-ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Manim
-media/
-*.mp4
-*.gif
-*.png
-*.jpg
-*.jpeg
-*.svg
-*.pdf
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
-
-# OS
 .DS_Store
-Thumbs.db
 
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
+# Project specific
+*.log
 .coverage
-.coverage.*
-.cache
-coverage.xml
-*.cover 
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Manim specific
+media/
+videos/
+images/
+*.mp4
+*.png
+*.jpg
+*.gif
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local 

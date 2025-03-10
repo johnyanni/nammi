@@ -1,16 +1,21 @@
-# Nammi Math Tutorials
+# NAMMI - Math Tutorial Generator
 
-An interactive math tutorial system built with Manim, featuring:
-- Beautiful animations
-- Clear explanations with voiceovers
-- Step-by-step problem solving
-- Interactive components
+NAMMI is a powerful tool for creating engaging math tutorials using Manim animations and Azure voiceover.
 
-## Setup
+## Features
+
+- Create beautiful math animations using Manim
+- Generate natural-sounding voiceovers using Azure
+- Smart colorization of mathematical expressions
+- Scrollable text management
+- Error handling and recovery
+- Modular component system
+
+## Installation
 
 1. Clone the repository:
 ```bash
-git clone [your-repository-url]
+git clone https://github.com/johnyanni/nammi.git
 cd nammi
 ```
 
@@ -25,19 +30,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Running Tutorials
-
-To run a tutorial, use the following command format:
-```bash
-cd src/topics/[subject]/scenes
-manim -pqh [tutorial_file].py [SceneName]
-```
-
-For example, to run the linear equations tutorial:
-```bash
-cd src/topics/algebra/scenes
-manim -pqh linear_equations_find_equation.py LinearEquationsFindEquation
-```
+4. Set up Azure credentials:
+- Create an Azure account
+- Set up a Speech Service
+- Add your Azure credentials to `.env`
 
 ## Project Structure
 
@@ -45,22 +41,60 @@ manim -pqh linear_equations_find_equation.py LinearEquationsFindEquation
 nammi/
 ├── src/
 │   ├── components/
-│   │   ├── common/          # Shared components and utilities
-│   │   └── styles/          # Common styles and constants
-│   └── topics/
-│       ├── algebra/         # Algebra tutorials
-│       └── [other_subjects] # Other math subjects
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
+│   │   ├── common/         # Shared components
+│   │   └── styles/         # Styling constants
+│   └── topics/             # Math topics
+│       └── linear_equations/
+│           └── scenes/     # Tutorial scenes
+├── tests/                  # Test files
+├── docs/                   # Documentation
+└── examples/              # Example tutorials
+```
+
+## Usage
+
+1. Create a new tutorial scene:
+```python
+from src.components.common.base_scene import MathTutorialScene
+
+class MyTutorial(MathTutorialScene):
+    def construct(self):
+        # Your tutorial code here
+        pass
+```
+
+2. Run the tutorial:
+```bash
+manim -pql src/topics/your_topic/scenes/your_scene.py MyTutorial
+```
+
+## Development
+
+1. Set up development environment:
+```bash
+pip install -r requirements-dev.txt
+```
+
+2. Run tests:
+```bash
+pytest
+```
+
+3. Run linting:
+```bash
+ruff check .
 ```
 
 ## Contributing
 
-1. Fork the repository
-2. Create a new branch for your feature
-3. Make your changes
-4. Submit a pull request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-[Your chosen license] 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Manim](https://github.com/ManimCommunity/manim) for animation capabilities
+- [Azure Speech Services](https://azure.microsoft.com/en-us/services/cognitive-services/speech-services/) for voiceover
+- All contributors and maintainers 

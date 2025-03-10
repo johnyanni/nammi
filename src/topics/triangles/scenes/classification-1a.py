@@ -1,8 +1,9 @@
 """Tutorial on classifying triangles by their sides and angles."""
 
 from manim import *
-from src.components.common.base_scene import MathTutorialScene
-from src.components.common.smart_tex import *
+from src.components.common.base_scene import *
+from src.components.common.scroll_manager import ScrollManager
+from src.components.common.quick_tip import QuickTip
 from src.components.styles.constants import *
 
 class TrianglesClassification(MathTutorialScene):
