@@ -137,7 +137,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         step1_group = create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
         step2_group = create_step(step2_title, step2_info)
         step3_group = create_step(step3_title, step3_info_1, step3_info_2, step3_info_3, step3_info_4, step3_info_5)
-        step4_group = create_step(step4_title, step4_title, step4_info_1, step4_info_2)
+        step4_group = create_step(step4_title, step4_info_1, step4_info_2)
         
         steps_group = VGroup(step1_group, step2_group, step3_group, step4_group).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
 

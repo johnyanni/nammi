@@ -21,7 +21,8 @@ class TestMathTutorialScene:
     
     def test_background_color(self, scene):
         """Test that background color is set correctly."""
-        assert scene.camera.background_color == "#121212"
+        scene.setup()
+        assert scene.camera.background_color == ManimColor("#121212")
     
     def test_voiceover_setup(self, scene):
         """Test that voiceover service is configured."""
