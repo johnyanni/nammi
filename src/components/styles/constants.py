@@ -8,6 +8,7 @@ COMPREHENSION_PAUSE = 3.0
 # Text scaling constants
 TEXT_SCALE = 0.5
 MATH_SCALE = 0.55
+SMALL_FONT = 24  # Font size for small text
 
 # Layout constants
 STANDARD_BUFF = 0.5
