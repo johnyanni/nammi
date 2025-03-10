@@ -1,3 +1,5 @@
+"""Tutorial on finding equations of lines using slope-intercept form."""
+
 from manim import *
 from src.components.common.base_scene import *
 from src.components.common.smart_tex import *
@@ -7,6 +9,8 @@ from src.components.common.slope_overlay import SlopeOverlay
 from src.components.styles.constants import *
 
 class LinearEquationsFindEquation(MathTutorialScene):
+    """A tutorial that teaches how to find the equation of a line using slope-intercept form."""
+    
     def construct(self):
         # Define colors (these are specific to this tutorial)
         y_intercept_color = YELLOW
