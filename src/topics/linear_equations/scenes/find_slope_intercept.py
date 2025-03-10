@@ -8,7 +8,7 @@ from src.components.common.quick_tip import QuickTip
 from src.components.common.slope_overlay import SlopeOverlay
 from src.components.styles.constants import *
 
-class LinearEquationsFindEquation(MathTutorialScene):
+class LinearEquationsFindSlopeIntercept(MathTutorialScene):
     """A tutorial that teaches how to find the equation of a line using slope-intercept form."""
     
     def construct(self):
