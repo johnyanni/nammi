@@ -1,5 +1,5 @@
 """Tutorial on graphing linear equations using slope-intercept form."""
-
+"""new features"""
 from manim import *
 from src.components.common.base_scene import *
 from src.components.common.scroll_manager import ScrollManager
@@ -343,4 +343,4 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             self.play(Indicate(final_line, scale_factor=1.1))
             self.wait(COMPREHENSION_PAUSE)
 
-        self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)# Test change to demonstrate branching
