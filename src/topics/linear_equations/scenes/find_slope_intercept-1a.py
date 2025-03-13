@@ -10,6 +10,19 @@ from src.components.styles.constants import *
 class LinearEquationsFindSlopeIntercept(MathTutorialScene):
     """A tutorial that teaches how to find the equation of a line using slope-intercept form."""
     
+    def create_colored_text(self, text_parts, colors):
+        """Create a MathTex with colored parts.
+        
+        Args:
+            text_parts: List of text strings to combine
+            colors: List of colors corresponding to each text part
+        """
+        tex = MathTex(*text_parts).scale(MATH_SCALE)
+        for i, color in enumerate(colors):
+            if color is not None:  # Only color if a color is specified
+                tex[i].set_color(color)
+        return tex
+
     def construct(self):
         # Define colors (these are specific to this tutorial)
         y_intercept_color = YELLOW
@@ -124,15 +137,13 @@ class LinearEquationsFindSlopeIntercept(MathTutorialScene):
         # Step 3: Determine the equation using the slope-intercept form
         step3_title = Tex("Step 3: Write the Equation in Slope-Intercept Form").scale(TEXT_SCALE)
         step3_info_1 = MathTex(r"\text{Slope-Intercept Form: } y = mx + b").scale(MATH_SCALE)
-        step3_info_2 = MathTex(
-            r"\text{Where } ",
-            r"m",
-            r" = \text{ slope and } ",
-            r"b",
-            r" = \text{ y-intercept}"
-        ).scale(MATH_SCALE)
-        step3_info_2[1].set_color(slope_color)  # Color 'm'
-        step3_info_2[3].set_color(y_intercept_color)  # Color 'b'
+        
+        # Create colored text for step3_info_2
+        step3_info_2 = self.create_colored_text(
+            [r"\text{Where } ", r"m", r" = \text{ slope and } ", r"b", r" = \text{ y-intercept}"],
+            [None, slope_color, None, y_intercept_color, None]
+        )
+        
         step3_info_3 = MathTex(r"m = \frac{1}{2}", color=slope_color).scale(MATH_SCALE)
         step3_info_4 = MathTex(r"b = 1", color=y_intercept_color).scale(MATH_SCALE)
         
@@ -162,8 +173,7 @@ class LinearEquationsFindSlopeIntercept(MathTutorialScene):
         }
         
         color_map_group = [step2_info_1, step2_info_2, step4_info, step4_info_0,]
-        
-        apply_smart_colorize(color_map_group, color_map_slope)
+        self.apply_smart_colorize(color_map_group, color_map_slope)
         
         # QuickTip
         tip_1 = QuickTip(
@@ -174,10 +184,10 @@ class LinearEquationsFindSlopeIntercept(MathTutorialScene):
  
 
         # Organize step groups
-        step1_group = create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
-        step2_group = create_step(step2_title, step2_info_1, step2_info_2)
-        step3_group = create_step(step3_title, step3_info_1, step3_info_2, step3_info_3, step3_info_4)
-        step4_group = create_step(step4_title, step4_info_0, step4_info)
+        step1_group = self.create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
+        step2_group = self.create_step(step2_title, step2_info_1, step2_info_2)
+        step3_group = self.create_step(step3_title, step3_info_1, step3_info_2, step3_info_3, step3_info_4)
+        step4_group = self.create_step(step4_title, step4_info_0, step4_info)
         
         steps_group = VGroup(step1_group, step2_group, step3_group, step4_group).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
 
