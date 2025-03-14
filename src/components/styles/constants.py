@@ -2,9 +2,9 @@
 
 # Animation timing constants
 QUICK_PAUSE = 0.5
-STANDARD_PAUSE = 2.0
-COMPREHENSION_PAUSE = 3.0
-
+STANDARD_PAUSE = 1.0
+COMPREHENSION_PAUSE = 2.0
+END_PAUSE = 3.0
 # Text scaling constants
 TEXT_SCALE = 0.5
 MATH_SCALE = 0.55

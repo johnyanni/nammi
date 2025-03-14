@@ -85,7 +85,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             rise_arrows.append(arrow)
         
         # Create run arrow
-        run_arrow = Arrow(
+        run_arrows = Arrow(
             start=axes.c2p(0, 1),
             end=axes.c2p(-1, 1),
             color=run_color,
@@ -94,7 +94,23 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             max_tip_length_to_length_ratio=0.4
         )
         
-        ######### Solution Steps #########  
+        # Create rise text label
+        rise_text_group = self.create_text_with_background(
+            r"\text{Rise} = 4",
+            text_color=rise_color
+        ).scale(MATH_SCALE)
+        rise_text_group.next_to(rise_arrows[1], LEFT, buff=0.5)
+        
+        # Create run text label
+        
+        run_text_group = self.create_text_with_background(
+            r"\text{Run} = 1",
+            text_color=run_color
+        ).scale(MATH_SCALE)
+        run_text_group.next_to(run_arrows[1], UP, buff=0.5)
+        
+
+
 
         # Problem statement
         problem_text = MathTex(r"\text{Graph: } y = -4x - 3").scale(MATH_SCALE)
@@ -102,12 +118,8 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         # Step 1: Identify Components
         step1_title = Tex("Step 1: Identify Components").scale(TEXT_SCALE)
         step1_info_1 = MathTex(r"\text{Slope-Intercept Form: } y = mx + b").scale(MATH_SCALE)
-        self.color_component(step1_info_1, "m", slope_color)
-        self.color_component(step1_info_1, "b", y_intercept_color)
-        
         step1_info_2 = MathTex(r"\text{Slope } (m) = -4", color=slope_color).scale(MATH_SCALE)
         step1_info_3 = MathTex(r"\text{Y-intercept } (b) = -3", color=y_intercept_color).scale(MATH_SCALE)
-        
         
         # Step 2: Plot Y-intercept
         step2_title = Tex("Step 2: Plot Y-intercept").scale(TEXT_SCALE)
@@ -118,16 +130,6 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         step3_info_1 = MathTex(r"\text{Slope } = -4 = \frac{\text{rise}}{\text{run}} = -\frac{4}{1}").scale(MATH_SCALE)
         step3_info_2 = MathTex(r"\text{From } (0, -3)\text{:}").scale(MATH_SCALE)
         step3_info_3 = MathTex(r"\text{Rise } 4 \text{ units UP}", color=rise_color).scale(MATH_SCALE)
-        SmartColorizeStatic(
-            step3_info_1,
-            {
-                r"\text{rise}": rise_color,
-                r"\text{run}": run_color,
-                "4": rise_color,
-                 "1": run_color
-            }
-        )
-        
         step3_info_4 = MathTex(r"\text{Run } 1 \text{ unit LEFT}", color=run_color).scale(MATH_SCALE)
         step3_info_5 = MathTex(r"\text{Second point: } (-1, 1)").scale(MATH_SCALE)
 
@@ -136,12 +138,16 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         step4_info_1 = MathTex(r"\text{Connect points } (0, -3) \text{ and } (-1, 1)").scale(MATH_SCALE)
         step4_info_2 = MathTex(r"\text{Extend line in both directions}").scale(MATH_SCALE)
         
-        
         final_equation = MathTex(r"y = -4x - 3").scale(MATH_SCALE)
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  # Position with both LEFT and DOWN buffs
         final_equation_boxed_group = self.create_equation_box(final_equation, color=slope_color)
         
         
+        self.color_component(step1_info_1, "m", slope_color)
+        self.color_component(step1_info_1, "b", y_intercept_color)
+        SmartColorizeStatic(step3_info_1,
+            {r"\text{rise}": rise_color, r"\text{run}": run_color, "4": rise_color, "1": run_color}
+        )
         
 
         # Organize step groups
@@ -244,14 +250,15 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
         
-        with self.voiceover("Let's visualize this with arrows. <bookmark mark='arcs'/> Each green arrow represents 1 unit of our rise."):
-            self.wait_until_bookmark("arcs")
+        with self.voiceover("Let's visualize this with arrows. Each green arrow represents 1 unit of our rise."):
             for arrow in rise_arrows:
                 self.play(GrowArrow(arrow), run_time=0.5)
+            self.play(Write(rise_text_group))
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover("And the red arrow shows our run of 1 unit to the left."):
-            self.play(GrowArrow(run_arrow))
+            self.play(GrowArrow(run_arrows))
+            self.play(Write(run_text_group))
             self.play(FadeIn(tip_1, shift=UP))
             self.wait(4)
             self.play(FadeOut(tip_1, shift=DOWN))

@@ -11,6 +11,9 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
     """A tutorial that teaches how to find the equation of a line using slope-intercept form."""
 
     def construct(self):
+        ###############################################################################
+        # SECTION 1: COLOR DEFINITIONS AND CONSTANTS
+        ###############################################################################
         # Define colors (these are specific to this tutorial)
         y_intercept_color = YELLOW
         slope_color = GREEN
@@ -18,10 +21,16 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         run_color = RED
         point_color = PINK
 
+        ###############################################################################
+        # SECTION 2: COORDINATE PLANE SETUP
+        ###############################################################################
         # Create axes
         axes, axes_labels = self.create_axes()
         axes.to_edge(RIGHT)
 
+        ###############################################################################
+        # SECTION 3: LINE AND GRAPHICAL ELEMENTS
+        ###############################################################################
         # Create the line y = (1/2)x + 1
         def line_function(x):
             return 0.5*x + 1  # Our equation: y = (1/2)x + 1
@@ -49,7 +58,10 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         
         # Group the line and tips
         line_group = VGroup(extended_line, start_tip, end_tip)
-        
+
+        ###############################################################################
+        # SECTION 4: POINTS AND ARROWS FOR VISUALIZATION
+        ###############################################################################
         # Create key points on the line
         y_intercept_point = Dot(axes.c2p(0, 1), color=y_intercept_color, radius=0.15)
         point1 = Dot(axes.c2p(0, 1), color=point_color, radius=0.15)
@@ -82,10 +94,30 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
                 max_stroke_width_to_length_ratio=10,
             )
             run_arrows.append(arrow)
+            
+        ###############################################################################
+        # SECTION 5: TEXT LABELS AND OVERLAYS
+        ###############################################################################
+        # Create rise text label
+        rise_text_group = self.create_text_with_background(
+            r"\text{Rise} = 2",
+            text_color=rise_color
+        ).scale(MATH_SCALE)
+        rise_text_group.next_to(rise_arrows[1], LEFT, buff=0.5)
+        
+        # Create run text label
+        
+        run_text_group = self.create_text_with_background(
+            r"\text{Run} = 4",
+            text_color=run_color
+        ).scale(MATH_SCALE)
+        run_text_group.next_to(run_arrows[1], UP, buff=0.5)
         
         black_screen = SlopeOverlay()
 
-
+        ###############################################################################
+        # SECTION 6: PROBLEM STATEMENT AND SOLUTION STEPS
+        ###############################################################################
         problem_text = Tex("Find the equation of the given line.").scale(MATH_SCALE)
 
         step1_title = Tex("Step 1: Identify Points on the Line").scale(TEXT_SCALE)
@@ -107,11 +139,21 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         step4_info_1 = MathTex(r"y = mx + b").scale(MATH_SCALE)
         step4_info_2 = MathTex(r"y = \frac{1}{2}x + 1").scale(MATH_SCALE)
         
-        final_equation = MathTex(r"y = -4x - 3").scale(MATH_SCALE)
+        final_equation = MathTex(r"y = \frac{1}{2}x + 1").scale(MATH_SCALE)
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  # Position with both LEFT and DOWN buffs
-        final_equation_boxed = self.create_equation_box(final_equation, color=slope_color)
         
-        
+        # Create background and text separately
+        final_equation_border = SurroundingRectangle(
+            final_equation,
+            color=slope_color,
+            buff=0.15,
+            corner_radius=0.15
+        )
+        final_equation_group = VGroup(final_equation_border, final_equation)  # Background first, then text
+
+        ###############################################################################
+        # SECTION 7: COLORING AND STYLING SETUP
+        ###############################################################################
         self.color_component(step3_info_1, "m", slope_color)
         self.color_component(step3_info_1, "b", y_intercept_color)
         
@@ -138,8 +180,10 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         
         # Apply all smart coloring at once
         self.apply_element_specific_coloring(smart_coloring)
-        
 
+        ###############################################################################
+        # SECTION 8: LAYOUT AND POSITIONING
+        ###############################################################################
         # Organize step groups
         step1_group = self.create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
         step2_group = self.create_step(step2_title, step2_info_1, step2_info_2)
@@ -161,6 +205,9 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         # Position the entire content
         steps_group.to_edge(LEFT, buff=0.6).to_edge(UP, buff=0.6)
 
+        ###############################################################################
+        # SECTION 9: SCROLL MANAGER AND UI ELEMENTS SETUP
+        ###############################################################################
         # Set up solution steps for the scroll manager
         solution_steps = VGroup(
             problem_text,
@@ -182,109 +229,101 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         
         scroll_mgr = ScrollManager(solution_steps)
 
+        ###############################################################################
+        # SECTION 10: ANIMATION SEQUENCE
+        ###############################################################################
         # Animation sequence with voiceovers
         with self.voiceover("Given a line on a coordinate plane, let's find its equation.") as tracker:
             self.play(Write(axes), Write(axes_labels), Write(line_group))
-            scroll_mgr.prepare_next(self)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: problem_text
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("Step 1: First, we need to identify at least two points on the line.") as tracker:
-            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)  # Prepares: step1_title
+        self.wait(QUICK_PAUSE)  
 
         with self.voiceover("Let's find the y-intercept, which is where the line crosses the y-axis.") as tracker:
-            scroll_mgr.prepare_next(self)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step1_info_1
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("The y-intercept is at the point (0, 1).") as tracker:
-            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)  # Prepares: step1_info_2
             self.play(Indicate(y_intercept_point))
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("We'll also select another point on the line. Let's use (4, 3).") as tracker:
-            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)  # Prepares: step1_info_3
             self.play(Indicate(point2))
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("Step 2: Now let's calculate the slope of the line.") as tracker:
             scroll_mgr.scroll_down(self, steps=1)
-            scroll_mgr.prepare_next(self)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step2_title
+        self.wait(QUICK_PAUSE)  
 
         with self.voiceover("The slope is the ratio of the rise to the run.") as tracker:
-            scroll_mgr.prepare_next(self)
-        self.wait(COMPREHENSION_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step2_info_1
+        self.wait(STANDARD_PAUSE)   
 
         with self.voiceover("To visualize this, let's see the rise between our two points.") as tracker:
-            # Create rise text label
-            rise_text = MathTex(r"\text{Rise} = 2", color=rise_color).scale(MATH_SCALE)
-            # Position it to the left of the rise arrows
-            rise_text.next_to(rise_arrows[0], LEFT, buff=0.5)
-            
-            # Show the arrows and then the label
             for arrow in rise_arrows:
-                self.play(GrowArrow(arrow), run_time=11)
-            self.play(Write(rise_text))
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+                self.play(GrowArrow(arrow), run_time=1)
+            self.play(Write(rise_text_group))
+        self.wait(STANDARD_PAUSE)  
             
         with self.voiceover("And the run between our points.") as tracker:
-            # Create run text label
-            run_text = MathTex(r"\text{Run} = 4", color=run_color).scale(MATH_SCALE)
-            # Position it above the run arrows
-            run_text.next_to(run_arrows[1], UP, buff=0.5)
-            
-            # Show the arrows and then the label
             for arrow in run_arrows:
                 self.play(GrowArrow(arrow), run_time=1)
-            self.play(Write(run_text))
+            self.play(Write(run_text_group))
             self.play(FadeIn(tip_1, shift=UP))
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+        self.wait(STANDARD_PAUSE)  
             
         with self.voiceover("Calculating the slope: The rise is 2 units, and the run is 4 units. So, the slope is two-fourths, which simplifies to one-half.") as tracker:
             scroll_mgr.scroll_down(self, steps=2)
-            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)  # Prepares: step2_info_2
             self.play(FadeOut(tip_1, shift=DOWN))
-        self.wait(COMPREHENSION_PAUSE)
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("Step 3: Now we can write the equation using the slope-intercept form.") as tracker:
-            scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+            scroll_mgr.prepare_next(self)  # Prepares: step3_title
+        self.wait(QUICK_PAUSE) 
 
         with self.voiceover("The slope-intercept form of a line is y equals mx plus b.") as tracker:
-            scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+            scroll_mgr.prepare_next(self)  # Prepares: step3_info_1
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("Where m is the slope <break time=\"1s\"/> and b is the y-intercept.") as tracker:
             self.highlight_formula_component(step3_info_1, "m", slope_color)
-            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)  # Prepares: step3_info_2
             self.highlight_formula_component(step3_info_1, "b", y_intercept_color)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+        self.wait(STANDARD_PAUSE)  
             
         with self.voiceover("We found that the slope m equals one-half.") as tracker:
-            scroll_mgr.prepare_next(self)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step3_info_3
+        self.wait(STANDARD_PAUSE)  
             
         with self.voiceover("When the given slope is positive, our line will slant to the right. Conversly, a negative slope will slant to the left.") as tracker:
             self.play(FadeIn(black_screen))
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+        self.wait(STANDARD_PAUSE)  
 
         with self.voiceover("And the y-intercept, b equals 1.") as tracker:
             self.play(FadeOut(black_screen))
-            scroll_mgr.prepare_next(self)
-        self.wait(COMPREHENSION_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step3_info_4
+        self.wait(STANDARD_PAUSE)   
 
         with self.voiceover("Step 4: Finally, let's write the complete equation of the line.") as tracker:
             scroll_mgr.scroll_down(self, steps=3)
-            scroll_mgr.prepare_next(self)
-        self.wait(STANDARD_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self)  # Prepares: step4_title
+        self.wait(QUICK_PAUSE)   
 
         with self.voiceover("Substituting our values into the slope-intercept form, we get y equals one-half x plus 1.") as tracker:
-            scroll_mgr.prepare_next(self)
-            scroll_mgr.prepare_next(self)
-            self.play(ReplacementTransform(problem_text, final_equation_boxed))
-        self.wait(COMPREHENSION_PAUSE)  # Wait AFTER voiceover finishes
+            scroll_mgr.prepare_next(self) # Prepares: step4_info_1
+            self.wait(1)
+            scroll_mgr.prepare_next(self)  # Prepares: step4_info_2
+            self.play(TransformFromCopy(step4_info_2, final_equation), run_time=2)
+            self.play(Write(final_equation_border))  # Only write the background
+        self.wait(QUICK_PAUSE)  
 
         with self.voiceover("And there we have it! The equation of our line is y equals one-half x plus 1.") as tracker:
-            self.play(Indicate(final_equation_boxed, scale_factor=1.2))
-        self.wait(COMPREHENSION_PAUSE)  # Wait AFTER voiceover finishes
-
-        self.wait(STANDARD_PAUSE) 
+            self.play(final_equation_group.animate.scale(1.1))
+        self.wait(END_PAUSE) 

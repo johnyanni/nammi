@@ -220,4 +220,45 @@ class MathTutorialScene(VoiceoverScene):
         
         return axes, axes_labels
 
+    def create_text_with_background(self, text, text_color=WHITE, background_color=BLACK, border_color=None, 
+                                  background_opacity=1, border_opacity=1, border_width=2, buff=0.15, 
+                                  corner_radius=0.15):
+        """Creates a text object with a customizable background and border.
+        
+        Args:
+            text: The text to display (can be MathTex, Tex, or Text)
+            text_color: Color of the text (default: WHITE)
+            background_color: Color of the background (default: BLACK)
+            border_color: Color of the border (default: None, uses background_color)
+            background_opacity: Opacity of the background (default: 1)
+            border_opacity: Opacity of the border (default: 1)
+            border_width: Width of the border line (default: 2)
+            buff: Padding around the text (default: 0.15)
+            corner_radius: Radius of the corners (default: 0.0 for sharp corners)
+            
+        Returns:
+            VGroup: A group containing the background and text
+        """
+        # Convert string to MathTex if needed
+        if isinstance(text, str):
+            text = MathTex(text, color=text_color)
+            
+        # Create the background rectangle
+        background = SurroundingRectangle(
+            text,
+            color=border_color if border_color else background_color,
+            fill_color=background_color,
+            fill_opacity=background_opacity,
+            stroke_width=border_width,
+            corner_radius=corner_radius,
+            buff=buff
+        )
+        
+        # Set border opacity if specified
+        if border_opacity != 1:
+            background.set_stroke(opacity=border_opacity)
+            
+        # Group the background and text
+        return VGroup(background, text)
+
 
