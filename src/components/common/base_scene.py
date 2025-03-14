@@ -83,6 +83,64 @@ class MathTutorialScene(VoiceoverScene):
         """
         for element in elements:
             SmartColorizeStatic(element, color_map)
+            
+            
+    def setup_smart_coloring(self, elements_and_patterns, color_dict):
+        """Create a smart coloring list based on elements and patterns.
+        
+        Args:
+            elements_and_patterns: Dictionary mapping elements to lists of patterns to color
+            color_dict: Dictionary mapping pattern strings to colors
+            
+        Returns:
+            List of (element, color_map) tuples for use with apply_element_specific_coloring
+            
+        Example:
+            elements_and_patterns = {
+                step2_info_1: [r"\text{rise}", r"\text{run}"],
+                step4_info_2: [r"\frac{1}{2}", "1"]
+            }
+            
+            color_dict = {
+                r"\text{rise}": rise_color,
+                r"\text{run}": run_color,
+                r"\frac{1}{2}": slope_color,
+                "1": y_intercept_color
+            }
+        """
+        smart_coloring = []
+        
+        for element, patterns in elements_and_patterns.items():
+            # Create a specific color map for this element
+            element_color_map = {}
+            for pattern in patterns:
+                if pattern in color_dict:
+                    element_color_map[pattern] = color_dict[pattern]
+            
+            # Add to the smart coloring list if we have mappings
+            if element_color_map:
+                smart_coloring.append((element, element_color_map))
+                
+        return smart_coloring
+
+    def apply_element_specific_coloring(self, coloring_list):
+        """Apply different color maps to specific elements.
+        
+        Args:
+            coloring_list: List of tuples (element, color_map) where each element 
+                          gets its own specific color mapping
+                          
+        Example:
+            smart_coloring = [
+                (step2_info_1, {r"\text{rise}": rise_color, r"\text{run}": run_color}),
+                (step4_info_2, {r"\frac{1}{2}": slope_color, "1": y_intercept_color})
+            ]
+            self.apply_element_specific_coloring(smart_coloring)
+        """
+        for element, color_map in coloring_list:
+            SmartColorizeStatic(element, color_map)
+            
+    
 
     def create_step(self, title, *content, buff=0.3):
         """Create a vertical group of elements with consistent formatting.

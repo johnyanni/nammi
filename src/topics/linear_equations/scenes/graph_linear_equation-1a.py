@@ -102,12 +102,12 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         # Step 1: Identify Components
         step1_title = Tex("Step 1: Identify Components").scale(TEXT_SCALE)
         step1_info_1 = MathTex(r"\text{Slope-Intercept Form: } y = mx + b").scale(MATH_SCALE)
+        self.color_component(step1_info_1, "m", slope_color)
+        self.color_component(step1_info_1, "b", y_intercept_color)
+        
         step1_info_2 = MathTex(r"\text{Slope } (m) = -4", color=slope_color).scale(MATH_SCALE)
         step1_info_3 = MathTex(r"\text{Y-intercept } (b) = -3", color=y_intercept_color).scale(MATH_SCALE)
         
-        # Color the formula components
-        self.color_component(step1_info_1, "m", slope_color)
-        self.color_component(step1_info_1, "b", y_intercept_color)
         
         # Step 2: Plot Y-intercept
         step2_title = Tex("Step 2: Plot Y-intercept").scale(TEXT_SCALE)
@@ -139,7 +139,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         
         final_equation = MathTex(r"y = -4x - 3").scale(MATH_SCALE)
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  # Position with both LEFT and DOWN buffs
-        final_equation_boxed_group = self.create_equation_box(final_equation, color=BLUE)
+        final_equation_boxed_group = self.create_equation_box(final_equation, color=slope_color)
         
         
         
@@ -191,64 +191,64 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         with self.voiceover("Let's graph the linear equation y equals negative 4x minus 3."):
             self.play(Write(axes), Write(axes_labels))
             scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("Step 1: We'll identify the key components of the equation."):
             scroll_mgr.prepare_next(self)
 
         with self.voiceover("This equation is in slope-intercept form: y equals mx plus b."):
             scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("The coefficient of x is the slope. Here, m equals negative 4."):
             self.highlight_formula_component(step1_info_1, "m", slope_color)
             scroll_mgr.prepare_next(self)
             self.play(ReplacementTransform(problem_text[0][8:10].copy(), step1_info_2[0][-2:]))
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("The constant term is the y-intercept. Here, b, equals negative 3."):
             self.highlight_formula_component(step1_info_1, "b", y_intercept_color)
             scroll_mgr.prepare_next(self)
             self.play(ReplacementTransform(problem_text[0][-2:].copy(), step1_info_3[0][-2:]))
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Step 2: Let's plot the y-intercept, which is the point where the line crosses the y-axis."):
             scroll_mgr.prepare_next(self)
-            self.wait(QUICK_PAUSE)
+        self.wait(QUICK_PAUSE)
 
         with self.voiceover("At the y-intercept, x equals 0, <bookmark mark='plot'/> so we plot the point (0, -3)."):
             scroll_mgr.prepare_next(self)
             self.wait_until_bookmark("plot")
             self.play(Indicate(dot_start))
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("Step 3: Now we'll use the slope to find a second point on the line."):
             scroll_mgr.scroll_down(self, steps=1)
             scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("The slope negative 4 can be expressed as a fraction: <bookmark mark='fraction'/> negative 4 over 1, which is the ratio of rise over run."):
             self.wait_until_bookmark("fraction")
             scroll_mgr.prepare_next(self)
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Starting from our y-intercept at (0, -3):"):
             scroll_mgr.prepare_next(self)
-            self.wait(QUICK_PAUSE)
+        self.wait(QUICK_PAUSE)
 
         with self.voiceover("The rise is 4 units up, because the slope is negative 4."):
             scroll_mgr.prepare_next(self)
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("The run is 1 unit to the left. <bookmark mark='run'/> We go left because the slope is negative."):
             scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
         
         with self.voiceover("Let's visualize this with arrows. <bookmark mark='arcs'/> Each green arrow represents 1 unit of our rise."):
             self.wait_until_bookmark("arcs")
             for arrow in rise_arrows:
                 self.play(GrowArrow(arrow), run_time=0.5)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("And the red arrow shows our run of 1 unit to the left."):
             self.play(GrowArrow(run_arrow))
@@ -261,7 +261,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             scroll_mgr.prepare_next(self)
             self.wait_until_bookmark("second")
             self.play(Indicate(dot_end))
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
         
         with self.voiceover("When the given slope is negative, our line will slant to the left. Conversly, a positive slope will slant to the right."):
             self.play(FadeIn(black_screen))
@@ -269,13 +269,13 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         with self.voiceover("Step 4: Finally, we'll draw a straight line through these two points."):
             self.play(FadeOut(black_screen))
             scroll_mgr.prepare_next(self)
-            self.wait(STANDARD_PAUSE)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover("We connect the points (0, -3) and (-1, 1)."):
             self.play(Write(connecting_line))
             scroll_mgr.scroll_down(self, steps=2)
             scroll_mgr.prepare_next(self)
-            self.wait(QUICK_PAUSE)
+        self.wait(QUICK_PAUSE)
 
         with self.voiceover("And extend the line in both directions <bookmark mark='extend'/> to complete our graph of y equals negative 4x minus 3."):
             scroll_mgr.prepare_next(self)
@@ -285,10 +285,10 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
                 FadeIn(end_tip)
             )
             self.play(ReplacementTransform(problem_text[0][7:], final_equation_boxed_group))
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Notice how the negative slope creates a line that falls from left to right, and the y-intercept determines where the line crosses the y-axis."):
             self.play(Indicate(extended_line, scale_factor=1.2))
-            self.wait(COMPREHENSION_PAUSE)
+        self.wait(COMPREHENSION_PAUSE)
 
-        self.wait(STANDARD_PAUSE)# Test change to demonstrate branching
+        self.wait(STANDARD_PAUSE)  # Test change to demonstrate branching
