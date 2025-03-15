@@ -20,7 +20,7 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         rise_color = BLUE
         run_color = RED
         point_color = PINK
-
+        line_color = WHITE
         ###############################################################################
         # SECTION 2: COORDINATE PLANE SETUP
         ###############################################################################
@@ -39,7 +39,7 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         extended_line = axes.plot(
             line_function, 
             x_range=[-6, 6],
-            color=WHITE,
+            color=line_color,
             stroke_width=3
         )
         
@@ -139,17 +139,6 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
         step4_info_1 = MathTex(r"y = mx + b").scale(MATH_SCALE)
         step4_info_2 = MathTex(r"y = \frac{1}{2}x + 1").scale(MATH_SCALE)
         
-        final_equation = MathTex(r"y = \frac{1}{2}x + 1").scale(MATH_SCALE)
-        final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  # Position with both LEFT and DOWN buffs
-        
-        # Create background and text separately
-        final_equation_border = SurroundingRectangle(
-            final_equation,
-            color=slope_color,
-            buff=0.15,
-            corner_radius=0.15
-        )
-        final_equation_group = VGroup(final_equation_border, final_equation)  # Background first, then text
 
         ###############################################################################
         # SECTION 7: COLORING AND STYLING SETUP
@@ -320,10 +309,8 @@ class LinearEquationsFindSlopeIntercept1c(MathTutorialScene):
             scroll_mgr.prepare_next(self) # Prepares: step4_info_1
             self.wait(1)
             scroll_mgr.prepare_next(self)  # Prepares: step4_info_2
-            self.play(TransformFromCopy(step4_info_2, final_equation), run_time=2)
-            self.play(Write(final_equation_border))  # Only write the background
         self.wait(QUICK_PAUSE)  
 
         with self.voiceover("And there we have it! The equation of our line is y equals one-half x plus 1.") as tracker:
-            self.play(final_equation_group.animate.scale(1.1))
+            self.play(step4_info_2.animate.scale(1.2))
         self.wait(END_PAUSE) 

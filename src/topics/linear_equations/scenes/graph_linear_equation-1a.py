@@ -11,15 +11,25 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
     """A tutorial that teaches how to graph a linear equation using slope-intercept form."""
 
     def construct(self):
+        ###############################################################################
+        # SECTION 1: COLOR DEFINITIONS AND CONSTANTS
+        ###############################################################################
         # Define colors (these are specific to this tutorial)
         y_intercept_color = YELLOW
         slope_color = BLUE
         rise_color = BLUE
         run_color = RED
+        line_color = WHITE
 
+        ###############################################################################
+        # SECTION 2: COORDINATE PLANE SETUP
+        ###############################################################################
         # Create axes
         axes, axes_labels = self.create_axes()
 
+        ###############################################################################
+        # SECTION 3: POINTS AND LINE SETUP
+        ###############################################################################
         # Create visual elements
         start_coords = (0, -3)
         end_coords = (-1, 1)
@@ -27,25 +37,27 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         dot_start = Dot(axes.c2p(*start_coords), color=y_intercept_color, radius=0.15)
         dot_end = Dot(axes.c2p(*end_coords), color=WHITE, radius=0.15)
         
-        
         def line_function(x):
             return -4*x - 3  # Our equation: y = -4x - 3
 
         # For the initial segment connecting just the two points
-        # Instead of using axes.plot, let's create a Line object directly for better control
         point1 = axes.c2p(start_coords[0], start_coords[1])  # (0, -3)
         point2 = axes.c2p(end_coords[0], end_coords[1])      # (-1, 1)
+        
         connecting_line = Line(
             start=point1,
             end=point2,
-            color=BLUE
+            color=line_color
         )
 
+        ###############################################################################
+        # SECTION 4: EXTENDED LINE AND TIPS
+        ###############################################################################
         # For the extended line showing the full graph
         extended_line = axes.plot(
             line_function, 
             x_range=[-2, 1],  # This range can be adjusted as needed
-            color=BLUE
+            color=line_color
         )
 
         # Add tips to the extended line with fixed orientation
@@ -61,15 +73,11 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         end_tip.move_to(end_point)
         end_tip.rotate(angle_of_vector([1, -4])+ PI)
         
-        
         extended_line_group = VGroup(extended_line, start_tip, end_tip)
-        
-        
-        
-        
-        
-        
-        
+
+        ###############################################################################
+        # SECTION 5: RISE AND RUN ARROWS
+        ###############################################################################
         # Create rise arrows
         rise_arrows = []
         for i in range(4):
@@ -93,7 +101,10 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             stroke_width=10,
             max_tip_length_to_length_ratio=0.4
         )
-        
+
+        ###############################################################################
+        # SECTION 6: TEXT LABELS AND OVERLAYS
+        ###############################################################################
         # Create rise text label
         rise_text_group = self.create_text_with_background(
             r"\text{Rise} = 4",
@@ -102,16 +113,15 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         rise_text_group.next_to(rise_arrows[1], LEFT, buff=0.5)
         
         # Create run text label
-        
         run_text_group = self.create_text_with_background(
             r"\text{Run} = 1",
             text_color=run_color
         ).scale(MATH_SCALE)
         run_text_group.next_to(run_arrows[1], UP, buff=0.5)
-        
 
-
-
+        ###############################################################################
+        # SECTION 7: PROBLEM STATEMENT AND SOLUTION STEPS
+        ###############################################################################
         # Problem statement
         problem_text = MathTex(r"\text{Graph: } y = -4x - 3").scale(MATH_SCALE)
         
@@ -137,19 +147,23 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         step4_title = Tex("Step 4: Draw Line Through Points").scale(TEXT_SCALE)
         step4_info_1 = MathTex(r"\text{Connect points } (0, -3) \text{ and } (-1, 1)").scale(MATH_SCALE)
         step4_info_2 = MathTex(r"\text{Extend line in both directions}").scale(MATH_SCALE)
-        
+
+        ###############################################################################
+        # SECTION 8: FINAL EQUATION AND STYLING
+        ###############################################################################
         final_equation = MathTex(r"y = -4x - 3").scale(MATH_SCALE)
-        final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  # Position with both LEFT and DOWN buffs
-        final_equation_boxed_group = self.create_equation_box(final_equation, color=slope_color)
-        
+        final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  
+        final_equation_group = self.create_text_with_background(final_equation, text_color=slope_color, border_color=slope_color)
         
         self.color_component(step1_info_1, "m", slope_color)
         self.color_component(step1_info_1, "b", y_intercept_color)
         SmartColorizeStatic(step3_info_1,
             {r"\text{rise}": rise_color, r"\text{run}": run_color, "4": rise_color, "1": run_color}
         )
-        
 
+        ###############################################################################
+        # SECTION 9: LAYOUT AND POSITIONING
+        ###############################################################################
         # Organize step groups
         step1_group = self.create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
         step2_group = self.create_step(step2_title, step2_info)
@@ -171,6 +185,9 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         # Position the entire content
         steps_group.to_edge(LEFT, buff=0.6).to_edge(UP, buff=0.6)
 
+        ###############################################################################
+        # SECTION 10: SCROLL MANAGER AND UI SETUP
+        ###############################################################################
         # Set up solution steps for the scroll manager
         solution_steps = VGroup(
             problem_text,
@@ -193,6 +210,9 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         
         black_screen = SlopeOverlay()
 
+        ###############################################################################
+        # SECTION 11: ANIMATION SEQUENCE
+        ###############################################################################
         # Animation sequence with voiceovers
         with self.voiceover("Let's graph the linear equation y equals negative 4x minus 3."):
             self.play(Write(axes), Write(axes_labels))
@@ -291,7 +311,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
                 FadeIn(start_tip),
                 FadeIn(end_tip)
             )
-            self.play(ReplacementTransform(problem_text[0][7:], final_equation_boxed_group))
+            self.play(ReplacementTransform(problem_text[0][7:], final_equation_group))
         self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Notice how the negative slope creates a line that falls from left to right, and the y-intercept determines where the line crosses the y-axis."):
