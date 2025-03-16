@@ -1,6 +1,7 @@
 """Base scene class for math tutorials with Azure voiceover setup."""
 
 from manim import *
+from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 from .smart_tex import *
@@ -155,25 +156,6 @@ class MathTutorialScene(VoiceoverScene):
         """
         return VGroup(title, *content).arrange(DOWN, aligned_edge=LEFT, buff=buff) 
 
-    def create_equation_box(self, equation, color=BLUE):
-        """Create a standardized box around an equation.
-        
-        Args:
-            equation: The MathTex object to box
-            color: The color of the box (defaults to BLUE)
-            
-        Returns:
-            VGroup containing the equation and its box
-        """
-        box = SurroundingRectangle(
-            equation,
-            color=color,
-            fill_color="#121212",
-            fill_opacity=0.8,
-            buff=0.2,
-            corner_radius=0.2
-        )
-        return VGroup(box, equation)
 
     def create_axes(self, x_range=[-6, 6, 1], y_range=[-6, 6, 1], x_length=6, y_length=6):
         """Create standardized axes with customizable ranges and lengths.
@@ -221,8 +203,8 @@ class MathTutorialScene(VoiceoverScene):
         return axes, axes_labels
 
     def create_text_with_background(self, text, text_color=WHITE, background_color=BLACK, border_color=None, 
-                                  background_opacity=1, border_opacity=1, border_width=2, buff=0.15, 
-                                  corner_radius=0.15):
+                                  background_opacity=1, border_opacity=1, border_width=2, buff=0.2, 
+                                  corner_radius=0.1):
         """Creates a text object with a customizable background and border.
         
         Args:

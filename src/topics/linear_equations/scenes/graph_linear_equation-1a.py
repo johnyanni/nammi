@@ -64,8 +64,8 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         start_point = axes.c2p(-2, line_function(-2))
         end_point = axes.c2p(1, line_function(1))
 
-        start_tip = ArrowTriangleFilledTip(color=BLUE, length=0.2)
-        end_tip = ArrowTriangleFilledTip(color=BLUE, length=0.2)
+        start_tip = ArrowTriangleFilledTip(color=line_color, length=0.2)
+        end_tip = ArrowTriangleFilledTip(color=line_color, length=0.2)
 
         # Position tips at the ends with fixed angles
         start_tip.move_to(start_point)
@@ -122,8 +122,11 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         ###############################################################################
         # SECTION 7: PROBLEM STATEMENT AND SOLUTION STEPS
         ###############################################################################
-        # Problem statement
-        problem_text = MathTex(r"\text{Graph: } y = -4x - 3").scale(MATH_SCALE)
+        # Problem statement split into two parts
+        problem_text_label = Tex("Graph:").scale(MATH_SCALE)
+        problem_text_equation = MathTex(r"y=-4x-3").scale(MATH_SCALE)
+        problem_text_equation.next_to(problem_text_label, RIGHT)
+        problem_text_equation_group = VGroup(problem_text_label, problem_text_equation)
         
         # Step 1: Identify Components
         step1_title = Tex("Step 1: Identify Components").scale(TEXT_SCALE)
@@ -151,7 +154,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         ###############################################################################
         # SECTION 8: FINAL EQUATION AND STYLING
         ###############################################################################
-        final_equation = MathTex(r"y = -4x - 3").scale(MATH_SCALE)
+        final_equation = problem_text_equation.copy()
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  
         final_equation_group = self.create_text_with_background(final_equation, text_color=slope_color, border_color=slope_color)
         
@@ -170,9 +173,8 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         step3_group = self.create_step(step3_title, step3_info_1, step3_info_2, step3_info_3, step3_info_4, step3_info_5)
         step4_group = self.create_step(step4_title, step4_info_1, step4_info_2)
         
-        # Create steps group with problem text
         steps_group = VGroup(
-            problem_text,
+            VGroup(problem_text_label, problem_text_equation),
             step1_group,
             step2_group,
             step3_group,
@@ -190,7 +192,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         ###############################################################################
         # Set up solution steps for the scroll manager
         solution_steps = VGroup(
-            problem_text,
+            problem_text_equation_group,
             step1_title,
             step1_info_1, step1_info_2, step1_info_3,
             step2_title,
@@ -228,14 +230,14 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         with self.voiceover("The coefficient of x is the slope. Here, m equals negative 4."):
             self.highlight_formula_component(step1_info_1, "m", slope_color)
-            scroll_mgr.prepare_next(self)
-            self.play(ReplacementTransform(problem_text[0][8:10].copy(), step1_info_2[0][-2:]))
+            scroll_mgr.prepare_next(self, slice(0,-2))
+            self.play(ReplacementTransform(problem_text_equation[0][2:4].copy(), step1_info_2[0][-2:]))
         self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("The constant term is the y-intercept. Here, b, equals negative 3."):
             self.highlight_formula_component(step1_info_1, "b", y_intercept_color)
-            scroll_mgr.prepare_next(self)
-            self.play(ReplacementTransform(problem_text[0][-2:].copy(), step1_info_3[0][-2:]))
+            scroll_mgr.prepare_next(self, slice(0,-2))
+            self.play(ReplacementTransform(problem_text_equation[0][-2:].copy(), step1_info_3[0][-2:]))
         self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Step 2: Let's plot the y-intercept, which is the point where the line crosses the y-axis."):
@@ -311,7 +313,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
                 FadeIn(start_tip),
                 FadeIn(end_tip)
             )
-            self.play(ReplacementTransform(problem_text[0][7:], final_equation_group))
+            self.play(ReplacementTransform(problem_text_equation[0][7:], final_equation_group))
         self.wait(COMPREHENSION_PAUSE)
 
         with self.voiceover("Notice how the negative slope creates a line that falls from left to right, and the y-intercept determines where the line crosses the y-axis."):
