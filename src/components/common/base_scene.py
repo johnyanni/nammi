@@ -141,7 +141,6 @@ class MathTutorialScene(VoiceoverScene):
         for element, color_map in coloring_list:
             SmartColorizeStatic(element, color_map)
             
-    
 
     def create_step(self, title, *content, buff=0.3):
         """Create a vertical group of elements with consistent formatting.

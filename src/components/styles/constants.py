@@ -6,8 +6,8 @@ STANDARD_PAUSE = 1.0
 COMPREHENSION_PAUSE = 2.0
 END_PAUSE = 3.0
 # Text scaling constants
-TEXT_SCALE = 0.5
-MATH_SCALE = 0.55
+TEXT_SCALE = 0.55
+MATH_SCALE = 0.6
 
 # Font sizes
 SMALL_FONT = 24  # Font size for small text

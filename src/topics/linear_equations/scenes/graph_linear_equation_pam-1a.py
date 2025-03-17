@@ -30,11 +30,9 @@ TEMPLATE_PARAMS = {
     # Animation indices for transformations
     "indices": {
         "slope_src_indices": [2, 4],          # Source indices in problem_text_equation for slope
-        "slope_tgt_indices": [-2, None],  
-        "y_intercept_src_indices": [-2, None], # Target indices in step1_info_2 for slope value
-        "y_intercept_tgt_indices": [-2, None], # Target indices in step1_info_3 for y-intercept value
-        "coord_src_indices": [-6, None],
-        "coord_tgt_indices": [-6, None]
+        "y_intercept_src_indices": [-2, None],    # Source indices in problem_text_equation for y-intercept
+        "slope_tgt_indices": [-2, None],      # Target indices in step1_info_2 for slope value
+        "y_intercept_tgt_indices": [-2, None] # Target indices in step1_info_3 for y-intercept value
     },
     
     # Coordinate points and visual ranges
@@ -183,11 +181,9 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         # Extract animation indices
         slope_src_start, slope_src_end = TEMPLATE_PARAMS["indices"]["slope_src_indices"]
-        slope_tgt_start, slope_tgt_end = TEMPLATE_PARAMS["indices"]["slope_tgt_indices"]
         y_intercept_src_start, y_intercept_src_end = TEMPLATE_PARAMS["indices"]["y_intercept_src_indices"]
+        slope_tgt_start, slope_tgt_end = TEMPLATE_PARAMS["indices"]["slope_tgt_indices"]
         y_intercept_tgt_start, y_intercept_tgt_end = TEMPLATE_PARAMS["indices"]["y_intercept_tgt_indices"]
-        coord_src_start, coord_src_end = TEMPLATE_PARAMS["indices"]["coord_src_indices"]
-        coord_tgt_start, coord_tgt_end = TEMPLATE_PARAMS["indices"]["coord_tgt_indices"]
 
         # Process fraction-related variables early
         def is_fraction_format(tex_string):
@@ -376,52 +372,56 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         # Step 1: Identify Components
         step1_title = Tex("Step 1: Identify Components").scale(TEXT_SCALE)
-        step1_p1 = MathTex(r"\text{Slope-Intercept Form: } y = mx + b").scale(MATH_SCALE)
-        step1_p2 = MathTex(f"\\text{{Slope }} (m) = {slope_display}", color=slope_color).scale(MATH_SCALE)
-        step1_p3 = MathTex(f"\\text{{Y-intercept }} (b) = {y_intercept_display}", color=y_intercept_color).scale(MATH_SCALE)
+        step1_info_1 = MathTex(r"\text{Slope-Intercept Form: } y = mx + b").scale(MATH_SCALE)
+        step1_info_2 = MathTex(f"\\text{{Slope }} (m) = {slope_display}", color=slope_color).scale(MATH_SCALE)
+        step1_info_3 = MathTex(f"\\text{{Y-intercept }} (b) = {y_intercept_display}", color=y_intercept_color).scale(MATH_SCALE)
         
         # Step 2: Plot Y-intercept
         step2_title = Tex("Step 2: Plot Y-intercept").scale(TEXT_SCALE)
-        step2_p1 = MathTex(f"\\text{{Plot point }} ({start_coords[0]}, {start_coords[1]})", color=y_intercept_color).scale(MATH_SCALE)
+        step2_info = MathTex(f"\\text{{Plot point }} ({start_coords[0]}, {start_coords[1]})", color=y_intercept_color).scale(MATH_SCALE)
 
         # Step 3: Use Slope to Find Second Point
         step3_title = Tex("Step 3: Use Slope to Find Second Point").scale(TEXT_SCALE)
         
-        # Create the appropriate step3_p1 based on slope representation
+        # Create the appropriate step3_info_1 based on slope representation
         if is_slope_fraction:
             # If slope_display is already a fraction, use it directly
-            step3_p1 = MathTex(f"\\text{{Slope }} = {slope_display} = \\frac{{\\text{{rise}}}}{{\\text{{run}}}}").scale(MATH_SCALE)
+            step3_info_1 = MathTex(f"\\text{{Slope }} = {slope_display} = \\frac{{\\text{{rise}}}}{{\\text{{run}}}}").scale(MATH_SCALE)
         else:
             # If slope_display is not a fraction, include the converted fraction representation
-            step3_p1 = MathTex(f"\\text{{Slope }} = {slope_display} = {converted_slope_display} = \\frac{{\\text{{rise}}}}{{\\text{{run}}}}").scale(MATH_SCALE)
+            step3_info_1 = MathTex(f"\\text{{Slope }} = {slope_display} = {converted_slope_display} = \\frac{{\\text{{rise}}}}{{\\text{{run}}}}").scale(MATH_SCALE)
         
         # Remaining step 3 information
-        step3_p2 = MathTex(f"\\text{{From }} ({start_coords[0]}, {start_coords[1]})", color=y_intercept_color).scale(MATH_SCALE)
+        step3_info_2 = MathTex(f"\\text{{From }} ({start_coords[0]}, {start_coords[1]})\\text{{:}}", color=y_intercept_color).scale(MATH_SCALE)
+        step3_info_3 = MathTex(f"\\text{{Rise }} {rise_value} \\text{{ units {rise_direction}}}", color=rise_color).scale(MATH_SCALE)
         
-        rise_unit_text = "units" if rise_value > 1 else "unit"
+        # Use proper pluralization for run units
         run_unit_text = "units" if run_value > 1 else "unit"
-        step3_p3 = MathTex(f"\\text{{Rise }} {rise_value} \\text{{ {rise_unit_text} {rise_direction}}} \\text{{ and }} \\text{{Run }} {run_value} \\text{{ {run_unit_text} {run_direction}}}").scale(TEXT_SCALE)
-        step3_p4 = MathTex(f"\\text{{Second point: }} ({end_coords[0]}, {end_coords[1]})").scale(MATH_SCALE)
+        step3_info_4 = MathTex(f"\\text{{Run }} {run_value} \\text{{ {run_unit_text} {run_direction}}}", color=run_color).scale(MATH_SCALE)
+        step3_info_5 = MathTex(f"\\text{{Second point: }} ({end_coords[0]}, {end_coords[1]})").scale(MATH_SCALE)
 
         # Step 4: Draw Line
         step4_title = Tex("Step 4: Draw Line Through Points").scale(TEXT_SCALE)
-        step4_p1 = MathTex(f"\\text{{Connect points }} ({start_coords[0]}, {start_coords[1]}) \\text{{ and }} ({end_coords[0]}, {end_coords[1]})").scale(MATH_SCALE)
-        step4_p2 = MathTex(r"\text{Extend line in both directions}").scale(TEXT_SCALE)
+        step4_info_1 = MathTex(f"\\text{{Connect points }} ({start_coords[0]}, {start_coords[1]}) \\text{{ and }} ({end_coords[0]}, {end_coords[1]})").scale(MATH_SCALE)
+        step4_info_2 = MathTex(r"\text{Extend line in both directions}").scale(MATH_SCALE)
 
         ###############################################################################
         # SECTION 8: FINAL EQUATION AND STYLING
         ###############################################################################
         final_equation = problem_text_equation.copy()
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  
-        
-        final_equation_rect = SurroundingRectangle(final_equation, color=slope_color, buff=0.1)
+        final_equation_group = self.create_text_with_background(
+            final_equation, 
+            text_color=slope_color, 
+            border_color=slope_color
+        )
         
         # Apply basic coloringrise_for_fraction = rise_value
-        self.color_component(step1_p1, "m", slope_color)
-        self.color_component(step1_p1, "b", y_intercept_color)
+        self.color_component(step1_info_1, "m", slope_color)
+        self.color_component(step1_info_1, "b", y_intercept_color)
         
         SmartColorizeStatic(
-            step3_p1,
+            step3_info_1,
             {
                 r"\text{rise}": rise_color, 
                 r"\text{run}": run_color, 
@@ -430,32 +430,17 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
              }
         )
         
-        SmartColorizeStatic(
-            step3_p3,
-            {
-                r"\text{Rise}": rise_color, 
-                r"\text{Run}": run_color, 
-                f"{rise_value} \\text{{ {rise_unit_text} {rise_direction}}}": rise_color,
-                f"{run_value} \\text{{ {run_unit_text} {run_direction}}}": run_color
-             }
-        )
         
-        SmartColorizeStatic(
-            step4_p1,
-            {
-                f"({start_coords[0]}, {start_coords[1]})": y_intercept_color
-             }
-        )
 
         ###############################################################################
         # SECTION 9: LAYOUT AND POSITIONING
         ###############################################################################
         # Organize step groups
         problem_text_equation_group = self.create_step(problem_text_label, problem_text_equation)
-        step1_group = self.create_step(step1_title, step1_p1, step1_p2, step1_p3)
-        step2_group = self.create_step(step2_title, step2_p1)
-        step3_group = self.create_step(step3_title, step3_p1, step3_p2, step3_p3, step3_p4)
-        step4_group = self.create_step(step4_title, step4_p1, step4_p2)
+        step1_group = self.create_step(step1_title, step1_info_1, step1_info_2, step1_info_3)
+        step2_group = self.create_step(step2_title, step2_info)
+        step3_group = self.create_step(step3_title, step3_info_1, step3_info_2, step3_info_3, step3_info_4, step3_info_5)
+        step4_group = self.create_step(step4_title, step4_info_1, step4_info_2)
         
         steps_group = VGroup(
             problem_text_equation_group,
@@ -479,15 +464,15 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             problem_text_label,
             problem_text_equation,
             step1_title,
-            step1_p1,
-            step1_p2,
-            step1_p3,
+            step1_info_1,
+            step1_info_2,
+            step1_info_3,
             step2_title,
-            step2_p1,
+            step2_info,
             step3_title,
-            step3_p1, step3_p2, step3_p3, step3_p4,
+            step3_info_1, step3_info_2, step3_info_3, step3_info_4, step3_info_5,
             step4_title,
-            step4_p1, step4_p2
+            step4_info_1, step4_info_2
         )
         
         scroll_mgr = ScrollManager(solution_steps)
@@ -499,10 +484,10 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         
         black_screen = SlopeOverlay()
         
-        self.display_indices(step2_p1, "step2_p1")
+        self.display_indices(step2_info, "step2_info")
 
-        # Example: Add this right after creating step3_p2 to see its indices
-        self.display_indices(step3_p2, "step3_p2")
+        # Example: Add this right after creating step3_info_2 to see its indices
+        self.display_indices(step3_info_2, "step3_info_2")
 
         ###############################################################################
         # SECTION 11: ANIMATION SEQUENCE
@@ -510,29 +495,25 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         # Animation sequence with voiceovers
         with self.voiceover(f"Let's graph the linear equation {spoken_equation}."):
             self.play(Write(axes), Write(axes_labels))
-            # Initial scroll preparation - Introducing the problem
-            scroll_mgr.prepare_next(self)  # Step 0: Problem Introduction
-            scroll_mgr.prepare_next(self)  # Step 0: Continuation of Problem Introduction
+            scroll_mgr.prepare_next(self)
+            scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover("Step 1: We'll identify the key components of the equation."):
-            # Prepare for Step 1: Identifying Equation Components
-            scroll_mgr.prepare_next(self)  # Step 1: Introducing Slope-Intercept Form
-        
+            scroll_mgr.prepare_next(self)
+
         with self.voiceover("This equation is in slope-intercept form: y equals mx plus b."):
-            # Prepare for detailed explanation of slope-intercept form
-            scroll_mgr.prepare_next(self)  # Step 1: Explaining y = mx + b
+            scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
 
         # Animation for the slope
         with self.voiceover(f"The coefficient of x is the slope. Here, m equals {slope_spoken}."):
-            self.highlight_formula_component(step1_p1, "m", slope_color)
+            self.highlight_formula_component(step1_info_1, "m", slope_color)
             
-            # Prepare for highlighting the slope
-            scroll_mgr.prepare_next(self, slice(0, slope_tgt_start))  # Step 1: Preparing Slope Transformation
+            scroll_mgr.prepare_next(self, slice(0, slope_tgt_start))
             
             source_text = problem_text_equation[0][slope_src_start:slope_src_end].copy()
-            target_text = step1_p2[0][slope_tgt_start:slope_tgt_end]
+            target_text = step1_info_2[0][slope_tgt_start:slope_tgt_end]
             
             # Perform the transformation animation
             self.play(ReplacementTransform(source_text, target_text))
@@ -541,66 +522,77 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         # Animation for the y-intercept
         with self.voiceover(f"The constant term is the y-intercept. Here, b equals {y_intercept_spoken}."):
-            self.highlight_formula_component(step1_p1, "b", y_intercept_color)
+            self.highlight_formula_component(step1_info_1, "b", y_intercept_color)
             
-            # Prepare for y-intercept transformation
-            scroll_mgr.prepare_next(self, slice(0, y_intercept_tgt_start))  # Step 1: Preparing Y-Intercept Transformation
+            scroll_mgr.prepare_next(self, slice(0, y_intercept_tgt_start))
             
             source_text = problem_text_equation[0][y_intercept_src_start:y_intercept_src_end].copy()
-            target_text = step1_p3[0][y_intercept_tgt_start:y_intercept_tgt_end]
+            target_text = step1_info_3[0][y_intercept_tgt_start:y_intercept_tgt_end]
 
             self.play(ReplacementTransform(source_text, target_text))
                 
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover(f"Step 2: Let's plot the y-intercept, which is the point where the line crosses the y-axis."):
-            # Prepare for y-intercept plotting step
-            scroll_mgr.prepare_next(self)  # Step 2: Introducing Y-Intercept Plotting
+            scroll_mgr.prepare_next(self)
         self.wait(QUICK_PAUSE)
 
         with self.voiceover(f"At the y-intercept, x equals 0, so we plot the point ({start_coords[0]}, {start_coords[1]})."):
-            # Prepare for specific y-intercept coordinates
-            scroll_mgr.prepare_next(self)  # Step 2: Showing Y-Intercept Coordinates
+            scroll_mgr.prepare_next(self)
             self.play(Indicate(dot_start))
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover("Step 3: Now we'll use the slope to find a second point on the line."):
-            # Scroll down to Step 3
-            scroll_mgr.scroll_down(self, steps=1)
-            # Prepare for Step 3 introduction
-            scroll_mgr.prepare_next(self)  # Step 3: Introducing Slope and Point Finding
+            scroll_mgr.scroll_down(self, steps=2)
+            scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
 
         # Use different voiceover text based on fraction representation
         if is_slope_fraction:
+            # For slopes already in fraction form - add a bookmark for consistency
             with self.voiceover(f"The slope {slope_spoken} is the ratio of rise over run."):
-                # Prepare for slope as a fraction
-                scroll_mgr.prepare_next(self)  # Step 3: Explaining Slope as Fraction
+                scroll_mgr.prepare_next(self)
         else:
+            # For slopes not in fraction form
             with self.voiceover(f"The slope {slope_spoken} can be expressed as a fraction: {slope_spoken} over {run_spoken}, which is the ratio of rise over run."):
-                # Prepare for slope representation
-                scroll_mgr.prepare_next(self)  # Step 3: Converting Slope to Fraction
+                scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover(f"Starting from our y-intercept at ({start_coords[0]}, {start_coords[1]}):"):
-            # Prepare for coordinate transformation
-            scroll_mgr.prepare_next(self, slice(0, coord_tgt_start))  # Step 3: Showing Starting Coordinates
             
-            source_coords = step2_p1[0][coord_src_start:coord_src_end].copy()
-            target_coords = step3_p2[0][coord_tgt_start:coord_tgt_end]
+            new_derivative = MathTex(f"\\frac{{\\text{{rise}}}}{{\\text{{run}}}}").scale(MATH_SCALE)
+            SmartColorizeStatic(
+                new_derivative,
+                {
+                    r"\text{rise}": rise_color, 
+                    r"\text{run}": run_color
+                }
+            )
+            scroll_mgr.replace_in_place(self, 9, new_derivative, run_time=1.5)
+            
+            scroll_mgr.prepare_next(self, slice(0, -7))
+            
+            # Create a copy of the y-intercept coordinates from step2_info
+            source_coords = step2_info[0][-6:].copy()  # This should capture "(0, -3)"
+            
+            # Target would be the same coordinates in step3_info_2
+            target_coords = step3_info_2[0][-7:]  # This should target "(0, -3)" in step3_info_2
             
             # Perform the transformation for the coordinates
             self.play(ReplacementTransform(source_coords, target_coords))
             
+        self.wait(QUICK_PAUSE)
+
+        with self.voiceover(f"The rise is {rise_spoken} units {rise_direction.lower()}, because the slope is {slope_spoken}."):
+            scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
 
-        rise_unit_spoken = "units" if rise_value > 1 else "unit"
-        run_unit_spoken = "units" if run_value > 1 else "unit"
         direction_explanation = f"We go {run_direction.lower()} because the slope is {'negative' if slope < 0 else 'positive'}."
         
-        with self.voiceover(f"The rise is {rise_spoken} {rise_unit_spoken} {rise_direction.lower()}, because the slope is {slope_spoken}. The run is {run_spoken} {run_unit_spoken} {run_direction.lower()}. {direction_explanation}"):
-            # Prepare for rise and run explanation
-            scroll_mgr.prepare_next(self)  # Step 3: Explaining Rise and Run
+        # Use proper pluralization for run units in voiceover
+        run_unit_spoken = "units" if run_value > 1 else "unit"
+        with self.voiceover(f"The run is {run_spoken} {run_unit_spoken} {run_direction.lower()}. {direction_explanation}"):
+            scroll_mgr.prepare_next(self)
         self.wait(STANDARD_PAUSE)
         
         with self.voiceover(f"Let's visualize this with arrows. Each arrow represents 1 unit of our rise."):
@@ -620,10 +612,8 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
             self.play(FadeOut(tip_1, shift=DOWN))
 
         with self.voiceover(f"This gives us our second point at ({end_coords[0]}, {end_coords[1]})."):
-            # Scroll down for second point
             scroll_mgr.scroll_down(self, steps=2)
-            # Prepare for second point
-            scroll_mgr.prepare_next(self)  # Step 3: Showing Second Point Coordinates
+            scroll_mgr.prepare_next(self)
             self.play(Indicate(dot_end))
         self.wait(STANDARD_PAUSE)
         
@@ -636,29 +626,24 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         with self.voiceover("Step 4: Finally, we'll draw a straight line through these two points."):
             self.play(FadeOut(black_screen))
-            # Prepare for Step 4 introduction
-            scroll_mgr.prepare_next(self)  # Step 4: Introducing Line Drawing
-        self.wait(QUICK_PAUSE)
+            scroll_mgr.prepare_next(self)
+        self.wait(STANDARD_PAUSE)
 
         with self.voiceover(f"We connect the points ({start_coords[0]}, {start_coords[1]}) and ({end_coords[0]}, {end_coords[1]})."):
             self.play(Write(connecting_line))
-            # Scroll down for connecting points
-            scroll_mgr.scroll_down(self, steps=1)
-            # Prepare for point connection
-            scroll_mgr.prepare_next(self)  # Step 4: Showing Point Connection
-        self.wait(STANDARD_PAUSE)
+            scroll_mgr.scroll_down(self, steps=2)
+            scroll_mgr.prepare_next(self)
+        self.wait(QUICK_PAUSE)
 
         with self.voiceover(f"And extend the line in both directions to complete our graph of {spoken_equation}."):
-            # Prepare for line extension
-            scroll_mgr.prepare_next(self)  # Step 4: Extending Line in Both Directions
+            scroll_mgr.prepare_next(self)
             self.play(
                 ReplacementTransform(connecting_line, extended_line),
                 FadeIn(start_tip),
                 FadeIn(end_tip)
             )
             # Use a safe replacement animation that doesn't rely on specific indices
-            self.play(ReplacementTransform(problem_text_equation.copy(), final_equation))
-            self.play(Create(final_equation_rect))
+            self.play(ReplacementTransform(problem_text_equation.copy(), final_equation_group))
         self.wait(STANDARD_PAUSE)
 
         with self.voiceover(f"Notice how the {'negative' if slope < 0 else 'positive'} slope creates a line that {'falls' if slope < 0 else 'rises'} from left to right, and the y-intercept determines where the line crosses the y-axis."):
