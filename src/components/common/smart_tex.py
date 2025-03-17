@@ -41,17 +41,26 @@ def search_shape_in_text(text: VMobject, shape: VMobject, index=0, threshold=100
     template.add_to_preamble(
         r"""
         \usepackage[T1]{fontenc}
-        \usepackage{txfonts}"""
+        \usepackage{txfonts}
+        """
     )
 
-    # Create new text and shape with the font template
-    if hasattr(text, "tex_string"):
-        text = MathTex(text.tex_string, tex_template=template)
-    if hasattr(shape, "tex_string"):
-        shape = MathTex(shape.tex_string, tex_template=template)
+    if hasattr(text, "tex_string") and not isinstance(text, Tex):
+        text_copy = MathTex(text.tex_string, tex_template=template)
+    elif hasattr(text, "tex_strings"):
+        text_copy = Tex(*text.tex_strings, tex_template=template)
+    else:
+        text_copy = text
+
+    if hasattr(shape, "tex_string") and not isinstance(shape, Tex):
+        shape_copy = MathTex(shape.tex_string, tex_template=template)
+    elif hasattr(shape, "tex_strings"):
+        shape_copy = Tex(*shape.tex_strings, tex_template=template)
+    else:
+        shape_copy = shape
 
     # Perform the shape search
-    results = _do_shape_search(text, shape, index, threshold)
+    results = _do_shape_search(text_copy, shape_copy, index, threshold)
 
     return results
 
@@ -128,9 +137,9 @@ def group_shapes_in_text(text: VMobject, shapes: VMobject | list[VMobject], inde
         shapes = [shapes]
     results = search_shapes_in_text(text, shapes, index)
     if not results:
-        print(
-            f"No results found for {''.join(shapes[0].tex_string.split(' ')[1:])[:-1]}"
-        )
+        # print(
+        #     f"No results found for {''.join(shapes[0].tex_string.split(' ')[1:])[:-1]}"
+        # )
         return VGroup(MathTex(""))
 
     return VGroup(*[text[index][s] for s in results])

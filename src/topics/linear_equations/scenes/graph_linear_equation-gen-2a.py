@@ -5,6 +5,7 @@ from src.components.common.base_scene import *
 from src.components.common.scroll_manager import ScrollManager
 from src.components.common.quick_tip import QuickTip
 from src.components.common.slope_overlay import SlopeOverlay
+from src.components.common.math_indices import MathIndices
 from src.components.styles.constants import *
 from fractions import Fraction
 
@@ -13,51 +14,51 @@ from fractions import Fraction
 TEMPLATE_PARAMS = {
     # Core equation values
     "equation": {
-        "slope": -4,                      # The slope value as a number
-        "y_intercept": -3,                # The y-intercept value as a number
-        "formatted": "y=-4x-3",           # Formatted equation with LaTeX
+        "slope": 2/3,                      # The slope value as a fraction
+        "y_intercept": 2,                  # The y-intercept value as a number
+        "formatted": "y=\\frac{2}{3}x+2",  # Formatted equation with LaTeX
     },
     
     # Display and spoken representations
     "display": {
-        "slope_display": "-4",            # How the slope appears in LaTeX
-        "slope_spoken": "negative four",  # How the slope should be spoken in voiceover
-        "y_intercept_display": "-3",      # How the y-intercept appears in LaTeX
-        "y_intercept_spoken": "negative three",  # How the y-intercept should be spoken
-        "spoken_equation": "y equals negative four x minus three",  # Spoken version for voiceover
+        "slope_display": "\\frac{2}{3}",   # How the slope appears in LaTeX
+        "slope_spoken": "two thirds",      # How the slope should be spoken in voiceover
+        "y_intercept_display": "2",        # How the y-intercept appears in LaTeX
+        "y_intercept_spoken": "two",       # How the y-intercept should be spoken
+        "spoken_equation": "y equals two thirds x plus two",  # Spoken version for voiceover
     },
     
     # Animation indices for transformations
     "indices": {
-        "slope_src_indices": [2, 4],          # Source indices in problem_text_equation for slope
-        "slope_tgt_indices": [-2, None],  
-        "y_intercept_src_indices": [-2, None], # Target indices in step1_info_2 for slope value
-        "y_intercept_tgt_indices": [-2, None], # Target indices in step1_info_3 for y-intercept value
-        "coord_src_indices": [-6, None],
-        "coord_tgt_indices": [-6, None]
+        "slope_src_indices": [2, 5],           # Source indices in problem_text_equation for slope
+        "slope_tgt_indices": [-3, None],       # Target indices in step1_info_2 for slope value
+        "y_intercept_src_indices": [-1, None], # Source indices in problem_text_equation for y-intercept
+        "y_intercept_tgt_indices": [-1, None], # Target indices in step1_info_3 for y-intercept value
+        "coord_src_indices": [-5, None],       # Source indices for coordinates
+        "coord_tgt_indices": [-5, None]        # Target indices for coordinates
     },
     
     # Coordinate points and visual ranges
     "geometry": {
-        "y_intercept_point": [0, -3],     # Coordinates of y-intercept point
-        "second_point": [-1, 1],          # Coordinates of second point
-        "axes_range": [-6, 6, 1],         # Range for axes: [min, max, step]
-        "x_line_range": [-2, 1]           # X-range for plotting the line
+        "y_intercept_point": [0, 2],       # Coordinates of y-intercept point
+        "second_point": [3, 4],            # Coordinates of second point
+        "axes_range": [-5, 5, 1],          # Range for axes: [min, max, step]
+        "x_line_range": [-3, 4]            # X-range for plotting the line (within -5 to 5)
     },
     
     # Rise and run values for slope visualization
     "rise_run": {
-        "rise_value": 4,                  # Absolute value of rise
-        "rise_spoken": "four",            # Spoken version of rise value
-        "run_value": 1,                   # Absolute value of run
-        "run_spoken": "one",              # Spoken version of run value
-        "rise_direction": "UP",           # Direction for rise: "UP" or "DOWN"
-        "run_direction": "LEFT"           # Direction for run: "LEFT" or "RIGHT"
+        "rise_value": 2,                   # Absolute value of rise
+        "rise_spoken": "two",              # Spoken version of rise value
+        "run_value": 3,                    # Absolute value of run
+        "run_spoken": "three",             # Spoken version of run value
+        "rise_direction": "UP",            # Direction for rise: "UP" or "DOWN"
+        "run_direction": "RIGHT"           # Direction for run: "LEFT" or "RIGHT"
     },
     
     # UI elements and styling
     "ui": {
-        "tip_message": "When the slope (m) is negative we go up (rise) and then to the left (run).",
+        "tip_message": "When the slope (m) is positive we go up (rise) and then to the right (run).",
         "y_intercept_color": "YELLOW", 
         "slope_color": "GREEN",
         "rise_color": "BLUE",
@@ -69,80 +70,7 @@ TEMPLATE_PARAMS = {
 class LinearEquationsGraphLinearEquation(MathTutorialScene):
     """A tutorial that teaches how to graph a linear equation using slope-intercept form."""
     
-    # Add this method to your MathTutorialScene class
-    def display_indices(self, mathtex_obj, label_text="", display_duration=5):
-        """
-        Displays the indices of characters in a MathTex object.
-        
-        Args:
-            mathtex_obj: The MathTex object to visualize
-            label_text: Optional text to display above the expression
-            display_duration: How long to display the visualization (seconds)
-        """
-        # Add a header with the label text
-        header = None
-        if label_text:
-            header = Text(label_text, font_size=36)
-            header.to_edge(UP)
-            self.add(header)
-        
-        # Add the original expression
-        original = mathtex_obj.copy()
-        original.move_to(ORIGIN + UP)
-        self.add(original)
-        
-        # Create visualization group
-        viz_group = VGroup()
-        
-        # Handle different structures of MathTex
-        if len(mathtex_obj.submobjects) > 0:
-            # Extract the first submobject (typical for MathTex)
-            submob = mathtex_obj[0]
-            
-            # Add index labels for each part
-            for i in range(len(submob)):
-                # Get character
-                char = submob[i].copy()
-                
-                # Create index label
-                index_label = Text(str(i), font_size=18, color=RED)
-                index_label.next_to(char, DOWN, buff=0.1)
-                
-                # Create background for visibility
-                bg = SurroundingRectangle(
-                    char, 
-                    color=BLUE, 
-                    stroke_width=1, 
-                    fill_opacity=0.1,
-                    buff=0.05
-                )
-                
-                # Group character with its index
-                char_group = VGroup(char, bg, index_label)
-                viz_group.add(char_group)
-            
-            # Arrange the visualization
-            viz_group.arrange(RIGHT, buff=0.3)
-            viz_group.move_to(ORIGIN + DOWN)
-            
-            # Add the visualization
-            self.add(viz_group)
-        
-        # Print the structure information to the console for reference
-        print(f"Structure of {label_text}:")
-        print(f"Total submobjects: {len(mathtex_obj.submobjects)}")
-        for i, submob in enumerate(mathtex_obj.submobjects):
-            if hasattr(submob, "submobjects"):
-                print(f"  Submobject {i} has {len(submob.submobjects)} parts")
-        
-        # Wait for the specified duration
-        self.wait(display_duration)
-        
-        # Clean up
-        self.remove(viz_group)
-        if header:
-            self.remove(header)
-        self.remove(original)
+    
 
     def construct(self):
         ###############################################################################
@@ -368,7 +296,8 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         ###############################################################################
         # Create the problem text with explicit parts for better control
         problem_text_label = Tex("Graph:").scale(MATH_SCALE)
-        problem_text_equation = MathTex(equation_str).scale(MATH_SCALE).next_to(problem_text_label, DOWN, aligned_edge=LEFT, buff=0.5)
+        problem_text_equation = MathTex(equation_str).scale(MATH_SCALE)
+        problem_text_group = VGroup(problem_text_label, problem_text_equation).arrange(buff=0.2)
         
         # Get absolute slope for text
         abs_slope = abs(slope)
@@ -414,7 +343,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         final_equation = problem_text_equation.copy()
         final_equation.next_to(start_point, LEFT + DOWN, buff=0.7)  
         
-        final_equation_rect = SurroundingRectangle(final_equation, color=slope_color, buff=0.1)
+        final_equation_rect = SurroundingRectangle(final_equation, color=slope_color, buff=0.2)
         
         # Apply basic coloringrise_for_fraction = rise_value
         self.color_component(step1_p1, "m", slope_color)
@@ -451,14 +380,13 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         # SECTION 9: LAYOUT AND POSITIONING
         ###############################################################################
         # Organize step groups
-        problem_text_equation_group = self.create_step(problem_text_label, problem_text_equation)
         step1_group = self.create_step(step1_title, step1_p1, step1_p2, step1_p3)
         step2_group = self.create_step(step2_title, step2_p1)
         step3_group = self.create_step(step3_title, step3_p1, step3_p2, step3_p3, step3_p4)
         step4_group = self.create_step(step4_title, step4_p1, step4_p2)
         
         steps_group = VGroup(
-            problem_text_equation_group,
+            problem_text_group,
             step1_group,
             step2_group,
             step3_group,
@@ -498,11 +426,6 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
         ).shift(DOWN * 2)
         
         black_screen = SlopeOverlay()
-        
-        self.display_indices(step2_p1, "step2_p1")
-
-        # Example: Add this right after creating step3_p2 to see its indices
-        self.display_indices(step3_p2, "step3_p2")
 
         ###############################################################################
         # SECTION 11: ANIMATION SEQUENCE
@@ -566,7 +489,7 @@ class LinearEquationsGraphLinearEquation(MathTutorialScene):
 
         with self.voiceover("Step 3: Now we'll use the slope to find a second point on the line."):
             # Scroll down to Step 3
-            scroll_mgr.scroll_down(self, steps=1)
+            scroll_mgr.scroll_down(self, steps=2)
             # Prepare for Step 3 introduction
             scroll_mgr.prepare_next(self)  # Step 3: Introducing Slope and Point Finding
         self.wait(STANDARD_PAUSE)

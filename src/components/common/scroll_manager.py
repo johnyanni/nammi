@@ -287,3 +287,46 @@ class ScrollManager(VGroup):
             # Add delay between animations if not the last one
             if i < len(new_contents) - 1:
                 scene.wait(cascade_delay)
+                
+                
+    def fade_in_from_target(self, scene, target, steps=1, run_time=None, animation_kwargs=None):
+        """Fades in the next equation(s) from a target position
+        
+        Args:
+            scene: The manim scene to animate on
+            target: Target position or mobject to fade from
+            steps: Number of equations to fade in (default: 1)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+            
+        Returns:
+            self: For method chaining
+        """
+        run_time = {} if run_time is None else {"run_time": run_time}
+        animation_kwargs = {} if animation_kwargs is None else animation_kwargs
+        
+        # Make sure we have enough equations left
+        if self.current_position + steps > len(self.equations):
+            steps = len(self.equations) - self.current_position
+            if steps <= 0:
+                print("No more equations to display.")
+                return self
+        
+        # Get the equations to fade in
+        equations_to_fade = [self.equations[self.current_position + i] for i in range(steps)]
+        
+        # Get target position
+        target_position = target.get_center() 
+        
+        # Fade in each equation from the target position
+        animations = [
+            FadeIn(eq, target_position=target_position, **animation_kwargs)
+            for eq in equations_to_fade
+        ]
+        
+        scene.play(*animations, **run_time)
+        
+        # Update position counter
+        self.current_position += steps
+        
+        return self
