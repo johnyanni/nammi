@@ -86,6 +86,8 @@ class MathTutorialScene(VoiceoverScene):
             SmartColorizeStatic(element, color_map)
             
             
+            
+            
     def setup_smart_coloring(self, elements_and_patterns, color_dict):
         """Create a smart coloring list based on elements and patterns.
         

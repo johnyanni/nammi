@@ -14,51 +14,51 @@ from fractions import Fraction
 TEMPLATE_PARAMS = {
     # Core equation values
     "equation": {
-        "slope": 2/3,                      # The slope value as a fraction
-        "y_intercept": 2,                  # The y-intercept value as a number
-        "formatted": "y=\\frac{2}{3}x+2",  # Formatted equation with LaTeX
+        "slope": -3/4,                      # The slope value as a fraction
+        "y_intercept": 3,                   # The y-intercept value as a number
+        "formatted": "y=-\\frac{3}{4}x+3",  # Formatted equation with LaTeX
     },
     
     # Display and spoken representations
     "display": {
-        "slope_display": "\\frac{2}{3}",   # How the slope appears in LaTeX
-        "slope_spoken": "two thirds",      # How the slope should be spoken in voiceover
-        "y_intercept_display": "2",        # How the y-intercept appears in LaTeX
-        "y_intercept_spoken": "two",       # How the y-intercept should be spoken
-        "spoken_equation": "y equals two thirds x plus two",  # Spoken version for voiceover
+        "slope_display": "-\\frac{3}{4}",   # How the slope appears in LaTeX
+        "slope_spoken": "negative three fourths", # How the slope should be spoken in voiceover
+        "y_intercept_display": "3",         # How the y-intercept appears in LaTeX
+        "y_intercept_spoken": "three",      # How the y-intercept should be spoken
+        "spoken_equation": "y equals negative three fourths x plus three",  # Spoken version for voiceover
     },
     
     # Animation indices for transformations
     "indices": {
-        "slope_src_indices": [2, 5],           # Source indices in problem_text_equation for slope
-        "slope_tgt_indices": [-3, None],       # Target indices in step1_info_2 for slope value
+        "slope_src_indices": [2, 6],          # Source indices in problem_text_equation for slope
+        "slope_tgt_indices": [-4, None],      # Target indices in step1_info_2 for slope value
         "y_intercept_src_indices": [-1, None], # Source indices in problem_text_equation for y-intercept
         "y_intercept_tgt_indices": [-1, None], # Target indices in step1_info_3 for y-intercept value
-        "coord_src_indices": [-5, None],       # Source indices for coordinates
-        "coord_tgt_indices": [-5, None]        # Target indices for coordinates
+        "coord_src_indices": [-5, None],
+        "coord_tgt_indices": [-5, None]
     },
     
     # Coordinate points and visual ranges
     "geometry": {
-        "y_intercept_point": [0, 2],       # Coordinates of y-intercept point
-        "second_point": [3, 4],            # Coordinates of second point
-        "axes_range": [-5, 5, 1],          # Range for axes: [min, max, step]
-        "x_line_range": [-5, 4]            # X-range for plotting the line (within -5 to 5)
+        "y_intercept_point": [0, 3],       # Coordinates of y-intercept point
+        "second_point": [4, 0],            # Coordinates of second point (run 4, rise -3)
+        "axes_range": [-4, 8, 1],          # Range for axes: [min, max, step]
+        "x_line_range": [-3.5, 7.5],       # X-range for plotting the line (contained within axes range)
     },
     
     # Rise and run values for slope visualization
     "rise_run": {
-        "rise_value": 2,                   # Absolute value of rise
-        "rise_spoken": "two",              # Spoken version of rise value
-        "run_value": 3,                    # Absolute value of run
-        "run_spoken": "three",             # Spoken version of run value
-        "rise_direction": "UP",            # Direction for rise: "UP" or "DOWN"
+        "rise_value": 3,                   # Simple rise value (absolute value of slope numerator)
+        "rise_spoken": "three",            # Spoken version of rise value
+        "run_value": 4,                    # Simple run value (slope denominator)
+        "run_spoken": "four",              # Spoken version of run value
+        "rise_direction": "DOWN",          # Direction for rise: "UP" or "DOWN"
         "run_direction": "RIGHT"           # Direction for run: "LEFT" or "RIGHT"
     },
     
     # UI elements and styling
     "ui": {
-        "tip_message": "When the slope (m) is positive we go up (rise) and then to the right (run).",
+        "tip_message": "When the slope (m) is negative, we go down (rise) and then to the right (run).",
         "y_intercept_color": "YELLOW", 
         "slope_color": "GREEN",
         "rise_color": "BLUE",
