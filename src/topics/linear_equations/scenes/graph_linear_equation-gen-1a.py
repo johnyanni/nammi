@@ -6,8 +6,6 @@ from src.components.common.scroll_manager import ScrollManager
 from src.components.common.quick_tip import QuickTip
 from src.components.common.slope_overlay import SlopeOverlay
 from src.components.common.math_indices import MathIndices
-from src.components.styles.constants import *
-from fractions import Fraction
 
 # TEMPLATE PARAMETERS - Restructured for clarity and better organization
 # ------------------------------------------------
