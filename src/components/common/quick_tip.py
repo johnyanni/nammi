@@ -1,7 +1,6 @@
 """Quick tip component for displaying helpful hints in tutorials."""
 
 from manim import *
-from ..styles.theme import *
 
 class QuickTip(VGroup):
 
