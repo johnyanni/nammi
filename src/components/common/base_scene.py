@@ -5,7 +5,7 @@ from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 from .smart_tex import *
-from .error_handling import ErrorReporter, ErrorRecovery, MathValidator
+from src.components.styles.constants import *
 
 # Common settings
 BACKGROUND_COLOR = ManimColor("#121212")
@@ -14,11 +14,8 @@ class MathTutorialScene(VoiceoverScene):
     """Base scene class that handles Azure voiceover setup."""
     
     def __init__(self):
-        """Initialize the scene with error handling components."""
+        """Initialize the scene."""
         super().__init__()
-        self.error_reporter = ErrorReporter()
-        self.error_recovery = ErrorRecovery(self.error_reporter)
-        self.validator = MathValidator()
     
     def setup(self):
         """Setup Azure voice configuration and common scene settings."""
