@@ -1,10 +1,10 @@
 """Tutorial on graphing linear equations using slope-intercept form."""
 
 from manim import *
-from src.templates.linear_equations.graphing_slope_intercept_form.t_using_rise_run import GraphSlopeInterceptFormUsingRiseRunTemplate
+from src.templates.linear_equations.graphing_slope_intercept_form.t_graph_slope_intercept_form import GraphSlopeInterceptFormTemplate
 
 
-class UsingRiseRun01(GraphSlopeInterceptFormUsingRiseRunTemplate):
+class GraphSlopeInterceptForm01(GraphSlopeInterceptFormTemplate):
     """A tutorial that teaches how to graph a linear equation using slope-intercept form."""
     
     

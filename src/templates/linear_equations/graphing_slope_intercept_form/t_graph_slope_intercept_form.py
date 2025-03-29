@@ -52,7 +52,7 @@ RISE_COLOR = BLUE
 RUN_COLOR = RED
 LINE_COLOR = WHITE
 
-class GraphSlopeInterceptFormUsingRiseRunTemplate(MathTutorialScene):
+class GraphSlopeInterceptFormTemplate(MathTutorialScene):
     """A tutorial that teaches how to graph a linear equation using slope-intercept form."""
 
     def construct(self):

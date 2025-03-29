@@ -33,15 +33,16 @@ class MathTutorialScene(VoiceoverScene):
         # Set common scene settings
         self.camera.background_color = BACKGROUND_COLOR 
 
-    def color_component(self, formula, component, color):
+    def color_component(self, formula, component, color, index=0):
         """Color a component in a formula.
         
         Args:
             formula: The MathTex object containing the formula
             component: The character to color (e.g., "m" or "b")
             color: The color to use
+            index: Which occurrence of the component to color (default: 0 for first occurrence)
         """
-        char = formula[0][search_shape_in_text(formula, MathTex(component))[0]]
+        char = formula[0][search_shape_in_text(formula, MathTex(component))[index]]
         char.set_color(color)
         return char
     
