@@ -9,13 +9,17 @@ class QuadraticFormula(MathTutorialScene):
     def construct(self):
 
         # Constants for scaling
-        TEX_SCALE = 0.70
+        TEX_SCALE = 0.6
 
         # Color Definitions
         A_COLOR = "#4ec9b0"
         B_COLOR = "#ff79c6"
         C_COLOR = "#00bfff"
         X_COLOR = "#ffb86c"
+    
+        # Indicate Animation
+        INDICATION_COLOR = "#9A48D0"
+        INDICATION_TIME = 2.0
 
         # Buffers
         WIDE_BUFF = 4.0
@@ -27,6 +31,18 @@ class QuadraticFormula(MathTutorialScene):
         EQUATION_BG_WIDTH = 2
         EQUATION_BG_OPACITY = 0.25
         EQUATION_BG_radius = 0.3
+
+
+
+
+
+
+
+
+
+
+
+
 
                         
         quadratic_equation = MathTex(r"ax^2 + bx + c = 0").scale(TEX_SCALE)
@@ -255,6 +271,8 @@ class QuadraticFormula(MathTutorialScene):
         Group(tip_1, tip_2).to_corner(DL)
 
         # Animations
+        
+        
         with self.voiceover(
                 text="""
                 In this exercise, we are trying to find the solutions to <bookmark mark='equation' /> this quadratic equation using <bookmark mark='formula' /> the quadratic formula.
@@ -285,8 +303,8 @@ class QuadraticFormula(MathTutorialScene):
 
         with self.voiceover(
                 text="""
-                First, let's <bookmark mark='coefficients' /> identify 'ay', 'b', and 'c'.
-                'a' is the coefficient <bookmark mark='x_squared' /> of x squared. Here, it's <bookmark mark='a' /> just 1.
+                First, let’s <bookmark mark='coefficients' /> identify 'ay', 'b', and 'c'.
+                'a' is the coefficient <bookmark mark='x_squared' /> of x squared. Here, it’s <bookmark mark='a' /> just 1.
                 'b' is the coefficient <bookmark mark='x' /> of x. That is <bookmark mark='b' /> just 11.
                 And 'c' is the <bookmark mark='constant' /> constant term, which <bookmark mark='c' /> is 20.
 
@@ -319,7 +337,7 @@ class QuadraticFormula(MathTutorialScene):
 
         with self.voiceover(
                 text="""
-                Now, let's substitute these values into the quadratic formula.
+                Now, let’s substitute these values into the quadratic formula.
                 """
         ) as tracker:
             self.play(Write(step_1_label))
@@ -439,7 +457,7 @@ class QuadraticFormula(MathTutorialScene):
             self.play(
                 ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
                 ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
-                rut_time=2
+                run_time=2
             )
             self.wait(STANDARD_PAUSE)
 

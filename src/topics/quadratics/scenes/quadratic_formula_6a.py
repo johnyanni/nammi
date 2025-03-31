@@ -3,11 +3,123 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 
 
+class EquationParts:
+    """Helper class to easily identify and reference parts of an equation for animation."""
+    
+    def __init__(self, equation, tex_scale=0.7):
+        """Initialize with an equation.
+        
+        Args:
+            equation: A MathTex object
+            tex_scale: Scaling factor for new equations created
+        """
+        self.equation = equation
+        self.parts = {}
+        self.tex_scale = tex_scale
+    
+    def find_part(self, name, pattern, indices=None, color=None):
+        """Find a part in the equation by pattern.
+        
+        Args:
+            name: Name to reference this part by
+            pattern: LaTeX pattern to search for
+            indices: Specific occurrence indices if there are multiple matches
+            color: Optional color to apply to this part
+        
+        Returns:
+            self for method chaining
+        """
+        search_result = search_shape_in_text(self.equation, MathTex(pattern))
+        
+        if not search_result:
+            print(f"Warning: Pattern '{pattern}' not found in equation")
+            return self
+        
+        # If indices specified, get only those occurrences
+        if indices is not None:
+            if isinstance(indices, int):
+                indices = [indices]  # Convert single index to list
+            
+            # Make sure we don't exceed available indices
+            valid_indices = [i for i in indices if i < len(search_result)]
+            if not valid_indices:
+                print(f"Warning: Specified indices {indices} not found for pattern '{pattern}'")
+                return self
+                
+            # Create VGroup of specified occurrences
+            part = VGroup(*[self.equation[0][search_result[i]] for i in valid_indices])
+        else:
+            # If no specific indices, use the first occurrence
+            part = self.equation[0][search_result[0]]
+        
+        # Apply color if specified
+        if color:
+            part.set_color(color)
+        
+        self.parts[name] = part
+        return self
+    
+    def find_group(self, name, patterns, color=None):
+        """Find a group of parts matching multiple patterns.
+        
+        Args:
+            name: Name to reference this group by
+            patterns: List of LaTeX patterns to search for
+            color: Optional color to apply to this group
+        
+        Returns:
+            self for method chaining
+        """
+        mobjects = []
+        
+        for pattern in patterns:
+            search_result = search_shape_in_text(self.equation, MathTex(pattern))
+            if search_result:
+                mobjects.append(self.equation[0][search_result[0]])
+        
+        if not mobjects:
+            print(f"Warning: None of the patterns in {patterns} found in equation")
+            return self
+            
+        group = VGroup(*mobjects)
+        
+        # Apply color if specified
+        if color:
+            group.set_color(color)
+            
+        self.parts[name] = group
+        return self
+    
+    def get_part(self, name):
+        """Get a previously found part by name."""
+        if name in self.parts:
+            return self.parts[name]
+        print(f"Warning: Part '{name}' not found")
+        return None
+    
+    def create_from_formula(formula, a_val, b_val, c_val, tex_scale=0.7):
+        """Factory method to create a substituted equation from the quadratic formula.
+        
+        Args:
+            formula: The original quadratic formula template
+            a_val: Value of coefficient a
+            b_val: Value of coefficient b
+            c_val: Value of coefficient c
+            tex_scale: Scaling factor for the equation
+            
+        Returns:
+            EquationParts object with the substituted equation
+        """
+        substituted = MathTex(
+            f"x = \\frac{{-({b_val})" + 
+            f" \\pm \\sqrt{{({b_val})^2 - 4({a_val})({c_val})}}}}{{2({a_val})}}"
+        ).scale(tex_scale)
+        
+        return EquationParts(substituted, tex_scale)
+
+
 class QuadraticFormula(MathTutorialScene):
-
-
     def construct(self):
-
         # Constants for scaling
         TEX_SCALE = 0.70
 
@@ -28,22 +140,26 @@ class QuadraticFormula(MathTutorialScene):
         EQUATION_BG_OPACITY = 0.25
         EQUATION_BG_radius = 0.3
 
-                        
+        # Create the basic equations                   
         quadratic_equation = MathTex(r"ax^2 + bx + c = 0").scale(TEX_SCALE)
         SmartColorizeStatic(quadratic_equation, {"2": X_COLOR})
         
-        quadratic_equation_coefficients = Group(
-            *[
-                quadratic_equation[0][group] for group in
-                search_shapes_in_text(quadratic_equation, [MathTex("a"), MathTex("b"), MathTex("c")])
-            ]
-        )
-                
+        # Find coefficient parts for the general equation
+        quad_eq_parts = EquationParts(quadratic_equation)
+        quad_eq_parts.find_part("a", "a", color=A_COLOR)
+        quad_eq_parts.find_part("b", "b", color=B_COLOR)
+        quad_eq_parts.find_part("c", "c", color=C_COLOR)
+        
+        # Create the quadratic formula
         quadratic_formula = MathTex(r"x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}").scale(TEX_SCALE)
+        
+        # Arrange the equations
         quadratic_group = Group(
             quadratic_equation,
             quadratic_formula,
         ).arrange(buff=WIDE_BUFF).to_edge(UP)
+        
+        # Apply colors
         self.apply_smart_colorize(
             quadratic_group,
             {
@@ -54,6 +170,7 @@ class QuadraticFormula(MathTutorialScene):
             }
         )
         
+        # Create backgrounds
         quadratic_equation_bg = SurroundingRectangle(
             quadratic_equation,
             buff=0.2,
@@ -83,128 +200,82 @@ class QuadraticFormula(MathTutorialScene):
                 "2": X_COLOR,
             }
         )
-        a_in_equation = equation[0][search_shape_in_text(equation, MathTex("1"))[0]].set_opacity(0)
-        b_in_equation = equation[0][search_shape_in_text(equation, MathTex("11"))[0]].set_color(B_COLOR)
-        c_in_equation = equation[0][search_shape_in_text(equation, MathTex("20"))[0]].set_color(C_COLOR)
         
-        a = MathTex("a = 1", color=A_COLOR).scale(TEX_SCALE)
-        a_value = a[0][search_shape_in_text(a, MathTex("1"))[0]]
+        # Find coefficients in the example equation
+        equation_parts = EquationParts(equation)
+        equation_parts.find_part("a", "1", color=A_COLOR).get_part("a").set_opacity(0)
+        equation_parts.find_part("b", "11", color=B_COLOR)
+        equation_parts.find_part("c", "20", color=C_COLOR)
         
-        b = MathTex("b = 11", color=B_COLOR).scale(TEX_SCALE)
-        b_value = b[0][search_shape_in_text(b, MathTex("11"))[0]]
+        # Create coefficient labels
+        a_eq = MathTex("a = 1", color=A_COLOR).scale(TEX_SCALE)
+        a_parts = EquationParts(a_eq)
+        a_parts.find_part("value", "1", color=A_COLOR)
         
-        c = MathTex("c = 20", color=C_COLOR).scale(TEX_SCALE)
-        c_value = c[0][search_shape_in_text(c, MathTex("20"))[0]]
+        b_eq = MathTex("b = 11", color=B_COLOR).scale(TEX_SCALE)
+        b_parts = EquationParts(b_eq)
+        b_parts.find_part("value", "11", color=B_COLOR)
         
-        coefficients = Group(a, b, c).arrange(buff=MED_BUFF).next_to(equation, DOWN * 2)
+        c_eq = MathTex("c = 20", color=C_COLOR).scale(TEX_SCALE)
+        c_parts = EquationParts(c_eq)
+        c_parts.find_part("value", "20", color=C_COLOR)
+        
+        # Group the coefficients
+        coefficients = Group(a_eq, b_eq, c_eq).arrange(buff=MED_BUFF).next_to(equation, DOWN * 2)
 
-        # Solution
+        # Step 1 - Create from template
         sol_step_1 = self.create_labeled_step(
             "Step 1: substitute the coefficients",
             MathTex(r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}").scale(TEX_SCALE)
         )
         step_1_label, step_1_exp = sol_step_1[0], sol_step_1[1]
-        step_1_fraction = step_1_exp[0][24]
-        step_1_x_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("x ="))[0]]
-        step_1_par_part = VGroup(
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("-"))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[0]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[0]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[3]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[3]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[4]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[4]]
-            )
-        )
-        step_1_b_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in
-                search_shape_in_text(step_1_exp, MathTex("11"))
-            ],
-        )
         
-        step_1_plus_minus_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(r"\pm"))[0]]
-        step_1_sqrt_part = VGroup(step_1_exp[0][8:10])
-        step_1_minus_four_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in [
-                    search_shape_in_text(step_1_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_1_exp, MathTex("4"))[0]
-                ]
-            ]
-        )
+        # Find parts in step 1 equation
+        step_1_parts = EquationParts(step_1_exp)
+        step_1_parts.find_part("x_part", "x =")
+        step_1_parts.find_part("fraction", r"\frac")
         
-        step_1_a_part = VGroup(
-            *[
-                step_1_exp[0][search_shapes_in_text(step_1_exp, MathTex("1"))[i]]
-                for i in [4, 5]
-                              
-            
-            ]
-        )
-        step_1_c_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("20"))[0]]
-        step_1_two_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[2]]
+        # Find negative b part
+        step_1_parts.find_group("negative_b", ["-", "(", "11", ")"])
+        step_1_parts.find_part("b_value_1", "11", color=B_COLOR)
         
-                
+        # Find plus/minus and sqrt parts
+        step_1_parts.find_part("plus_minus", r"\pm")
+        step_1_parts.find_part("sqrt_part", r"\sqrt")
+        
+        # Find b squared part
+        step_1_parts.find_group("b_squared", ["(", "11", ")", "^", "2"])
+        step_1_parts.find_part("b_value_2", "11", color=B_COLOR)
+        
+        # Find the -4ac part
+        step_1_parts.find_part("minus_sign", "-", indices=1)
+        step_1_parts.find_part("four", "4")
+        step_1_parts.find_group("minus_four", ["-", "4"])
+        
+        # Find the values of a and c
+        step_1_parts.find_part("a_value_1", "1", indices=0, color=A_COLOR)
+        step_1_parts.find_part("a_value_2", "1", indices=1, color=A_COLOR)
+        step_1_parts.find_part("c_value", "20", color=C_COLOR)
+        
+        # Find the denominator parts
+        step_1_parts.find_part("two_part", "2", indices=2)
+        step_1_parts.find_group("denominator", ["2", "(", "1", ")"])
+        
+        # Create simplified steps
         sol_step_2 = self.create_labeled_step(
             "Step 2: simplifying the expression",
             MathTex(r"x = \frac{-11 \pm \sqrt{121 - 80}}{2}").scale(TEX_SCALE)
         )
         step_2_label, step_2_exp = sol_step_2[0], sol_step_2[1]
-        step_2_fraction = step_2_exp[0][14]
-        step_2_x_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("x ="))[0]]
-        step_2_b_part = VGroup(
-            VGroup(
-                *[
-                    step_2_exp[0][group] for group in [
-                        search_shape_in_text(step_2_exp, MathTex("-"))[0],
-                        search_shape_in_text(step_2_exp, MathTex("11"))[0]
-                    ]
-                ]
-            ),
-            step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("121"))[0]]
-        )
-        step_2_plus_minus_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex(r"\pm"))[0]]
-        step_2_sqrt_part = step_2_exp[0][6:8]
-        step_2_4ac_part = VGroup(
-            *[
-                step_2_exp[0][group] for group in [
-                    search_shape_in_text(step_2_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_2_exp, MathTex("80"))[0]
-                ]
-            ]
-        )
-        step_2_two_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("2"))[1]]
-
-        step_2_transform_index = [
-            [0, 1, 2, 4, 5, 7, 8, 9, 24],
-            [0, 1, 2, 3, 4, 5, 6, 7, 14]
-        ]
-                
+        
+        # Create Step 3
         sol_step_3 = self.create_labeled_step(
             "Step 3: simplifying the square root",
             MathTex(r"x = \frac{-11 \pm \sqrt{41}}{2}").scale(TEX_SCALE)
         )
         step_3_label, step_3_exp = sol_step_3[0], sol_step_3[1]
-        step_3_41_index = search_shape_in_text(step_3_exp, MathTex("41"))[0]
-        step_3_41_part = step_3_exp[0][step_3_41_index]
-        step_3_transform_index = [
-            [0, 1, 2, 3, 4, 5, 6, 7, 14, 15],
-            [0, 1, 2, 3, 4, 5, 6, 7, 10, 11]
-        ]
         
+        # Apply color to all steps
         self.apply_smart_colorize(
             [step_1_exp, step_2_exp, step_3_exp],
             {
@@ -294,26 +365,29 @@ class QuadraticFormula(MathTutorialScene):
         ) as tracker:
             self.wait_until_bookmark("coefficients")
             self.play(
-                FadeIn(a[0][:2], b[0][:2], c[0][:2])
+                FadeIn(a_eq[0][:2], b_eq[0][:2], c_eq[0][:2])
             )
 
             self.wait_until_bookmark("x_squared")
-            self.play(self.indicate(quadratic_equation_coefficients[0]))
+            self.play(self.indicate(quad_eq_parts.get_part("a")))
 
             self.wait_until_bookmark("a")
-            self.play(FadeIn(a_value, target_position=a_in_equation), run_time=2)
+            self.play(FadeIn(a_parts.get_part("value"), 
+                    target_position=equation_parts.get_part("a")), run_time=2)
 
             self.wait_until_bookmark("x")
-            self.play(self.indicate(quadratic_equation_coefficients[1]))
+            self.play(self.indicate(quad_eq_parts.get_part("b")))
 
             self.wait_until_bookmark("b")
-            self.play(FadeIn(b_value, target_position=b_in_equation), run_time=2)
+            self.play(FadeIn(b_parts.get_part("value"), 
+                    target_position=equation_parts.get_part("b")), run_time=2)
 
             self.wait_until_bookmark("constant")
-            self.play(self.indicate(quadratic_equation_coefficients[2]))
+            self.play(self.indicate(quad_eq_parts.get_part("c")))
 
             self.wait_until_bookmark("c")
-            self.play(FadeIn(c_value, target_position=c_in_equation), run_time=2)
+            self.play(FadeIn(c_parts.get_part("value"), 
+                    target_position=equation_parts.get_part("c")), run_time=2)
 
             self.wait(COMPREHENSION_PAUSE)
 
@@ -334,54 +408,58 @@ class QuadraticFormula(MathTutorialScene):
                 all divided <bookmark mark='two' /> by 2 times 'ay', which <bookmark mark='a_2' /> is one.
                 """
         ) as tracker:
-            self.play(Write(step_1_x_part), Write(step_1_fraction))
+            self.play(
+                Write(step_1_parts.get_part("x_part")), 
+                Write(step_1_parts.get_part("fraction"))
+            )
 
             self.wait_until_bookmark("negative_b")
-            self.play(Write(step_1_par_part[0]))
-            self.play(ReplacementTransform(b_value.copy(), step_1_b_part[0]))
+            self.play(Write(step_1_parts.get_part("negative_b")))
+            self.play(ReplacementTransform(b_parts.get_part("value").copy(), 
+                                          step_1_parts.get_part("b_value_1")))
 
             self.wait_until_bookmark("plus_minus")
-            self.play(Write(step_1_plus_minus_part))
-            self.play(Write(step_1_sqrt_part))
+            self.play(Write(step_1_parts.get_part("plus_minus")))
+            self.play(Write(step_1_parts.get_part("sqrt_part")))
             
             self.wait_until_bookmark("b_squared")
-            self.play(
-                Write(step_1_par_part[1]),
-            )
-            self.play(ReplacementTransform(b_value.copy(), step_1_b_part[1]))
+            self.play(Write(step_1_parts.get_part("b_squared")))
+            self.play(ReplacementTransform(b_parts.get_part("value").copy(), 
+                                          step_1_parts.get_part("b_value_2")))
         
-            
             self.wait_until_bookmark("minus_4")
             self.play(
-                Write(step_1_minus_four_part),
-                Write(step_1_par_part[2]),
+                Write(step_1_parts.get_part("minus_four"))
             )
 
             self.wait_until_bookmark("a_1")
             self.play(
-                ReplacementTransform(a_value.copy(), step_1_a_part[0])
+                ReplacementTransform(a_parts.get_part("value").copy(), 
+                                    step_1_parts.get_part("a_value_1"))
             )
 
             self.wait_until_bookmark("c")
             self.play(
-                ReplacementTransform(c_value.copy(), step_1_c_part)
+                ReplacementTransform(c_parts.get_part("value").copy(), 
+                                    step_1_parts.get_part("c_value"))
             )
 
             self.wait_until_bookmark("two")
             self.play(
-                Write(step_1_two_part),
-                Write(step_1_par_part[3]),
+                Write(step_1_parts.get_part("two_part"))
             )
 
             self.wait_until_bookmark("a_2")
             self.play(
-                ReplacementTransform(a_value.copy(), step_1_a_part[1])
+                ReplacementTransform(a_parts.get_part("value").copy(), 
+                                    step_1_parts.get_part("a_value_2"))
             )
             
             self.play(FadeIn(tip_1, shift=UP))
             self.wait(COMPREHENSION_PAUSE)
         self.play(FadeOut(tip_1, shift=DOWN))
 
+        # Steps 2 and 3 - Simplified approach as before
         with self.voiceover(
                 text="""
                 Next, we simplify step by step: 11 squared <bookmark mark='b_squared' /> equals 121.
@@ -390,23 +468,25 @@ class QuadraticFormula(MathTutorialScene):
                 """
         ) as tracker:
             self.play(Write(step_2_label))
-            self.play(
-                *[
-                    FadeTransform(step_1_exp[0][i][:].copy(), step_2_exp[0][j][:])
-                    if i == 8 or i == 9 else
-                    ReplacementTransform(step_1_exp[0][i][:].copy(), step_2_exp[0][j][:])
-                    for i, j in zip(*step_2_transform_index)
-                ]
-            )
-        
+            
+            # Simple fade in of the whole step 2 equation
+            self.play(FadeIn(step_2_exp))
+            
+            # Find parts for indicators
+            step_2_parts = EquationParts(step_2_exp)
+            step_2_parts.find_part("b_squared", "121")
+            step_2_parts.find_part("four_ac", "80")
+            step_2_parts.find_part("denominator", "2")
+            
+            # Indicate the relevant parts at each bookmark
             self.wait_until_bookmark("b_squared")
-            self.play(FadeIn(step_2_b_part[1]))
+            self.play(Indicate(step_2_parts.get_part("b_squared")))
                 
             self.wait_until_bookmark("four_ac")
-            self.play(FadeIn(step_2_4ac_part))
+            self.play(Indicate(step_2_parts.get_part("four_ac")))
             
             self.wait_until_bookmark("den")
-            self.play(FadeIn(step_2_two_part))
+            self.play(Indicate(step_2_parts.get_part("denominator")))
 
             self.wait(COMPREHENSION_PAUSE)
             
@@ -416,15 +496,16 @@ class QuadraticFormula(MathTutorialScene):
                 """
         ) as tracker:
             self.play(Write(step_3_label))
-            self.play(
-                *[
-                    ReplacementTransform(step_2_exp[0][i].copy(), step_3_exp[0][j])
-                    for i, j in zip(*step_3_transform_index)
-                ]
-            )
+            
+            # Simple fade in of the whole step 3 equation
+            self.play(FadeIn(step_3_exp))
+            
+            # Find the 41 for indication
+            step_3_parts = EquationParts(step_3_exp)
+            step_3_parts.find_part("sqrt_value", "41")
             
             self.wait_until_bookmark("equation")
-            self.play(FadeIn(step_3_41_part))
+            self.play(Indicate(step_3_parts.get_part("sqrt_value")))
 
             self.wait(COMPREHENSION_PAUSE)
 
@@ -439,7 +520,7 @@ class QuadraticFormula(MathTutorialScene):
             self.play(
                 ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
                 ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
-                rut_time=2
+                run_time=2
             )
             self.wait(STANDARD_PAUSE)
 

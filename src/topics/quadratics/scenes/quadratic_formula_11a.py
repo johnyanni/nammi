@@ -98,106 +98,122 @@ class QuadraticFormula(MathTutorialScene):
         
         coefficients = Group(a, b, c).arrange(buff=MED_BUFF).next_to(equation, DOWN * 2)
 
-        # Solution
+        # Solution Step 1 - Cleaner approach
+        # Create step 1 equation
+        step_1_tex = r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}"
         sol_step_1 = self.create_labeled_step(
             "Step 1: substitute the coefficients",
-            MathTex(r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}").scale(TEX_SCALE)
+            MathTex(step_1_tex).scale(TEX_SCALE)
         )
         step_1_label, step_1_exp = sol_step_1[0], sol_step_1[1]
-        step_1_fraction = step_1_exp[0][24]
-        step_1_x_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("x ="))[0]]
+
+        # Helper function to find elements in the equation
+        def find_element(pattern, exp=step_1_exp, nth=0, as_group=False):
+            indices = search_shape_in_text(exp, MathTex(pattern))
+            if not indices or nth >= len(indices):
+                return None
+            if as_group:
+                return VGroup(exp[0][indices[nth]])
+            return exp[0][indices[nth]]
+
+        def find_elements(pattern, exp=step_1_exp, as_group=True):
+            indices = search_shape_in_text(exp, MathTex(pattern))
+            if not indices:
+                return None
+            elements = [exp[0][idx] for idx in indices]
+            return VGroup(*elements) if as_group else elements
+
+        # Find basic elements
+        step_1_fraction = step_1_exp[0][24]  # Known index for fraction
+        step_1_x_part = find_element("x =")
+        step_1_plus_minus_part = find_element(r"\pm")
+        step_1_sqrt_part = VGroup(step_1_exp[0][8:10])  # Known indices for sqrt
+        step_1_two_part = find_element("2", nth=2)
+
+        # Find parentheses groups
         step_1_par_part = VGroup(
+            # Group 1: -(11)
             VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("-"))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[0]]
+                find_element("-"), 
+                find_element("(", nth=0), 
+                find_element(")", nth=0)
             ),
+            # Group 2: (11)^2
             VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[0]]
+                find_element("(", nth=1), 
+                find_element(")", nth=1),
+                find_element("2", nth=0)
             ),
+            # Group 3: (1)(20)
             VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[3]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[3]]
+                find_element("(", nth=2), 
+                find_element(")", nth=2),
+                find_element("(", nth=3), 
+                find_element(")", nth=3)
             ),
+            # Group 4: (1) in denominator
             VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[4]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[4]]
+                find_element("(", nth=4), 
+                find_element(")", nth=4)
             )
         )
-        step_1_b_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in
-                search_shape_in_text(step_1_exp, MathTex("11"))
-            ],
-        )
-        
-        step_1_plus_minus_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(r"\pm"))[0]]
-        step_1_sqrt_part = VGroup(step_1_exp[0][8:10])
-        step_1_minus_four_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in [
-                    search_shape_in_text(step_1_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_1_exp, MathTex("4"))[0]
-                ]
-            ]
-        )
-        
+
+        # Find coefficient values
+        step_1_b_part = find_elements("11")
+        step_1_minus_four_part = VGroup(find_element("-", nth=1), find_element("4"))
         step_1_a_part = VGroup(
-            *[
-                step_1_exp[0][search_shapes_in_text(step_1_exp, MathTex("1"))[i]]
-                for i in [4, 5]
-                              
-            
-            ]
+            find_element("1", nth=4),
+            find_element("1", nth=5)
         )
-        step_1_c_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("20"))[0]]
-        step_1_two_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[2]]
+        step_1_c_part = find_element("20")
         
-                
+        # Solution Step 2        
         sol_step_2 = self.create_labeled_step(
             "Step 2: simplifying the expression",
             MathTex(r"x = \frac{-11 \pm \sqrt{121 - 80}}{2}").scale(TEX_SCALE)
         )
         step_2_label, step_2_exp = sol_step_2[0], sol_step_2[1]
+        
+        # Helper function to find elements in step 2
+        def find_step2_element(pattern, nth=0):
+            return find_element(pattern, exp=step_2_exp, nth=nth)
+            
+        def find_step2_elements(pattern):
+            return find_elements(pattern, exp=step_2_exp)
+        
         step_2_fraction = step_2_exp[0][14]
-        step_2_x_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("x ="))[0]]
+        step_2_x_part = find_step2_element("x =")
         step_2_b_part = VGroup(
             VGroup(
-                *[
-                    step_2_exp[0][group] for group in [
-                        search_shape_in_text(step_2_exp, MathTex("-"))[0],
-                        search_shape_in_text(step_2_exp, MathTex("11"))[0]
-                    ]
-                ]
+                find_step2_element("-"),
+                find_step2_element("11")
             ),
-            step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("121"))[0]]
+            find_step2_element("121")
         )
-        step_2_plus_minus_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex(r"\pm"))[0]]
-        step_2_sqrt_part = step_2_exp[0][6:8]
+        step_2_plus_minus_part = find_step2_element(r"\pm")
+        step_2_sqrt_part = VGroup(step_2_exp[0][6:8])
         step_2_4ac_part = VGroup(
-            *[
-                step_2_exp[0][group] for group in [
-                    search_shape_in_text(step_2_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_2_exp, MathTex("80"))[0]
-                ]
-            ]
+            find_step2_element("-", nth=1),
+            find_step2_element("80")
         )
-        step_2_two_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("2"))[1]]
+        step_2_two_part = find_step2_element("2", nth=1)
 
         step_2_transform_index = [
             [0, 1, 2, 4, 5, 7, 8, 9, 24],
             [0, 1, 2, 3, 4, 5, 6, 7, 14]
         ]
-                
+        
+        # Solution Step 3       
         sol_step_3 = self.create_labeled_step(
             "Step 3: simplifying the square root",
             MathTex(r"x = \frac{-11 \pm \sqrt{41}}{2}").scale(TEX_SCALE)
         )
         step_3_label, step_3_exp = sol_step_3[0], sol_step_3[1]
+        
+        # Helper function to find elements in step 3
+        def find_step3_element(pattern, nth=0):
+            return find_element(pattern, exp=step_3_exp, nth=nth)
+            
         step_3_41_index = search_shape_in_text(step_3_exp, MathTex("41"))[0]
         step_3_41_part = step_3_exp[0][step_3_41_index]
         step_3_transform_index = [
@@ -439,7 +455,7 @@ class QuadraticFormula(MathTutorialScene):
             self.play(
                 ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
                 ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
-                rut_time=2
+                run_time=2
             )
             self.wait(STANDARD_PAUSE)
 

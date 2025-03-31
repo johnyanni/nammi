@@ -4,10 +4,7 @@ from src.components.common.quick_tip import QuickTip
 
 
 class QuadraticFormula(MathTutorialScene):
-
-
     def construct(self):
-
         # Constants for scaling
         TEX_SCALE = 0.70
 
@@ -28,22 +25,25 @@ class QuadraticFormula(MathTutorialScene):
         EQUATION_BG_OPACITY = 0.25
         EQUATION_BG_radius = 0.3
 
-                        
+        # Create the generic quadratic equation
         quadratic_equation = MathTex(r"ax^2 + bx + c = 0").scale(TEX_SCALE)
         SmartColorizeStatic(quadratic_equation, {"2": X_COLOR})
         
-        quadratic_equation_coefficients = Group(
-            *[
-                quadratic_equation[0][group] for group in
-                search_shapes_in_text(quadratic_equation, [MathTex("a"), MathTex("b"), MathTex("c")])
-            ]
-        )
-                
+        # Find the coefficients in the general equation
+        quad_a = quadratic_equation[0][0]  # 'a' is typically first character
+        quad_b = quadratic_equation[0][4]  # 'b' is typically at position 4
+        quad_c = quadratic_equation[0][8]  # 'c' is typically at position 8
+        
+        # Create the quadratic formula
         quadratic_formula = MathTex(r"x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}").scale(TEX_SCALE)
+        
+        # Arrange the quadratic equation and formula
         quadratic_group = Group(
             quadratic_equation,
-            quadratic_formula,
+            quadratic_formula
         ).arrange(buff=WIDE_BUFF).to_edge(UP)
+        
+        # Apply smart colorization
         self.apply_smart_colorize(
             quadratic_group,
             {
@@ -54,6 +54,7 @@ class QuadraticFormula(MathTutorialScene):
             }
         )
         
+        # Create background rectangles
         quadratic_equation_bg = SurroundingRectangle(
             quadratic_equation,
             buff=0.2,
@@ -83,10 +84,13 @@ class QuadraticFormula(MathTutorialScene):
                 "2": X_COLOR,
             }
         )
+        
+        # Find the values in the example equation
         a_in_equation = equation[0][search_shape_in_text(equation, MathTex("1"))[0]].set_opacity(0)
         b_in_equation = equation[0][search_shape_in_text(equation, MathTex("11"))[0]].set_color(B_COLOR)
         c_in_equation = equation[0][search_shape_in_text(equation, MathTex("20"))[0]].set_color(C_COLOR)
         
+        # Create coefficient labels
         a = MathTex("a = 1", color=A_COLOR).scale(TEX_SCALE)
         a_value = a[0][search_shape_in_text(a, MathTex("1"))[0]]
         
@@ -96,115 +100,52 @@ class QuadraticFormula(MathTutorialScene):
         c = MathTex("c = 20", color=C_COLOR).scale(TEX_SCALE)
         c_value = c[0][search_shape_in_text(c, MathTex("20"))[0]]
         
+        # Group the coefficients
         coefficients = Group(a, b, c).arrange(buff=MED_BUFF).next_to(equation, DOWN * 2)
 
-        # Solution
+        # STEP 1: Create with placeholder for values
+        step_1_eq = MathTex(r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}").scale(TEX_SCALE)
+        
+        # Find values to be animated in step 1
+        step_1_a_indices = search_shapes_in_text(step_1_eq, [MathTex("1")])
+        step_1_b_indices = search_shape_in_text(step_1_eq, MathTex("11"))
+        step_1_c_index = search_shape_in_text(step_1_eq, MathTex("20"))[0]
+        
+        # Note: Only keeping what we need for the transformations
+        step_1_a_parts = [step_1_eq[0][step_1_a_indices[4]], step_1_eq[0][step_1_a_indices[5]]]
+        step_1_b_parts = [step_1_eq[0][idx] for idx in step_1_b_indices]
+        step_1_c_part = step_1_eq[0][step_1_c_index]
+        
+        # Create the step with label
         sol_step_1 = self.create_labeled_step(
             "Step 1: substitute the coefficients",
-            MathTex(r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}").scale(TEX_SCALE)
+            step_1_eq
         )
-        step_1_label, step_1_exp = sol_step_1[0], sol_step_1[1]
-        step_1_fraction = step_1_exp[0][24]
-        step_1_x_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("x ="))[0]]
-        step_1_par_part = VGroup(
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("-"))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[0]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[0]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[1]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[0]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[2]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[3]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[3]]
-            ),
-            VGroup(
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("("))[4]],
-                step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(")"))[4]]
-            )
-        )
-        step_1_b_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in
-                search_shape_in_text(step_1_exp, MathTex("11"))
-            ],
-        )
+        step_1_label, step_1_exp = sol_step_1
         
-        step_1_plus_minus_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex(r"\pm"))[0]]
-        step_1_sqrt_part = VGroup(step_1_exp[0][8:10])
-        step_1_minus_four_part = VGroup(
-            *[
-                step_1_exp[0][group] for group in [
-                    search_shape_in_text(step_1_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_1_exp, MathTex("4"))[0]
-                ]
-            ]
-        )
-        
-        step_1_a_part = VGroup(
-            *[
-                step_1_exp[0][search_shapes_in_text(step_1_exp, MathTex("1"))[i]]
-                for i in [4, 5]
-                              
-            
-            ]
-        )
-        step_1_c_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("20"))[0]]
-        step_1_two_part = step_1_exp[0][search_shape_in_text(step_1_exp, MathTex("2"))[2]]
-        
-                
+        # STEP 2: Simplifying - just create the full equation
         sol_step_2 = self.create_labeled_step(
             "Step 2: simplifying the expression",
             MathTex(r"x = \frac{-11 \pm \sqrt{121 - 80}}{2}").scale(TEX_SCALE)
         )
-        step_2_label, step_2_exp = sol_step_2[0], sol_step_2[1]
-        step_2_fraction = step_2_exp[0][14]
-        step_2_x_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("x ="))[0]]
-        step_2_b_part = VGroup(
-            VGroup(
-                *[
-                    step_2_exp[0][group] for group in [
-                        search_shape_in_text(step_2_exp, MathTex("-"))[0],
-                        search_shape_in_text(step_2_exp, MathTex("11"))[0]
-                    ]
-                ]
-            ),
-            step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("121"))[0]]
-        )
-        step_2_plus_minus_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex(r"\pm"))[0]]
-        step_2_sqrt_part = step_2_exp[0][6:8]
-        step_2_4ac_part = VGroup(
-            *[
-                step_2_exp[0][group] for group in [
-                    search_shape_in_text(step_2_exp, MathTex("-"))[1],
-                    search_shape_in_text(step_2_exp, MathTex("80"))[0]
-                ]
-            ]
-        )
-        step_2_two_part = step_2_exp[0][search_shape_in_text(step_2_exp, MathTex("2"))[1]]
-
-        step_2_transform_index = [
-            [0, 1, 2, 4, 5, 7, 8, 9, 24],
-            [0, 1, 2, 3, 4, 5, 6, 7, 14]
-        ]
-                
+        step_2_label, step_2_exp = sol_step_2
+        
+        # Find parts to highlight in step 2
+        step_2_121_index = search_shape_in_text(step_2_exp, MathTex("121"))[0]
+        step_2_80_index = search_shape_in_text(step_2_exp, MathTex("80"))[0]
+        step_2_2_index = search_shape_in_text(step_2_exp, MathTex("2"))[-1]  # Last occurrence
+        
+        # STEP 3: Final simplification
         sol_step_3 = self.create_labeled_step(
             "Step 3: simplifying the square root",
             MathTex(r"x = \frac{-11 \pm \sqrt{41}}{2}").scale(TEX_SCALE)
         )
-        step_3_label, step_3_exp = sol_step_3[0], sol_step_3[1]
-        step_3_41_index = search_shape_in_text(step_3_exp, MathTex("41"))[0]
-        step_3_41_part = step_3_exp[0][step_3_41_index]
-        step_3_transform_index = [
-            [0, 1, 2, 3, 4, 5, 6, 7, 14, 15],
-            [0, 1, 2, 3, 4, 5, 6, 7, 10, 11]
-        ]
+        step_3_label, step_3_exp = sol_step_3
         
+        # Find 41 for highlighting in step 3
+        step_3_41_index = search_shape_in_text(step_3_exp, MathTex("41"))[0]
+        
+        # Apply smart colorization to all steps
         self.apply_smart_colorize(
             [step_1_exp, step_2_exp, step_3_exp],
             {
@@ -217,12 +158,14 @@ class QuadraticFormula(MathTutorialScene):
             }
         )
         
+        # Group all solution steps
         solution_steps = Group(
             sol_step_1,
             sol_step_2,
             sol_step_3
         ).arrange(DOWN, aligned_edge=LEFT)
         
+        # Create solutions
         first_root = MathTex(r"x = \frac{-11 + \sqrt{41}}{2}").scale(TEX_SCALE)
         first_root_dec = MathTex("x = -2.298").scale(TEX_SCALE)
         first_root_group = Group(first_root, first_root_dec).arrange(DOWN, aligned_edge=LEFT).align_to(sol_step_1, UP).to_edge(RIGHT)
@@ -233,6 +176,7 @@ class QuadraticFormula(MathTutorialScene):
         second_root_group = Group(second_root, second_root_dec).arrange(DOWN, aligned_edge=LEFT).align_to(sol_step_3, UP).to_edge(RIGHT)
         second_root_rec = self.create_surrounding_rectangle(second_root_dec)
 
+        # Apply coloring to roots
         self.apply_smart_colorize(
             [first_root, first_root_dec, second_root, second_root_dec],
             {
@@ -241,6 +185,7 @@ class QuadraticFormula(MathTutorialScene):
             }
         )
         
+        # Arrange the full solution
         solution = Group(
             solution_steps,
             Group(
@@ -249,12 +194,13 @@ class QuadraticFormula(MathTutorialScene):
             )
         ).arrange(buff=3.5).next_to(coefficients, DOWN * 1.5)
 
-        # Tips
+        # Create tips
         tip_1 = QuickTip(r"The \textbf{quadratic formula} is faster than completing the square in many cases")
         tip_2 = QuickTip("Writing the answer in decimal format is not entirely necessary")
         Group(tip_1, tip_2).to_corner(DL)
 
-        # Animations
+        # ANIMATION SEQUENCES
+        # Introduction
         with self.voiceover(
                 text="""
                 In this exercise, we are trying to find the solutions to <bookmark mark='equation' /> this quadratic equation using <bookmark mark='formula' /> the quadratic formula.
@@ -283,13 +229,13 @@ class QuadraticFormula(MathTutorialScene):
             
             self.wait(QUICK_PAUSE)
 
+        # Coefficient identification
         with self.voiceover(
                 text="""
                 First, let's <bookmark mark='coefficients' /> identify 'ay', 'b', and 'c'.
                 'a' is the coefficient <bookmark mark='x_squared' /> of x squared. Here, it's <bookmark mark='a' /> just 1.
                 'b' is the coefficient <bookmark mark='x' /> of x. That is <bookmark mark='b' /> just 11.
                 And 'c' is the <bookmark mark='constant' /> constant term, which <bookmark mark='c' /> is 20.
-
                 """
         ) as tracker:
             self.wait_until_bookmark("coefficients")
@@ -298,25 +244,26 @@ class QuadraticFormula(MathTutorialScene):
             )
 
             self.wait_until_bookmark("x_squared")
-            self.play(self.indicate(quadratic_equation_coefficients[0]))
+            self.play(self.indicate(quad_a))
 
             self.wait_until_bookmark("a")
             self.play(FadeIn(a_value, target_position=a_in_equation), run_time=2)
 
             self.wait_until_bookmark("x")
-            self.play(self.indicate(quadratic_equation_coefficients[1]))
+            self.play(self.indicate(quad_b))
 
             self.wait_until_bookmark("b")
             self.play(FadeIn(b_value, target_position=b_in_equation), run_time=2)
 
             self.wait_until_bookmark("constant")
-            self.play(self.indicate(quadratic_equation_coefficients[2]))
+            self.play(self.indicate(quad_c))
 
             self.wait_until_bookmark("c")
             self.play(FadeIn(c_value, target_position=c_in_equation), run_time=2)
 
             self.wait(COMPREHENSION_PAUSE)
 
+        # Step 1: Substituting values
         with self.voiceover(
                 text="""
                 Now, let's substitute these values into the quadratic formula.
@@ -324,6 +271,7 @@ class QuadraticFormula(MathTutorialScene):
         ) as tracker:
             self.play(Write(step_1_label))
 
+        # Step 1: Show substitutions
         with self.voiceover(
                 text="""
                 x equals negative 'b', <bookmark mark='negative_b' /> which is negative 11,
@@ -334,54 +282,43 @@ class QuadraticFormula(MathTutorialScene):
                 all divided <bookmark mark='two' /> by 2 times 'ay', which <bookmark mark='a_2' /> is one.
                 """
         ) as tracker:
-            self.play(Write(step_1_x_part), Write(step_1_fraction))
-
+            # Write the basic equation first except for a, b, c values
+            # Hide the values that will be transformed in
+            self.play(Write(step_1_eq))
+            
+            # Now do the replacements at the specified bookmarks
             self.wait_until_bookmark("negative_b")
-            self.play(Write(step_1_par_part[0]))
-            self.play(ReplacementTransform(b_value.copy(), step_1_b_part[0]))
+            self.play(ReplacementTransform(b_value.copy(), step_1_b_parts[0]), run_time=1)
 
             self.wait_until_bookmark("plus_minus")
-            self.play(Write(step_1_plus_minus_part))
-            self.play(Write(step_1_sqrt_part))
+            # This is a structural part, no replacement needed
+            pass
             
             self.wait_until_bookmark("b_squared")
-            self.play(
-                Write(step_1_par_part[1]),
-            )
-            self.play(ReplacementTransform(b_value.copy(), step_1_b_part[1]))
-        
+            self.play(ReplacementTransform(b_value.copy(), step_1_b_parts[1]), run_time=1)
             
             self.wait_until_bookmark("minus_4")
-            self.play(
-                Write(step_1_minus_four_part),
-                Write(step_1_par_part[2]),
-            )
+            # This is a structural part, no replacement needed
+            pass
 
             self.wait_until_bookmark("a_1")
-            self.play(
-                ReplacementTransform(a_value.copy(), step_1_a_part[0])
-            )
+            self.play(ReplacementTransform(a_value.copy(), step_1_a_parts[0]), run_time=1)
 
             self.wait_until_bookmark("c")
-            self.play(
-                ReplacementTransform(c_value.copy(), step_1_c_part)
-            )
+            self.play(ReplacementTransform(c_value.copy(), step_1_c_part), run_time=1)
 
             self.wait_until_bookmark("two")
-            self.play(
-                Write(step_1_two_part),
-                Write(step_1_par_part[3]),
-            )
+            # This is a structural part, no replacement needed
+            pass
 
             self.wait_until_bookmark("a_2")
-            self.play(
-                ReplacementTransform(a_value.copy(), step_1_a_part[1])
-            )
+            self.play(ReplacementTransform(a_value.copy(), step_1_a_parts[1]), run_time=1)
             
             self.play(FadeIn(tip_1, shift=UP))
             self.wait(COMPREHENSION_PAUSE)
         self.play(FadeOut(tip_1, shift=DOWN))
 
+        # Step 2: Simplifying
         with self.voiceover(
                 text="""
                 Next, we simplify step by step: 11 squared <bookmark mark='b_squared' /> equals 121.
@@ -390,44 +327,40 @@ class QuadraticFormula(MathTutorialScene):
                 """
         ) as tracker:
             self.play(Write(step_2_label))
-            self.play(
-                *[
-                    FadeTransform(step_1_exp[0][i][:].copy(), step_2_exp[0][j][:])
-                    if i == 8 or i == 9 else
-                    ReplacementTransform(step_1_exp[0][i][:].copy(), step_2_exp[0][j][:])
-                    for i, j in zip(*step_2_transform_index)
-                ]
-            )
-        
+            
+            # Write the full equation
+            self.play(FadeIn(step_2_exp))
+            
+            # Highlight specific parts
             self.wait_until_bookmark("b_squared")
-            self.play(FadeIn(step_2_b_part[1]))
+            self.play(Indicate(step_2_exp[0][step_2_121_index]))
                 
             self.wait_until_bookmark("four_ac")
-            self.play(FadeIn(step_2_4ac_part))
+            self.play(Indicate(step_2_exp[0][step_2_80_index]))
             
             self.wait_until_bookmark("den")
-            self.play(FadeIn(step_2_two_part))
+            self.play(Indicate(step_2_exp[0][step_2_2_index]))
 
             self.wait(COMPREHENSION_PAUSE)
             
+        # Step 3: Final simplification
         with self.voiceover(
                 text="""
                 And finally, 121 minus 80 <bookmark mark='equation' /> gives us 41.
                 """
         ) as tracker:
             self.play(Write(step_3_label))
-            self.play(
-                *[
-                    ReplacementTransform(step_2_exp[0][i].copy(), step_3_exp[0][j])
-                    for i, j in zip(*step_3_transform_index)
-                ]
-            )
             
+            # Write the full equation
+            self.play(FadeIn(step_3_exp))
+            
+            # Highlight the 41
             self.wait_until_bookmark("equation")
-            self.play(FadeIn(step_3_41_part))
+            self.play(Indicate(step_3_exp[0][step_3_41_index]))
 
             self.wait(COMPREHENSION_PAUSE)
 
+        # Solution forms
         with self.voiceover(
                 text="""
                 Since we can't simplify the square root of 41 further, we'll keep it exact.
@@ -439,10 +372,11 @@ class QuadraticFormula(MathTutorialScene):
             self.play(
                 ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
                 ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
-                rut_time=2
+                run_time=2
             )
             self.wait(STANDARD_PAUSE)
 
+        # Decimal approximations
         with self.voiceover(
                 text="""
                 Finally, if we want decimal approximations: the first solution, with the plus, is <bookmark mark='root_1' /> about -2.298.
@@ -459,6 +393,7 @@ class QuadraticFormula(MathTutorialScene):
             self.wait(QUICK_PAUSE)
         self.play(FadeOut(tip_2, shift=DOWN))
             
+        # Conclusion
         with self.voiceover(
                 text="""
                 So these are the actual solutions using the quadratic formula.
