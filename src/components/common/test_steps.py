@@ -54,7 +54,11 @@ class TestSteps(VMobject):
         """Extract and store all components during initialization for easier access later."""
         # Find the indices of key components
         equal_index = search_shape_in_text(self._step_1, MathTex("="))[0]
-        slope_index = search_shape_in_text(self._step_1, MathTex(fr"{self._slope}"))[0]
+        slope_index = search_shape_in_text(self._step_1, MathTex(fr"{self._slope}"))
+        if slope_index[0].start < equal_index.start:
+            slope_index = slope_index[1]
+        else:
+            slope_index = slope_index[0]
         y_intercept_index = search_shape_in_text(self._step_1, MathTex(fr"{self._y_intercept}"))[-1]
         times_index = search_shape_in_text(self._step_1, MathTex(r"\times"))
         not_equal_index = search_shape_in_text(self._step_2, MathTex(r"\ne"))
