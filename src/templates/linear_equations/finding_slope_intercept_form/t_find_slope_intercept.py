@@ -246,20 +246,6 @@ class FindSlopeInterceptFormTemplate(MathTutorialScene):
         step4_p1 = MathTex(r"y = mx + b").scale(MATH_SCALE)
         step4_p2 = MathTex(FINAL_EQUATION).scale(MATH_SCALE)
         
-        
-        step4_p1_var = step4_p1[0][search_shape_in_text(step4_p1, MathTex("y"))[0]].set_color(RED)
-        
-        self.add(step4_p1_var)
-        
-        # step4_p2_var = step4_p2[0][search_shape_in_text(step4_p2, MathTex(f"{SLOPE_DISPLAY}"))[0]].set_color(SLOPE_COLOR)
-        
-        step4_p2_var = self.color_component(step4_p2, SLOPE_DISPLAY, SLOPE_COLOR)
-        
-        step4_p2_var_2 = step4_p2[0][search_shape_in_text(step4_p2, MathTex(f"{Y_INTERCEPT_DISPLAY}"))[1]].set_color(Y_INTERCEPT_COLOR)
-        
-        self.add(step4_p2_var)
-        self.add(step4_p2_var_2)
-        
 
         ##############################################################################
         # SECTION 6: COLORING AND STYLING SETUP
@@ -269,7 +255,6 @@ class FindSlopeInterceptFormTemplate(MathTutorialScene):
         smart_coloring = self.setup_smart_coloring({
             step2_p1: [r"Slope", r"\text{rise}", r"\text{run}"],
             step2_p2: [r"Slope", f"{rise}", f"{run}", f"{RISE_VALUE}", f"{RUN_VALUE}", SLOPE_DISPLAY],
-            step3_p1: ["m","b"],
             step3_p2: [r"m \text{ = slope", r"b \text{ = y-intercept"],
             step4_p1: ["m", "b"],
             step4_p2: [Y_INTERCEPT_DISPLAY, SLOPE_DISPLAY]

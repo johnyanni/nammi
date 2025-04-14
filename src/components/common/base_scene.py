@@ -5,7 +5,17 @@ from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 from .smart_tex import *
-from src.components.styles.constants import *
+from .custom_axes import CustomAxes
+
+
+MATH_SCALE = 0.60
+MATH_SCALE_SMALL = 0.55
+TEXT_SCALE = 0.55
+
+QUICK_PAUSE = 0.5
+STANDARD_PAUSE = 1.0
+COMPREHENSION_PAUSE = 2.0
+
 
 # Common settings
 BACKGROUND_COLOR = ManimColor("#121212")

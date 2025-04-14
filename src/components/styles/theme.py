@@ -2,14 +2,6 @@
 
 from manim import *
 
-# Colors
-PROBLEM_COLOR = WHITE
-SOLUTION_COLOR = "#89CFF0"  # Baby Blue
-HIGHLIGHT_COLOR = "#FFD700"  # Gold
-EMPHASIS_COLOR = "#FF69B4"  # Hot Pink
-SUCCESS_COLOR = "#90EE90"  # Light Green
-ERROR_COLOR = "#FF6B6B"  # Light Red
-
 # Text Scales
 TITLE_SCALE = 0.8
 PROBLEM_SCALE = 0.7

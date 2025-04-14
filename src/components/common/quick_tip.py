@@ -1,6 +1,7 @@
 """Quick tip component for displaying helpful hints in tutorials."""
 
 from manim import *
+from .smart_tex import *
 
 class QuickTip(VGroup):
 
@@ -34,7 +35,8 @@ class QuickTip(VGroup):
         body.arrange(DOWN, buff=line_spacing)
 
         if color_map:
-            self.apply_smart_colorize(body, color_map=color_map)
+            for part in body:
+                SmartColorizeStatic(part, color_map=color_map)
          
         # Calculate dimensions
         total_height = header.height + body.height + line_spacing * 4

@@ -8,7 +8,7 @@ class MathIndices:
     @staticmethod
     def display_indices(scene, mathtex_obj, label_text="", display_duration=5):
         """
-        Displays the indices of characters in a MathTex object.
+        Displays the indices of characters in a MathTex object by overlaying index labels.
         
         Args:
             scene: The Manim scene to add/remove objects to/from
@@ -26,13 +26,8 @@ class MathIndices:
             header.to_edge(UP)
             scene.add(header)
         
-        # Add the original expression
-        original = mathtex_obj.copy()
-        original.move_to(ORIGIN + UP)
-        scene.add(original)
-        
-        # Create visualization group
-        viz_group = VGroup()
+        # Create group for index labels
+        index_labels_group = VGroup()
         
         # Handle different structures of MathTex
         if len(mathtex_obj.submobjects) > 0:
@@ -42,31 +37,34 @@ class MathIndices:
             # Add index labels for each part
             for i in range(len(submob)):
                 # Get character
-                char = submob[i].copy()
+                char = submob[i]
                 
                 # Create index label
-                index_label = Text(str(i), font_size=18, color=RED)
-                index_label.next_to(char, DOWN, buff=0.1)
+                index_label = Text(str(i), font_size=14, color=RED)
                 
-                # Create background for visibility
+                # Position label above the character
+                index_label.move_to(char.get_center() + UP * 0.3)
+                
+                # Add a small background for better visibility
                 bg = SurroundingRectangle(
-                    char, 
+                    index_label, 
                     color=BLUE, 
                     stroke_width=1, 
-                    fill_opacity=0.1,
+                    fill_color=BLACK,
+                    fill_opacity=0.7,
                     buff=0.05
                 )
                 
-                # Group character with its index
-                char_group = VGroup(char, bg, index_label)
-                viz_group.add(char_group)
+                # Group label with its background
+                label_group = VGroup(bg, index_label)
+                index_labels_group.add(label_group)
+        
+        # Make sure the original MathTex is visible (add it if it's not already in the scene)
+        if mathtex_obj not in scene.mobjects:
+            scene.add(mathtex_obj)
             
-            # Arrange the visualization
-            viz_group.arrange(RIGHT, buff=0.3)
-            viz_group.move_to(ORIGIN + DOWN)
-            
-            # Add the visualization
-            scene.add(viz_group)
+        # Add the index labels on top
+        scene.add(index_labels_group)
         
         # Print the structure information to the console for reference
         print(f"Structure of {label_text}:")
@@ -78,8 +76,10 @@ class MathIndices:
         # Wait for the specified duration
         scene.wait(display_duration)
         
-        # Clean up
-        scene.remove(viz_group)
+        # Clean up just the index labels, leaving the original MathTex
+        scene.remove(index_labels_group)
         if header:
             scene.remove(header)
-        scene.remove(original) 
+        
+        # Note: We don't remove the original mathtex_obj since we're assuming
+        # it's part of the scene and should remain visible
