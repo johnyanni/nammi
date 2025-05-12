@@ -14,6 +14,8 @@ TEXT_SCALE = 0.55
 
 TEX_SCALE = 0.70
 
+FOOTNOTE_SCALE = 0.6
+
 
 QUICK_PAUSE = 0.5
 STANDARD_PAUSE = 1.0
@@ -411,4 +413,25 @@ class MathTutorialScene(VoiceoverScene):
             elements.append(element)
         
         return VGroup(*elements) if as_group else elements
+    
+    
+    def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0):
+        terms = VGroup(*[MathTex(rf"{term_added}").scale(FOOTNOTE_SCALE) for _ in range(2)])
+        if color:
+            terms.set_color(color)
+            
+        terms[0].next_to(left_term, DOWN)
+        terms[1].next_to(right_term, DOWN)
+        
+        # Apply horizontal spacing adjustment
+        terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
+        terms[1].shift(RIGHT * h_spacing)  # Move right annotation further right
+        
+        
+        if terms[0].get_y() < terms[1].get_y():
+            terms[1].align_to(terms[0], DOWN)
+        else:
+            terms[0].align_to(terms[1], DOWN)
+
+        return terms
 

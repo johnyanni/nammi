@@ -3,27 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 
 
-def add_annotations(term_added, left_term, right_term, color=None, h_spacing=0):
-    terms = VGroup(*[MathTex(rf"{term_added}").scale(FOOTNOTE_SCALE) for _ in range(2)])
-    if color:
-        terms.set_color(color)
-        
-    terms[0].next_to(left_term, DOWN)
-    terms[1].next_to(right_term, DOWN)
-    
-     # Apply horizontal spacing adjustment
-    terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
-    terms[1].shift(RIGHT * h_spacing)  # Move right annotation further right
-    
-    
-    if terms[0].get_y() < terms[1].get_y():
-        terms[1].align_to(terms[0], DOWN)
-    else:
-        terms[0].align_to(terms[1], DOWN)
 
-    return terms
-
-FOOTNOTE_SCALE = 0.6
 
 # Colors
 VARIABLE_COLOR  = "#BB88FF"
@@ -74,12 +54,12 @@ class SolveForX(MathTutorialScene):
         # Find elements for annotations
         plus_3 = self.find_element("3", equation)
         minus_2 = self.find_element("2", equation)
-        subtract_3 = add_annotations("-3", plus_3, minus_2, color=CONSTANT_COLOR)
+        subtract_3 = self.add_annotations("-3", plus_3, minus_2, color=CONSTANT_COLOR)
         
         # Annotations for step 2
         step_1_x_over_7 = self.find_element(r"\frac{x}{7}", step_1)
         step_1_minus_5 = self.find_element("5", step_1)
-        multiply_7 = add_annotations(r"\times 7", step_1_x_over_7, step_1_minus_5, color=COEFF_COLOR)
+        multiply_7 = self.add_annotations(r"\times 7", step_1_x_over_7, step_1_minus_5, color=COEFF_COLOR)
         
         # Tips
         tip_1 = QuickTip(
