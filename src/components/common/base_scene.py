@@ -12,6 +12,11 @@ MATH_SCALE = 0.60
 MATH_SCALE_SMALL = 0.55
 TEXT_SCALE = 0.55
 
+TEX_SCALE = 0.70
+
+FOOTNOTE_SCALE = 0.6
+
+
 QUICK_PAUSE = 0.5
 STANDARD_PAUSE = 1.0
 COMPREHENSION_PAUSE = 2.0
@@ -285,14 +290,148 @@ class MathTutorialScene(VoiceoverScene):
     
     
     def indicate(self, mobject, color="#9A48D0", run_time=2.0):
-        """Create an Indicate animation for a mobject.
+        """Indicate a mobject with a color."""
+        return Indicate(mobject, color=color, run_time=run_time)
+    
+    
+    def get_elements(self, equation, element_text, color=None, opacity=None, occurrence=None):
+        """
+        Helper function to isolate elements from a MathTex or Tex object.
         
         Args:
-            mobject: The mobject to indicate
-            color: The color to use for indication (default: "#9A48D0")
-            run_time: How long the indication should last (default: 2.0)
-            
+            equation: The MathTex or Tex object containing the expression
+            element_text: The text of the element to isolate (e.g., "x", "1")
+            color: Optional color to apply to the elements
+            opacity: Optional opacity to set for the elements
+            occurrence: Optional specific occurrence to return (0-based index)
+                    None returns all occurrences as a list
+                    Integer returns that specific occurrence (0=first, 1=second, etc.)
+        
         Returns:
-            Indicate animation for the mobject
+            If occurrence is None: List of all matching components
+            If occurrence is int: The specific component at that occurrence
+            Returns empty list or None if not found
         """
-        return Indicate(mobject, color=color, run_time=run_time)
+        indices = search_shape_in_text(equation, MathTex(element_text))
+        
+        if not indices or len(indices) == 0:
+            print(f"Warning: Could not find '{element_text}' in the expression")
+            return [] if occurrence is None else None
+        
+        # If a specific occurrence is requested
+        if occurrence is not None:
+            if occurrence < 0 or occurrence >= len(indices):
+                print(f"Warning: Requested occurrence {occurrence} is out of range (0-{len(indices)-1})")
+                return None
+            
+            element = equation[0][indices[occurrence]]
+            if color:
+                element.set_color(color)
+            if opacity is not None:
+                element.set_opacity(opacity)
+            return element
+        
+        # Return all occurrences
+        elements = []
+        for idx in indices:
+            element = equation[0][idx]
+            if color:
+                element.set_color(color)
+            if opacity is not None:
+                element.set_opacity(opacity)
+            elements.append(element)
+        
+        return elements
+
+
+
+
+
+    def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
+        """
+        Find a specific occurrence of a pattern within an expression.
+        
+        Args:
+            pattern: The text pattern to search for (e.g., "x", "1")
+            exp: The MathTex or Tex object to search within
+            nth: Which occurrence to return (0-based index)
+            as_group: If True, returns the element wrapped in a VGroup
+            color: Optional color to set for the element
+            opacity: Optional opacity to set for the element
+        
+        Returns:
+            The matching element, or a VGroup containing the element if as_group=True
+            None if not found
+        """
+        indices = search_shape_in_text(exp, MathTex(pattern))
+        if not indices or nth >= len(indices):
+            print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+            return None
+        
+        element = exp[0][indices[nth]]
+        
+        if color:
+            element.set_color(color)
+        
+        if opacity is not None:
+            element.set_opacity(opacity)
+        
+        return VGroup(element) if as_group else element
+
+
+    def find_elements(self, pattern, exp, as_group=True, color=None, opacity=None):
+        """
+        Find all occurrences of a pattern within an expression.
+        
+        Args:
+            pattern: The text pattern to search for (e.g., "x", "1")
+            exp: The MathTex or Tex object to search within
+            as_group: If True, returns all elements as a VGroup
+            color: Optional color to set for all found elements
+            opacity: Optional opacity to set for all found elements
+        
+        Returns:
+            A VGroup of all matching elements if as_group=True
+            A list of all matching elements if as_group=False
+            None if no matches found
+        """
+        indices = search_shape_in_text(exp, MathTex(pattern))
+        if not indices:
+            print(f"Warning: No occurrences of '{pattern}' found")
+            return None
+        
+        elements = []
+        for idx in indices:
+            element = exp[0][idx]
+            
+            if color:
+                element.set_color(color)
+            
+            if opacity is not None:
+                element.set_opacity(opacity)
+                
+            elements.append(element)
+        
+        return VGroup(*elements) if as_group else elements
+    
+    
+    def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0):
+        terms = VGroup(*[MathTex(rf"{term_added}").scale(FOOTNOTE_SCALE) for _ in range(2)])
+        if color:
+            terms.set_color(color)
+            
+        terms[0].next_to(left_term, DOWN)
+        terms[1].next_to(right_term, DOWN)
+        
+        # Apply horizontal spacing adjustment
+        terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
+        terms[1].shift(RIGHT * h_spacing)  # Move right annotation further right
+        
+        
+        if terms[0].get_y() < terms[1].get_y():
+            terms[1].align_to(terms[0], DOWN)
+        else:
+            terms[0].align_to(terms[1], DOWN)
+
+        return terms
+
