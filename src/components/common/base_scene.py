@@ -280,6 +280,28 @@ class MathTutorialScene(VoiceoverScene):
             return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
         
         
+    def create_labeled_step_alt(
+                self,
+                label_text,
+                expressions,
+                color_map=None,
+                label_color=GREY,
+                label_scale=0.5,
+                label_buff=0.2,
+                eq_hbuff=0.2,
+                tex_scale=TEX_SCALE
+        ):
+            label = Tex(label_text, color=label_color).scale(label_scale)
+            exp_group = VGroup(*[MathTex(exp).scale(tex_scale) for exp in expressions])
+            exp_group.arrange(RIGHT, buff=eq_hbuff)
+            
+            if color_map:
+                self.apply_smart_colorize(exp_group, color_map)
+            
+            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+        
+        
+        
     def create_surrounding_rectangle(
             self,
             mobject,
@@ -292,127 +314,6 @@ class MathTutorialScene(VoiceoverScene):
     def indicate(self, mobject, color="#9A48D0", run_time=2.0):
         """Indicate a mobject with a color."""
         return Indicate(mobject, color=color, run_time=run_time)
-    
-    
-    def get_elements(self, equation, element_text, color=None, opacity=None, occurrence=None):
-        """
-        Helper function to isolate elements from a MathTex or Tex object.
-        
-        Args:
-            equation: The MathTex or Tex object containing the expression
-            element_text: The text of the element to isolate (e.g., "x", "1")
-            color: Optional color to apply to the elements
-            opacity: Optional opacity to set for the elements
-            occurrence: Optional specific occurrence to return (0-based index)
-                    None returns all occurrences as a list
-                    Integer returns that specific occurrence (0=first, 1=second, etc.)
-        
-        Returns:
-            If occurrence is None: List of all matching components
-            If occurrence is int: The specific component at that occurrence
-            Returns empty list or None if not found
-        """
-        indices = search_shape_in_text(equation, MathTex(element_text))
-        
-        if not indices or len(indices) == 0:
-            print(f"Warning: Could not find '{element_text}' in the expression")
-            return [] if occurrence is None else None
-        
-        # If a specific occurrence is requested
-        if occurrence is not None:
-            if occurrence < 0 or occurrence >= len(indices):
-                print(f"Warning: Requested occurrence {occurrence} is out of range (0-{len(indices)-1})")
-                return None
-            
-            element = equation[0][indices[occurrence]]
-            if color:
-                element.set_color(color)
-            if opacity is not None:
-                element.set_opacity(opacity)
-            return element
-        
-        # Return all occurrences
-        elements = []
-        for idx in indices:
-            element = equation[0][idx]
-            if color:
-                element.set_color(color)
-            if opacity is not None:
-                element.set_opacity(opacity)
-            elements.append(element)
-        
-        return elements
-
-
-
-
-
-    def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
-        """
-        Find a specific occurrence of a pattern within an expression.
-        
-        Args:
-            pattern: The text pattern to search for (e.g., "x", "1")
-            exp: The MathTex or Tex object to search within
-            nth: Which occurrence to return (0-based index)
-            as_group: If True, returns the element wrapped in a VGroup
-            color: Optional color to set for the element
-            opacity: Optional opacity to set for the element
-        
-        Returns:
-            The matching element, or a VGroup containing the element if as_group=True
-            None if not found
-        """
-        indices = search_shape_in_text(exp, MathTex(pattern))
-        if not indices or nth >= len(indices):
-            print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-            return None
-        
-        element = exp[0][indices[nth]]
-        
-        if color:
-            element.set_color(color)
-        
-        if opacity is not None:
-            element.set_opacity(opacity)
-        
-        return VGroup(element) if as_group else element
-
-
-    def find_elements(self, pattern, exp, as_group=True, color=None, opacity=None):
-        """
-        Find all occurrences of a pattern within an expression.
-        
-        Args:
-            pattern: The text pattern to search for (e.g., "x", "1")
-            exp: The MathTex or Tex object to search within
-            as_group: If True, returns all elements as a VGroup
-            color: Optional color to set for all found elements
-            opacity: Optional opacity to set for all found elements
-        
-        Returns:
-            A VGroup of all matching elements if as_group=True
-            A list of all matching elements if as_group=False
-            None if no matches found
-        """
-        indices = search_shape_in_text(exp, MathTex(pattern))
-        if not indices:
-            print(f"Warning: No occurrences of '{pattern}' found")
-            return None
-        
-        elements = []
-        for idx in indices:
-            element = exp[0][idx]
-            
-            if color:
-                element.set_color(color)
-            
-            if opacity is not None:
-                element.set_opacity(opacity)
-                
-            elements.append(element)
-        
-        return VGroup(*elements) if as_group else elements
     
     
     def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0):
@@ -434,4 +335,598 @@ class MathTutorialScene(VoiceoverScene):
             terms[0].align_to(terms[1], DOWN)
 
         return terms
+    
+    def create_callout(
+            self,
+            text,
+            target,
+            position=UP,
+            color=TEAL,
+            text_scale=0.55,
+            buff=0.2,
+            animate=True,
+            run_time=1,
+    ):
+        """
+        Creates and animates a callout with highlighting behavior.
 
+        Parameters:
+        -----------
+        text : str
+            The text to display in the callout
+        target : Mobject
+            The object to highlight and position the callout near
+        position : np.array or UP/DOWN/LEFT/RIGHT, default=UP
+            Direction to place the callout relative to target
+        color : color, default=TEAL
+            Color for highlighting and callout text
+        text_scale : float, default=0.55
+            Scale of the callout text
+        buff : float, default=0.2
+            Space between callout and target
+        animate : bool, default=True
+            Whether to animate the callout appearance
+        run_time : float, default=1
+            Duration of the animation
+
+        Returns:
+        --------
+        CalloutManager : A class with methods to show and hide the callout
+        """
+        # Store original properties
+        original_color = target.get_color()
+
+        callout_text = Tex(text, color=color).scale(text_scale)
+
+        background_width = callout_text.width + 0.4
+        background_height = callout_text.height + 0.4
+
+        rounded_background = RoundedRectangle(
+            width=background_width,
+            height=background_height,
+            corner_radius=0.15,
+            fill_color=BLACK,
+            fill_opacity=1,
+            stroke_width=0,
+        )
+
+        rounded_background.move_to(callout_text.get_center())
+
+        callout = VGroup(rounded_background, callout_text)
+        callout.next_to(target, position, buff=buff)
+        callout.set_z_index(10)
+
+        # Create a manager class for this specific callout
+        class CalloutManager:
+            def __init__(
+                self, scene, callout_obj, target_obj, orig_color, position, buff
+            ):
+                self.scene = scene
+                self.callout = callout_obj
+                self.target = target_obj
+                self.original_color = orig_color
+                self.is_visible = False
+                self.position = position
+                self.buff = buff
+
+                self.callout.add_updater(
+                    lambda m: m.next_to(target_obj, position, buff=buff)
+                )
+
+            def show(self, run_time=1):
+                """Show the callout and highlight the target"""
+                animations = []
+
+                # Only change color if it's not already highlighted
+                if self.target.get_color() != color:
+                    animations.append(self.target.animate.set_color(color))
+
+                if not self.is_visible:
+                    animations.append(FadeIn(self.callout))
+                    self.is_visible = True
+
+                if animations:
+                    self.scene.play(*animations, run_time=run_time)
+                return self
+
+            def hide(self, run_time=1):
+                """Hide the callout and restore original color"""
+                animations = []
+
+                if self.target.get_color() != self.original_color:
+                    animations.append(
+                        self.target.animate.set_color(self.original_color)
+                    )
+
+                if self.is_visible:
+                    animations.append(FadeOut(self.callout))
+                    self.is_visible = False
+
+                if animations:
+                    self.scene.play(*animations, run_time=run_time)
+                return self
+
+            def add_to_scene(self):
+                """Just add the callout to the scene without animation"""
+                self.scene.add(self.callout)
+                # Also update target color
+                self.target.set_color(color)
+                self.is_visible = True
+                return self
+
+            def get_callout(self):
+                """Return the callout object"""
+                return self.callout
+
+        # Create the manager
+        manager = CalloutManager(self, callout, target, original_color, position, buff)
+
+        # Animate if requested
+        if animate:
+            manager.show(run_time=run_time)
+
+        return manager
+
+
+    # def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
+    #     """
+    #     Find a specific occurrence of a pattern within an expression.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         as_group: If True, returns the element wrapped in a VGroup
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+        
+    #     Returns:
+    #         The matching element, or a VGroup containing the element if as_group=True
+    #         None if not found
+    #     """
+    #     try:
+    #         # Create a temporary MathTex object for matching
+    #         # We don't add this to the scene - it's just for pattern matching
+    #         pattern_tex = MathTex(pattern)
+            
+    #         # Find the pattern in the expression
+    #         indices = search_shape_in_text(exp, pattern_tex)
+            
+    #         if not indices or nth >= len(indices):
+    #             print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #             return None
+            
+    #         # Get the specific element
+    #         element = exp[0][indices[nth]]
+            
+    #         # Apply color and opacity if specified
+    #         if color:
+    #             element.set_color(color)
+            
+    #         if opacity is not None:
+    #             element.set_opacity(opacity)
+            
+    #         # Return as appropriate format
+    #         return VGroup(element) if as_group else element
+            
+    #     except Exception as e:
+    #         print(f"Error finding pattern '{pattern}': {e}")
+    #     return None
+    
+    
+
+    # def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
+    #     """
+    #     Find a specific occurrence of a pattern within an expression.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         as_group: If True, returns the element wrapped in a VGroup
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+        
+    #     Returns:
+    #         The matching element, or a VGroup containing the element if as_group=True
+    #         None if not found
+    #     """
+    #     indices = search_shape_in_text(exp, MathTex(pattern))
+    #     if not indices or nth >= len(indices):
+    #         print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #         return None
+        
+    #     element = exp[0][indices[nth]]
+        
+    #     # Apply color if specified
+    #     if color is not None:
+    #         element.set_color(color)
+        
+    #     # Apply opacity if specified
+    #     if opacity is not None:
+    #         element.set_opacity(opacity)
+        
+    #     # Return element, wrapped in VGroup if requested
+    #     if as_group:
+    #         return VGroup(element)
+    #     return element
+
+
+
+
+    # def find_elements(self, pattern, exp, as_group=True, color=None, opacity=None):
+    #     """
+    #     Find all occurrences of a pattern within an expression.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1")
+    #         exp: The MathTex or Tex object to search within
+    #         as_group: If True, returns all elements as a VGroup
+    #         color: Optional color to set for all found elements
+    #         opacity: Optional opacity to set for all found elements
+        
+    #     Returns:
+    #         A VGroup of all matching elements if as_group=True
+    #         A list of all matching elements if as_group=False
+    #         None if no matches found
+    #     """
+    #     indices = search_shape_in_text(exp, MathTex(pattern))
+    #     if not indices:
+    #         print(f"Warning: No occurrences of '{pattern}' found")
+    #         return None
+        
+    #     elements = []
+    #     for idx in indices:
+    #         element = exp[0][idx]
+            
+    #         if color:
+    #             element.set_color(color)
+            
+    #         if opacity is not None:
+    #             element.set_opacity(opacity)
+                
+    #         elements.append(element)
+        
+    #     return VGroup(*elements) if as_group else elements
+    
+    
+
+
+    # def find_adjacent_elements(self, pattern1, pattern2, exp, nth1=0, nth2=0, color=None):
+    #     """Find two adjacent patterns and group them together."""
+        
+    #     # Count occurrences to provide better warnings
+    #     indices1 = search_shape_in_text(exp, MathTex(pattern1))
+    #     indices2 = search_shape_in_text(exp, MathTex(pattern2))
+        
+    #     if not indices1:
+    #         print(f"Warning: Pattern '{pattern1}' not found in expression")
+    #         return None
+        
+    #     if not indices2:
+    #         print(f"Warning: Pattern '{pattern2}' not found in expression")
+    #         return None
+        
+    #     # Validate nth1 is in range
+    #     if abs(nth1) > len(indices1):
+    #         print(f"Warning: Requested occurrence {nth1} for '{pattern1}' is out of range (found {len(indices1)} occurrences)")
+    #         return None
+        
+    #     # Validate nth2 is in range
+    #     if abs(nth2) > len(indices2):
+    #         print(f"Warning: Requested occurrence {nth2} for '{pattern2}' is out of range (found {len(indices2)} occurrences)")
+    #         return None
+        
+    #     # Get the elements
+    #     elem1 = exp[0][indices1[nth1 % len(indices1)]]
+    #     elem2 = exp[0][indices2[nth2 % len(indices2)]]
+        
+    #     group = VGroup(elem1, elem2)
+        
+    #     if color:
+    #         group.set_color(color)
+        
+    #     return group
+    
+    
+    
+        
+    # def find_adjacent_elements(self, first_pattern, second_pattern, exp, color=None, opacity=None):
+    #     """
+    #     Find two adjacent elements within an expression and return them as a VGroup.
+        
+    #     Args:
+    #         first_pattern: The text pattern to search for first element (e.g., "-")
+    #         second_pattern: The text pattern to search for second element (e.g., "5")
+    #         exp: The MathTex or Tex object to search within
+    #         color: Optional color to set for the elements
+    #         opacity: Optional opacity to set for the elements
+        
+    #     Returns:
+    #         A VGroup containing the two adjacent elements
+    #         None if not found
+    #     """
+    #     # Find indices of both patterns
+    #     first_indices = search_shape_in_text(exp, MathTex(first_pattern))
+    #     second_indices = search_shape_in_text(exp, MathTex(second_pattern))
+        
+    #     if not first_indices or not second_indices:
+    #         print(f"Warning: Could not find '{first_pattern}' or '{second_pattern}'")
+    #         return None
+        
+    #     # Check for adjacency - find pairs where second follows first
+    #     adjacent_pairs = []
+    #     for first_idx in first_indices:
+    #         for second_idx in second_indices:
+    #             # Check if they're adjacent (second follows first)
+    #             if isinstance(first_idx, slice) and isinstance(second_idx, slice):
+    #                 if first_idx.stop == second_idx.start:
+    #                     adjacent_pairs.append((first_idx, second_idx))
+        
+    #     if not adjacent_pairs:
+    #         print(f"Warning: No adjacent occurrences of '{first_pattern}' and '{second_pattern}' found")
+    #         return None
+        
+    #     # Use the first adjacent pair found
+    #     first_idx, second_idx = adjacent_pairs[0]
+        
+    #     # Get the elements
+    #     first_element = exp[0][first_idx]
+    #     second_element = exp[0][second_idx]
+        
+    #     # Create a VGroup with both elements
+    #     result = VGroup(first_element, second_element)
+        
+    #     # Apply color if specified
+    #     if color is not None:
+    #         result.set_color(color)
+        
+    #     # Apply opacity if specified
+    #     if opacity is not None:
+    #         result.set_opacity(opacity)
+        
+    #     return result
+    
+    
+    
+    # def find_adjacent_elements(self, first_pattern, second_pattern, exp, nth=0, color=None, opacity=None):
+    #     """
+    #     Find the nth occurrence of two adjacent elements within an expression and return them as a VGroup.
+        
+    #     Args:
+    #         first_pattern: The text pattern to search for first element (e.g., "-")
+    #         second_pattern: The text pattern to search for second element (e.g., "5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to find (default: 0)
+    #         color: Optional color to set for the elements
+    #         opacity: Optional opacity to set for the elements
+        
+    #     Returns:
+    #         A VGroup containing the two adjacent elements
+    #         None if not found
+    #     """
+    #     # Find indices of both patterns
+    #     first_indices = search_shape_in_text(exp, MathTex(first_pattern))
+    #     second_indices = search_shape_in_text(exp, MathTex(second_pattern))
+        
+    #     if not first_indices or not second_indices:
+    #         print(f"Warning: Could not find '{first_pattern}' or '{second_pattern}'")
+    #         return None
+        
+    #     # Check for adjacency - find pairs where second follows first
+    #     adjacent_pairs = []
+    #     for first_idx in first_indices:
+    #         for second_idx in second_indices:
+    #             # Check if they're adjacent (second follows first)
+    #             if isinstance(first_idx, slice) and isinstance(second_idx, slice):
+    #                 if first_idx.stop == second_idx.start:
+    #                     adjacent_pairs.append((first_idx, second_idx))
+        
+    #     if not adjacent_pairs or nth >= len(adjacent_pairs):
+    #         print(f"Warning: No adjacent occurrences at index {nth} of '{first_pattern}' and '{second_pattern}' found")
+    #         return None
+        
+    #     # Use the nth adjacent pair found
+    #     first_idx, second_idx = adjacent_pairs[nth]
+        
+    #     # Get the elements
+    #     first_element = exp[0][first_idx]
+    #     second_element = exp[0][second_idx]
+        
+    #     # Create a VGroup with both elements
+    #     result = VGroup(first_element, second_element)
+        
+    #     # Apply color if specified
+    #     if color is not None:
+    #         result.set_color(color)
+        
+    #     # Apply opacity if specified
+    #     if opacity is not None:
+    #         result.set_opacity(opacity)
+        
+    #     return result
+    
+    
+    
+    
+    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False):
+    #     """
+    #     Enhanced find_element that automatically handles negative numbers and other patterns.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+    #         as_group: If True, returns the element wrapped in a VGroup
+        
+    #     Returns:
+    #         The matching element, or a VGroup containing the element if as_group=True
+    #         None if not found
+    #     """
+    #     # First try direct search
+    #     try:
+    #         indices = search_shape_in_text(exp, MathTex(pattern))
+    #         if indices and nth < len(indices):
+    #             element = exp[0][indices[nth]]
+                
+    #             if color is not None:
+    #                 element.set_color(color)
+                
+    #             if opacity is not None:
+    #                 element.set_opacity(opacity)
+                
+    #             return VGroup(element) if as_group else element
+    #     except Exception:
+    #         pass  # If direct search fails, try adjacent elements approach
+        
+    #     # If pattern looks like it might be a negative number, try adjacent search
+    #     if pattern.startswith('-') and len(pattern) > 1:
+    #         try:
+    #             num_part = pattern[1:]  # Remove the minus sign
+    #             minus_indices = search_shape_in_text(exp, MathTex("-"))
+    #             num_indices = search_shape_in_text(exp, MathTex(num_part))
+                
+    #             # Find adjacent pairs
+    #             adjacent_pairs = []
+    #             for minus_idx in minus_indices:
+    #                 for num_idx in num_indices:
+    #                     if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+    #                         if minus_idx.stop == num_idx.start:
+    #                             adjacent_pairs.append((minus_idx, num_idx))
+                
+    #             if adjacent_pairs and nth < len(adjacent_pairs):
+    #                 minus_idx, num_idx = adjacent_pairs[nth]
+    #                 minus_element = exp[0][minus_idx]
+    #                 num_element = exp[0][num_idx]
+                    
+    #                 # Create a group with both elements
+    #                 result = VGroup(minus_element, num_element)
+                    
+    #                 if color is not None:
+    #                     result.set_color(color)
+                    
+    #                 if opacity is not None:
+    #                     result.set_opacity(opacity)
+                    
+    #                 return result
+    #         except Exception:
+    #             pass  # If adjacent search fails, fall back to default behavior
+        
+    #     # If all else fails, warn and return None
+    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #     return None
+    
+    
+    
+    def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, context=None):
+        """
+        Enhanced find_element that automatically handles negative numbers, context, and other patterns.
+        
+        Args:
+            pattern: The text pattern to search for (e.g., "x", "1", "-5")
+            exp: The MathTex or Tex object to search within
+            nth: Which occurrence to return (0-based index)
+            color: Optional color to set for the element
+            opacity: Optional opacity to set for the element
+            as_group: If True, returns the element wrapped in a VGroup
+            context: Optional context pattern to disambiguate elements
+                (e.g., "4ac" for finding "a" in "4ac")
+        
+        Returns:
+            The matching element, or a VGroup containing the element if as_group=True
+            None if not found
+        """
+        # If context is provided, try context-aware finding first
+        if context:
+            try:
+                # Find all occurrences of the pattern
+                pattern_indices = search_shape_in_text(exp, MathTex(pattern))
+                
+                if pattern_indices:
+                    # Find the context pattern
+                    context_indices = search_shape_in_text(exp, MathTex(context))
+                    
+                    if context_indices:
+                        # Find matches within or adjacent to the context
+                        context_matches = []
+                        for p_idx in pattern_indices:
+                            for c_idx in context_indices:
+                                # Check if pattern is within or adjacent to the context
+                                if isinstance(p_idx, slice) and isinstance(c_idx, slice):
+                                    # Within context
+                                    if (p_idx.start >= c_idx.start and p_idx.stop <= c_idx.stop):
+                                        context_matches.append(p_idx)
+                                    # Adjacent to context (just before or after)
+                                    elif (abs(p_idx.stop - c_idx.start) <= 1) or (abs(p_idx.start - c_idx.stop) <= 1):
+                                        context_matches.append(p_idx)
+                        
+                        # Use the nth match found in context
+                        if context_matches and nth < len(context_matches):
+                            element = exp[0][context_matches[nth]]
+                            
+                            if color is not None:
+                                element.set_color(color)
+                            
+                            if opacity is not None:
+                                element.set_opacity(opacity)
+                            
+                            return VGroup(element) if as_group else element
+            except Exception as e:
+                print(f"Context search failed: {e}, falling back to standard search")
+                # Continue with regular search methods
+        
+        # First try direct search
+        try:
+            indices = search_shape_in_text(exp, MathTex(pattern))
+            if indices and nth < len(indices):
+                element = exp[0][indices[nth]]
+                
+                if color is not None:
+                    element.set_color(color)
+                
+                if opacity is not None:
+                    element.set_opacity(opacity)
+                
+                return VGroup(element) if as_group else element
+        except Exception:
+            pass  # If direct search fails, try adjacent elements approach
+        
+        # If pattern looks like it might be a negative number, try adjacent search
+        if pattern.startswith('-') and len(pattern) > 1:
+            try:
+                num_part = pattern[1:]  # Remove the minus sign
+                minus_indices = search_shape_in_text(exp, MathTex("-"))
+                num_indices = search_shape_in_text(exp, MathTex(num_part))
+                
+                # Find adjacent pairs
+                adjacent_pairs = []
+                for minus_idx in minus_indices:
+                    for num_idx in num_indices:
+                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+                            if minus_idx.stop == num_idx.start:
+                                adjacent_pairs.append((minus_idx, num_idx))
+                
+                if adjacent_pairs and nth < len(adjacent_pairs):
+                    minus_idx, num_idx = adjacent_pairs[nth]
+                    minus_element = exp[0][minus_idx]
+                    num_element = exp[0][num_idx]
+                    
+                    # Create a group with both elements
+                    result = VGroup(minus_element, num_element)
+                    
+                    if color is not None:
+                        result.set_color(color)
+                    
+                    if opacity is not None:
+                        result.set_opacity(opacity)
+                    
+                    return result
+            except Exception:
+                pass  # If adjacent search fails, fall back to default behavior
+        
+        # If we get here, both context search and standard searches failed
+        print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
+            (f" within context '{context}'" if context else ""))
+        return None
