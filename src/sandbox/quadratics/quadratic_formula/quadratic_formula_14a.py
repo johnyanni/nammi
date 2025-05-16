@@ -2,7 +2,6 @@ from manim import *
 from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 from src.components.common.scroll_manager import ScrollManager
-from src.components.common.math_indices import MathIndices
 
 class QuadraticFormula3(MathTutorialScene):
     def construct(self):
@@ -161,10 +160,7 @@ class QuadraticFormula3(MathTutorialScene):
             sol_step_4,
             sol_step_5
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.5).next_to(coefficients, DOWN * 2.5)
-        
 
-        math_indices = MathIndices()
-        math_indices.display_indices(self, step_1_exp, "step_1_exp", display_duration=3)
         
         ordered_steps = VGroup(
             step_0_label, step_0_exp,
