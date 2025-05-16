@@ -3,7 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 
 
-class QuadraticFormula(MathTutorialScene):
+class QuadraticFormula05(MathTutorialScene):
     def construct(self):
         
         # Color Definitions
@@ -129,46 +129,10 @@ class QuadraticFormula(MathTutorialScene):
         step_1_exp = step_1_exp_group[0]  # Get the actual MathTex object
         
         
+        formula_template = MathTex(r"x = \frac{-(\phantom{11}) \pm \sqrt{(\phantom{11})^2 - 4(\phantom{1})(\phantom{20})}}{2(\phantom{1})}").scale(TEX_SCALE)
         
-        # 1. Basic equation components
-        x_part = self.find_element("x", step_1_exp)
-        equals_part = self.find_element("=", step_1_exp)
-        x_equals = VGroup(x_part, equals_part)
+        formula_template.move_to(step_1_exp.get_center())
 
-        # 2. Symbols
-        neg_sign = self.find_element("-", step_1_exp, nth=0)  # First minus sign
-        plus_minus = self.find_element(r"\pm", step_1_exp)
-        sqrt_symbol = step_1_exp[0][11:13]
-        minus_in_sqrt = self.find_element("-", step_1_exp, nth=1)  # Minus inside square root
-        four_symbol = self.find_element("4", step_1_exp)
-        squared_symbol = self.find_element("2", step_1_exp, nth=0)  # Exponent 2
-        two_in_denom = self.find_element("2", step_1_exp, nth=-1)  # Last occurrence of '2'
-
-        # 3. Parentheses structures
-        # First parentheses pair: -(?)
-        first_left_paren = self.find_element("(", step_1_exp, nth=0)
-        first_right_paren = self.find_element(")", step_1_exp, nth=0)
-        first_paren_pair = VGroup(first_left_paren, first_right_paren)
-
-        # Second parentheses pair: (?)^2
-        second_left_paren = self.find_element("(", step_1_exp, nth=1)
-        second_right_paren = self.find_element(")", step_1_exp, nth=1)
-        second_paren_pair = VGroup(second_left_paren, second_right_paren)
-
-        # Third parentheses pair: 4(?)
-        third_left_paren = self.find_element("(", step_1_exp, nth=2)
-        third_right_paren = self.find_element(")", step_1_exp, nth=2)
-        third_paren_pair = VGroup(third_left_paren, third_right_paren)
-
-        # Fourth parentheses pair: (?)
-        fourth_left_paren = self.find_element("(", step_1_exp, nth=3)
-        fourth_right_paren = self.find_element(")", step_1_exp, nth=3)
-        fourth_paren_pair = VGroup(fourth_left_paren, fourth_right_paren)
-
-        # Fifth parentheses pair: 2(?)
-        fifth_left_paren = self.find_element("(", step_1_exp, nth=4)
-        fifth_right_paren = self.find_element(")", step_1_exp, nth=4)
-        fifth_paren_pair = VGroup(fifth_left_paren, fifth_right_paren)
 
         # ---- COEFFICIENT VALUES (SEPARATE) ----
         # Get all instances of coefficients separately
@@ -185,36 +149,10 @@ class QuadraticFormula(MathTutorialScene):
 
         c_in_4ac = step_1_c_part           # The 20 in 4(1)(20)
 
-        # ---- STRUCTURAL GROUPINGS (WITHOUT COEFFICIENTS) ----
-        # These are just the structure pieces that you can animate first
 
-        # 1. The -b term structure: -(...)
-        minus_b_struct = VGroup(neg_sign, first_left_paren, first_right_paren)
 
-        # 2. The b^2 term structure: (...)^2
-        b_squared_struct = VGroup(second_left_paren, second_right_paren, squared_symbol)
 
-        # 3. The 4ac term structure: 4(...)(...)
-        four_ac_struct = VGroup(
-            four_symbol, 
-            third_left_paren, third_right_paren,
-            fourth_left_paren, fourth_right_paren
-        )
 
-        # 4. The 2a term structure in denominator: 2(...)
-        two_a_struct = VGroup(two_in_denom, fifth_left_paren, fifth_right_paren)
-
-        # 5. The square root structure
-        sqrt_struct = VGroup(sqrt_symbol, b_squared_struct, minus_in_sqrt, four_ac_struct)
-
-        # 6. The complete structure (excluding coefficients)
-        formula_struct = VGroup(
-            x_equals,
-            minus_b_struct,
-            plus_minus,
-            sqrt_struct,
-            two_a_struct
-        )
         
         
         
@@ -277,4 +215,26 @@ class QuadraticFormula(MathTutorialScene):
 
         self.play(Write(step_0_label))
 
-        self.play(Write(formula_struct))
+        
+        
+        
+        # Animate the template appearing
+        self.play(Write(formula_template), run_time=2)
+        self.wait(0.5)
+
+        # At this point, the entire formula with empty spaces is showing
+        # Now we can animate substituting each coefficient
+
+        # Substitute b values
+        self.play(self.indicate(b))  # Highlight b = 11
+        self.play(ReplacementTransform(b_value.copy(), b_in_fraction), run_time=1.5)
+        self.play(ReplacementTransform(b_value.copy(), b_in_sqrt), run_time=1.5)
+
+        # Substitute a values
+        self.play(self.indicate(a))  # Highlight a = 1
+        self.play(ReplacementTransform(a_value.copy(), a_in_4ac), run_time=1.5)
+        self.play(ReplacementTransform(a_value.copy(), a_in_denominator), run_time=1.5)
+
+        # Substitute c value
+        self.play(self.indicate(c))  # Highlight c = 20
+        self.play(ReplacementTransform(c_value.copy(), c_in_4ac), run_time=1.5)

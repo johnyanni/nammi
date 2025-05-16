@@ -307,11 +307,16 @@ class QuadraticFormula(MathTutorialScene):
         with self.voiceover(
                 text="""
                 x equals negative 'b', <bookmark mark='negative_b' /> which is negative 11,
+                <break time="1s"/>
                 <bookmark mark='plus_minus' /> plus or minus the square root of 'b' squared,
+                <break time="1s"/>
                 <bookmark mark='b_squared' /> so 11 squared,
-                <bookmark mark='minus_4' /> minus 4 times 'ay',
+                <break time="1s"/>
+                <bookmark mark='minus_4' /> minus 4 times 'a',
+                <break time="1s"/>
                 which <bookmark mark='a_1' /> is one, times 'c', <bookmark mark='c' /> which is 20,
-                all divided <bookmark mark='two' /> by 2 times 'ay', which <bookmark mark='a_2' /> is one.
+                <break time="5s"/>
+                all divided <bookmark mark='two' /> by 2 times 'a', which <bookmark mark='a_2' /> is one.
                 """
         ) as tracker:
             # Write the basic equation first except for a, b, c values

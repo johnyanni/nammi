@@ -3,7 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 
 
-class QuadraticFormula(MathTutorialScene):
+class QuadraticFormula07(MathTutorialScene):
     def construct(self):
         
         # Color Definitions
@@ -124,107 +124,43 @@ class QuadraticFormula(MathTutorialScene):
             "Step 1: Substitute the coefficients",
             MathTex(r"x = \frac{-(11) \pm \sqrt{(11)^2 - 4(1)(20)}}{2(1)}").scale(TEX_SCALE)
         )
+
+        step_1_label, step_1_exp = sol_step_1[0], sol_step_1[1]  # Get the actual MathTex object
+
+        # Find all coefficient values
+        b_in_fraction = self.find_element("11", step_1_exp, nth=0)
+        b_in_sqrt = self.find_element("11", step_1_exp, nth=1)
+        a_in_4ac = self.find_element("1", step_1_exp, nth=4)  # Adjust index as needed
+        a_in_denominator = self.find_element("1", step_1_exp, nth=5)  # Adjust index as needed
+        c_in_4ac = self.find_element("20", step_1_exp)
         
-        step_1_label, step_1_exp_group = sol_step_1
-        step_1_exp = step_1_exp_group[0]  # Get the actual MathTex object
         
         
-        
-        # 1. Basic equation components
-        x_part = self.find_element("x", step_1_exp)
-        equals_part = self.find_element("=", step_1_exp)
-        x_equals = VGroup(x_part, equals_part)
+        # fraction = step_1_exp[0][27]
+        # sqrt_part = step_1_exp[11:13] 
+       
+        x_parts = self.find_element("x =", step_1_exp)
+        plus_minus_part = self.find_element(r"\pm", step_1_exp)
 
-        # 2. Symbols
-        neg_sign = self.find_element("-", step_1_exp, nth=0)  # First minus sign
-        plus_minus = self.find_element(r"\pm", step_1_exp)
-        sqrt_symbol = step_1_exp[0][11:13]
-        minus_in_sqrt = self.find_element("-", step_1_exp, nth=1)  # Minus inside square root
-        four_symbol = self.find_element("4", step_1_exp)
-        squared_symbol = self.find_element("2", step_1_exp, nth=0)  # Exponent 2
-        two_in_denom = self.find_element("2", step_1_exp, nth=-1)  # Last occurrence of '2'
+        part1 = VGroup(x_parts, plus_minus_part)
 
-        # 3. Parentheses structures
-        # First parentheses pair: -(?)
-        first_left_paren = self.find_element("(", step_1_exp, nth=0)
-        first_right_paren = self.find_element(")", step_1_exp, nth=0)
-        first_paren_pair = VGroup(first_left_paren, first_right_paren)
+        # # Find x and = separately
+        # x_elem = self.find_element("x", step_1_exp)
+        # equals_elem = self.find_element("=", step_1_exp)
 
-        # Second parentheses pair: (?)^2
-        second_left_paren = self.find_element("(", step_1_exp, nth=1)
-        second_right_paren = self.find_element(")", step_1_exp, nth=1)
-        second_paren_pair = VGroup(second_left_paren, second_right_paren)
+        # # Create a VGroup to animate them together
+        # x_part = VGroup(x_elem, equals_elem)
 
-        # Third parentheses pair: 4(?)
-        third_left_paren = self.find_element("(", step_1_exp, nth=2)
-        third_right_paren = self.find_element(")", step_1_exp, nth=2)
-        third_paren_pair = VGroup(third_left_paren, third_right_paren)
-
-        # Fourth parentheses pair: (?)
-        fourth_left_paren = self.find_element("(", step_1_exp, nth=3)
-        fourth_right_paren = self.find_element(")", step_1_exp, nth=3)
-        fourth_paren_pair = VGroup(fourth_left_paren, fourth_right_paren)
-
-        # Fifth parentheses pair: 2(?)
-        fifth_left_paren = self.find_element("(", step_1_exp, nth=4)
-        fifth_right_paren = self.find_element(")", step_1_exp, nth=4)
-        fifth_paren_pair = VGroup(fifth_left_paren, fifth_right_paren)
-
-        # ---- COEFFICIENT VALUES (SEPARATE) ----
-        # Get all instances of coefficients separately
-        step_1_b_parts = self.find_elements("11", step_1_exp, as_group=False)
-        step_1_a_parts = self.find_elements("1", step_1_exp, as_group=False)
-        step_1_c_part = self.find_element("20", step_1_exp)
-
-        # Specifically name each coefficient by its position for clarity
-        b_in_fraction = step_1_b_parts[0]  # The 11 in -(11)
-        b_in_sqrt = step_1_b_parts[1]      # The 11 in (11)^2
-
-        a_in_4ac = step_1_a_parts[4]       # The 1 in 4(1)(20)
-        a_in_denominator = step_1_a_parts[5]  # The 1 in 2(1)
-
-        c_in_4ac = step_1_c_part           # The 20 in 4(1)(20)
-
-        # ---- STRUCTURAL GROUPINGS (WITHOUT COEFFICIENTS) ----
-        # These are just the structure pieces that you can animate first
-
-        # 1. The -b term structure: -(...)
-        minus_b_struct = VGroup(neg_sign, first_left_paren, first_right_paren)
-
-        # 2. The b^2 term structure: (...)^2
-        b_squared_struct = VGroup(second_left_paren, second_right_paren, squared_symbol)
-
-        # 3. The 4ac term structure: 4(...)(...)
-        four_ac_struct = VGroup(
-            four_symbol, 
-            third_left_paren, third_right_paren,
-            fourth_left_paren, fourth_right_paren
-        )
-
-        # 4. The 2a term structure in denominator: 2(...)
-        two_a_struct = VGroup(two_in_denom, fifth_left_paren, fifth_right_paren)
-
-        # 5. The square root structure
-        sqrt_struct = VGroup(sqrt_symbol, b_squared_struct, minus_in_sqrt, four_ac_struct)
-
-        # 6. The complete structure (excluding coefficients)
-        formula_struct = VGroup(
-            x_equals,
-            minus_b_struct,
-            plus_minus,
-            sqrt_struct,
-            two_a_struct
-        )
         
         
         
         
         
         
-        
+
         
         self.apply_smart_colorize(
-            [step_0_exp],
+            [step_0_exp, step_1_exp],
             {
                 "x": X_COLOR,
                 "1": A_COLOR,
@@ -275,6 +211,11 @@ class QuadraticFormula(MathTutorialScene):
         
         self.play(FadeIn(c_value, target_position=c_in_q_equation), run_time=2)
 
-        self.play(Write(step_0_label))
+        # Now animate the formula
+        self.play(Write(step_1_label))
 
-        self.play(Write(formula_struct))
+
+
+
+# Then animate
+        self.play(Write(part1))
