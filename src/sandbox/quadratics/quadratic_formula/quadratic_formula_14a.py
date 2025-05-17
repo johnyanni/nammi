@@ -126,8 +126,8 @@ class QuadraticFormula3(MathTutorialScene):
         
         
 
-        b_in_frac = self.find_element("-6", step_1_exp, context="x=-(-6)", opacity=0, color=B_COLOR)
-        b_in_sqrt = self.find_element("-6", step_1_exp, context="-6", opacity=0, color=B_COLOR)
+        b_in_frac = self.find_element("-6", step_1_exp, nth=0, context="-(-6)", opacity=0, color=B_COLOR)
+        b_in_sqrt = self.find_element("-6", step_1_exp, nth=1, context="-6", opacity=0, color=B_COLOR)
         a_in_4ac = self.find_element("1", step_1_exp, context="4(1)", opacity=0, color=A_COLOR)
         c_in_4ac = self.find_element("8", step_1_exp, context=")(8)2", opacity=0, color=C_COLOR)
         a_in_denom = self.find_element("1", step_1_exp, context="2(1)", opacity=0, color=A_COLOR)
