@@ -172,7 +172,7 @@ class QuadraticFormula3(MathTutorialScene):
             step_5_label, step_5_exp
         )
         scroll_mgr = ScrollManager(ordered_steps)
-        
+        steps_to_scroll = len(substitution) + 2
 
         
         ###############################################################################
@@ -218,22 +218,24 @@ class QuadraticFormula3(MathTutorialScene):
         scroll_mgr.scroll_down(self, steps=2)
         
         
-        # Display the next steps
-        scroll_mgr.prepare_next(self)  # Shows sol_step_2
-        scroll_mgr.prepare_next(self)  # Shows sol_step_3
-        
-        scroll_mgr.scroll_down(self, steps=2)
-        
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
-        
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
-        
-        scroll_mgr.scroll_down(self, steps=2)
+        # Show subsequent steps
+        scroll_mgr.prepare_next(self)  # Shows step_2_label
+        scroll_mgr.prepare_next(self)  # Shows step_2_exp
+        scroll_mgr.prepare_next(self)  # Shows step_3_label
+        scroll_mgr.prepare_next(self)  # Shows step_3_exp
 
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
+        # Scroll again
+        scroll_mgr.scroll_down(self, steps=steps_to_scroll)
+
+        # Show final steps (no duplicates)
+        scroll_mgr.prepare_next(self)  # Shows step_4_label
+        scroll_mgr.prepare_next(self)  # Shows step_4_exp
+        
+        scroll_mgr.scroll_down(self, steps=2)
+        
+        
+        scroll_mgr.prepare_next(self)  # Shows step_5_label
+        scroll_mgr.prepare_next(self)  # Shows step_5_exp
         
         
         self.wait(2)

@@ -3,7 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 from src.components.common.scroll_manager import ScrollManager
 
-class QuadraticFormula3(MathTutorialScene):
+class QuadraticFormula4(MathTutorialScene):
     def construct(self):
         
         # Color Definitions
@@ -58,28 +58,29 @@ class QuadraticFormula3(MathTutorialScene):
         )
         
         ###############################################################################
-        # GIVEN EQUATION AND SETUP
+        # GIVEN EQUATION AND SETUP - NEW EQUATION
         ###############################################################################
         
-        q_equation = MathTex("x^2 - 6x + 8 = 0").scale(TEX_SCALE).to_edge(UP, buff=0.6)
+        # New equation: 2x² + 5x - 3 = 0
+        q_equation = MathTex("2x^2 + 5x - 3 = 0").scale(TEX_SCALE).to_edge(UP, buff=0.6)
         
-        a_in_q_equation = self.find_element("1", q_equation, color=A_COLOR)      
-        b_in_q_equation = self.find_element("-6", q_equation, color=B_COLOR)      
-        c_in_q_equation = self.find_element("8", q_equation, color=C_COLOR)      
+        a_in_q_equation = self.find_element("2", q_equation, color=A_COLOR)      
+        b_in_q_equation = self.find_element("5", q_equation, color=B_COLOR)      
+        c_in_q_equation = self.find_element("-3", q_equation, color=C_COLOR)      
         
-        # Create coefficient labels
-        a = MathTex("a = 1", color=A_COLOR).scale(TEX_SCALE)
-        b = MathTex("b = -6", color=B_COLOR).scale(TEX_SCALE)
-        c = MathTex("c = 8", color=C_COLOR).scale(TEX_SCALE)
+        # Create coefficient labels with new values
+        a = MathTex("a = 2", color=A_COLOR).scale(TEX_SCALE)
+        b = MathTex("b = 5", color=B_COLOR).scale(TEX_SCALE)
+        c = MathTex("c = -3", color=C_COLOR).scale(TEX_SCALE)
         
-        a_value = self.find_element("1", a)
-        b_value = self.find_element("-6", b)
-        c_value = self.find_element("8", c)
+        a_value = self.find_element("2", a)
+        b_value = self.find_element("5", b)
+        c_value = self.find_element("-3", c)
         
         coefficients = Group(a, b, c).arrange(buff=1).next_to(q_equation, DOWN * 1.5)
         
         ###############################################################################
-        # SOLVING THE EQUATION
+        # SOLVING THE EQUATION - WITH NEW VALUES
         ###############################################################################       
         
         sol_step_0 = self.create_labeled_step(
@@ -91,58 +92,65 @@ class QuadraticFormula3(MathTutorialScene):
         
         sol_step_1 = self.create_labeled_step(
             "Step 1: Substitute the coefficients",
-            MathTex(r"x = \frac{-(-6) \pm \sqrt{(-6)^2 - 4(1)(8)}}{2(1)}").scale(TEX_SCALE)
+            MathTex(r"x = \frac{-(5) \pm \sqrt{(5)^2 - 4(2)(-3)}}{2(2)}").scale(TEX_SCALE)
         )
         
         step_1_label, step_1_exp = sol_step_1[0], sol_step_1[1]
         
         sol_step_2 = self.create_labeled_step(
             "Step 2: Simplify the expression",
-            MathTex(r"x = \frac{6 \pm \sqrt{36 - 32}}{2}").scale(TEX_SCALE)
+            MathTex(r"x = \frac{-5 \pm \sqrt{25 - 4(2)(-3)}}{4}").scale(TEX_SCALE)
         )
         
         step_2_label, step_2_exp = sol_step_2[0], sol_step_2[1]
         
         sol_step_3 = self.create_labeled_step(
             "Step 3: Continue simplifying",
-            MathTex(r"x = \frac{6 \pm \sqrt{4}}{2}").scale(TEX_SCALE)
+            MathTex(r"x = \frac{-5 \pm \sqrt{25 + 24}}{4}").scale(TEX_SCALE)
         )
         
         step_3_label, step_3_exp = sol_step_3[0], sol_step_3[1]
         
         sol_step_4 = self.create_labeled_step(
-            "Step 4: Find the two roots",
-            MathTex(r"x = \frac{6 \pm 2}{2}").scale(TEX_SCALE)
+            "Step 4: Calculate the square root",
+            MathTex(r"x = \frac{-5 \pm \sqrt{49}}{4}").scale(TEX_SCALE)
         )
         
         step_4_label, step_4_exp = sol_step_4[0], sol_step_4[1]
         
         sol_step_5 = self.create_labeled_step(
-            "Final solution",
-            MathTex(r"x = \frac{6 + 2}{2} = 4 \ \text{or} \ x = \frac{6 - 2}{2} = 2").scale(TEX_SCALE)
+            "Step 5: Find the two roots",
+            MathTex(r"x = \frac{-5 \pm 7}{4}").scale(TEX_SCALE)
         )
         
         step_5_label, step_5_exp = sol_step_5[0], sol_step_5[1]
         
+        sol_step_6 = self.create_labeled_step(
+            "Final solution",
+            MathTex(r"x = \frac{-5 + 7}{4} = \frac{1}{2} \ \text{or} \ x = \frac{-5 - 7}{4} = -3").scale(TEX_SCALE)
+        )
         
+        step_6_label, step_6_exp = sol_step_6[0], sol_step_6[1]
+        
+        # Find elements in step_1_exp to highlight and animate
+        b_in_frac = self.find_element("5", step_1_exp, nth=0, opacity=0, color=B_COLOR)
+        b_in_sqrt = self.find_element("5", step_1_exp, nth=1, opacity=0, color=B_COLOR)
+        a_in_4ac = self.find_element("2", step_1_exp, nth=1, opacity=0, color=A_COLOR)
+        c_in_4ac = self.find_element("-3", step_1_exp, nth=0, opacity=0, color=C_COLOR)
+        a_in_denom = self.find_element("2", step_1_exp, nth=-1, opacity=0, color=A_COLOR)
 
-        b_in_frac = self.find_element("-6", step_1_exp, nth=0, opacity=0, color=B_COLOR)
-        b_in_sqrt = self.find_element("-6", step_1_exp, nth=1, opacity=0, color=B_COLOR)
-        a_in_4ac = self.find_element("1", step_1_exp, context="4(1)", opacity=0, color=A_COLOR)
-        c_in_4ac = self.find_element("8", step_1_exp, context=")(8)2", opacity=0, color=C_COLOR)
-        a_in_denom = self.find_element("1", step_1_exp, context="2(1)", opacity=0, color=A_COLOR)
-
-        # 3. Create visible copies with the SAME initial positions
+        # Create visible copies with the same initial positions
         visible_b_frac = b_in_frac.copy().set_opacity(1)
         visible_b_sqrt = b_in_sqrt.copy().set_opacity(1)
         visible_a_4ac = a_in_4ac.copy().set_opacity(1)
         visible_a_denom = a_in_denom.copy().set_opacity(1)
         visible_c_4ac = c_in_4ac.copy().set_opacity(1)
 
-        # 4. Add these copies to step_1_exp NOW to maintain relative positioning
+        # Add these copies to step_1_exp to maintain relative positioning
         substitution = VGroup(visible_b_frac, visible_b_sqrt, visible_a_4ac, visible_a_denom, visible_c_4ac)
         step_1_exp.add(*substitution)
         
+        # Apply coloring to formula components
         self.apply_smart_colorize(
             [quadratic_form, quadratic_formula, step_0_exp],
             {
@@ -152,16 +160,18 @@ class QuadraticFormula3(MathTutorialScene):
             }
         )
         
+        # Arrange all solution steps
         solution_steps = VGroup(
             sol_step_0,
             sol_step_1,
             sol_step_2,
             sol_step_3,
             sol_step_4,
-            sol_step_5
+            sol_step_5,
+            sol_step_6
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.5).next_to(coefficients, DOWN * 2.5)
         
-        
+        # Create ordered steps for scroll manager
         ordered_steps = VGroup(
             step_0_label, step_0_exp,
             step_1_label, step_1_exp,
@@ -169,11 +179,12 @@ class QuadraticFormula3(MathTutorialScene):
             step_2_label, step_2_exp,
             step_3_label, step_3_exp,
             step_4_label, step_4_exp,
-            step_5_label, step_5_exp
+            step_5_label, step_5_exp,
+            step_6_label, step_6_exp
         )
-        scroll_mgr = ScrollManager(ordered_steps)
         
-
+        scroll_mgr = ScrollManager(ordered_steps)
+        steps_to_scroll = len(substitution) + 2
         
         ###############################################################################
         # ANIMATIONS
@@ -202,13 +213,13 @@ class QuadraticFormula3(MathTutorialScene):
         self.play(self.indicate(quad_form_c))
         self.play(FadeIn(c_value, target_position=c_in_q_equation), run_time=2)
            
-        
-        # Then after showing step_0 and step_1:
+        # Show step_0 and step_1
         scroll_mgr.prepare_next(self)  # Shows step_0_label
         scroll_mgr.prepare_next(self)  # Shows step_0_exp
         scroll_mgr.prepare_next(self)  # Shows step_1_label
         scroll_mgr.prepare_next(self)  # Shows step_1_exp
 
+        # Animate the coefficient substitutions
         scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
         scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
         scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
@@ -217,23 +228,24 @@ class QuadraticFormula3(MathTutorialScene):
     
         scroll_mgr.scroll_down(self, steps=2)
         
-        
-        # Display the next steps
-        scroll_mgr.prepare_next(self)  # Shows sol_step_2
-        scroll_mgr.prepare_next(self)  # Shows sol_step_3
-        
-        scroll_mgr.scroll_down(self, steps=2)
-        
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
-        
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
-        
-        scroll_mgr.scroll_down(self, steps=2)
+        # Show steps 2 and 3
+        scroll_mgr.prepare_next(self)  # Shows step_2_label
+        scroll_mgr.prepare_next(self)  # Shows step_2_exp
+        scroll_mgr.prepare_next(self)  # Shows step_3_label
+        scroll_mgr.prepare_next(self)  # Shows step_3_exp
 
-        scroll_mgr.prepare_next(self)  # Shows sol_step_4
-        scroll_mgr.prepare_next(self)  # Shows sol_step_5
+        # Scroll again
+        scroll_mgr.scroll_down(self, steps=steps_to_scroll)
+
+        # Show steps 4 and 5
+        scroll_mgr.prepare_next(self)  # Shows step_4_label
+        scroll_mgr.prepare_next(self)  # Shows step_4_exp
+        scroll_mgr.prepare_next(self)  # Shows step_5_label
+        scroll_mgr.prepare_next(self)  # Shows step_5_exp
         
+        # Final scroll and show solution
+        scroll_mgr.scroll_down(self, steps=2)
+        scroll_mgr.prepare_next(self)  # Shows step_6_label
+        scroll_mgr.prepare_next(self)  # Shows step_6_exp
         
         self.wait(2)

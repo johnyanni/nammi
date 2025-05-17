@@ -23,7 +23,7 @@ def add_annotations(term_added, left_term, right_term, color=None, h_spacing=0):
 
     return terms
 
-FOOTNOTE_SCALE = 0.6
+FOOTNOTE_SCALE = 0.55
 
 # Colors
 VARIABLE_COLOR  = "#BB88FF"
