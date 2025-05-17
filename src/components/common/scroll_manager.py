@@ -330,3 +330,4 @@ class ScrollManager(VGroup):
         self.current_position += steps
         
         return self
+    

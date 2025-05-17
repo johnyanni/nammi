@@ -3,7 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 from src.components.common.scroll_manager import ScrollManager
 
-class QuadraticFormula4(MathTutorialScene):
+class QuadraticFormulaALT02(MathTutorialScene):
     def construct(self):
         
         # Color Definitions
@@ -68,10 +68,7 @@ class QuadraticFormula4(MathTutorialScene):
             MathTex("-x^2 - 3x = - 9").scale(0.6)
         )
         
-        question_title_group.arrange(DOWN, aligned_edge=LEFT, buff=0.1).to_edge(UP, buff=0.4).to_edge(LEFT, buff=1)
-        
-        
-        
+        question_title_group.arrange(DOWN, aligned_edge=LEFT, buff=0.1).to_edge(UP, buff=0.6).to_edge(LEFT, buff=1)
         
         
         
@@ -87,7 +84,7 @@ class QuadraticFormula4(MathTutorialScene):
         final_equation = MathTex("-x^2 - 3x + 9 = 0").scale(TEX_SCALE)
 
         
-        pre_solution_steps = VGroup(
+        top = VGroup(
             pre_sol_step_0,
             final_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=ANNOTATION_SPACING).next_to(question_title_group, DOWN, buff=0.5).align_to(question_title_group, LEFT)
@@ -100,7 +97,7 @@ class QuadraticFormula4(MathTutorialScene):
             color=RED
         )
         
-        pre_solution = Group(pre_sol_step_0, add_9)
+        pre_solving = Group(pre_sol_step_0, add_9)
         
         
 
@@ -110,13 +107,13 @@ class QuadraticFormula4(MathTutorialScene):
 
         mid_sol_step_0 = self.create_labeled_step(
             "Label the coefficients",
-            MathTex("-x^2 - 3x + 9 = 0").scale(TEX_SCALE)
+            MathTex("-1x^2 - 3x + 9 = 0").scale(TEX_SCALE)
         )
         
         mid_sol_step_0_label, mid_sol_step_0_exp = mid_sol_step_0[0], mid_sol_step_0[1]
-        
+
         # Find elements in q_equation to highlight
-        a_in_q_equation = self.find_element("-1", mid_sol_step_0_exp, opacity=0, color=A_COLOR)  # Implied coefficient of x²
+        a_in_q_equation = self.find_element("-1", mid_sol_step_0_exp, color=A_COLOR)  # Implied coefficient of x²
         b_in_q_equation = self.find_element("-3", mid_sol_step_0_exp, color=B_COLOR)      
         c_in_q_equation = self.find_element("9", mid_sol_step_0_exp, color=C_COLOR)      
 
@@ -124,22 +121,33 @@ class QuadraticFormula4(MathTutorialScene):
         a = MathTex("a = -1", color=A_COLOR).scale(TEX_SCALE)
         b = MathTex("b = -3", color=B_COLOR).scale(TEX_SCALE)
         c = MathTex("c = 9", color=C_COLOR).scale(TEX_SCALE)
+        
+        start_coefficients = VGroup(
+            a[0][:3],
+            b[0][:3],
+            c[0][:3]
+        )
 
         # Extract coefficient values
         a_value = self.find_element("-1", a)
         b_value = self.find_element("-3", b)
         c_value = self.find_element("9", c)
+        
+        coefficient_values = VGroup(a_value, b_value, c_value)
 
         # Arrange coefficients horizontally
         coefficients = VGroup(a, b, c).arrange(RIGHT, buff=0.6)
 
-        mid_solution_steps = VGroup(
+        intro = VGroup(
             mid_sol_step_0,
             coefficients
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
 
-        mid_solution_steps.next_to(question_title_group, DOWN, buff=0.4)
-        mid_solution_steps.align_to(question_title_group, LEFT)
+        intro.next_to(question_title_group, DOWN, buff=0.4)
+        intro.align_to(question_title_group, LEFT)
+
+
+
 
 
 
@@ -193,35 +201,12 @@ class QuadraticFormula4(MathTutorialScene):
 
         step_5_label, step_5_exp = sol_step_5[0], sol_step_5[1]
 
-        # sol_step_6 = self.create_labeled_step(
-        #     "Final solution",
-        #     MathTex(r"x = \frac{3 + 6.7082}{-2} \approx -4.85 \ \text{or} \ x = \frac{3 - 6.7082}{-2} \approx 1.85").scale(TEX_SCALE)
-        # )
-        
-        first_root = MathTex(r"x = \frac{3 + 6.7082}{-2}").scale(TEX_SCALE)
-        first_root_dec = MathTex(r"x \approx -4.85").scale(TEX_SCALE)
-        first_root_group = VGroup(first_root, first_root_dec).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        sol_step_6 = self.create_labeled_step(
+            "Final solution",
+            MathTex(r"x = \frac{3 + 6.7082}{-2} \approx -4.85 \ \text{or} \ x = \frac{3 - 6.7082}{-2} \approx 1.85").scale(TEX_SCALE)
+        )
 
-        second_root = MathTex(r"x = \frac{3 - 6.7082}{-2}").scale(TEX_SCALE)
-        second_root_dec = MathTex(r"x \approx 1.85").scale(TEX_SCALE)
-        second_root_group = VGroup(second_root, second_root_dec).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
-
-        # Arrange the groups vertically
-        root_steps = VGroup(
-            first_root_group,
-            second_root_group
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.8)
-        
-        # Position the entire group
-        root_steps.next_to(quadratic_group, DOWN, buff=0.6)
-
-        first_root_rec = self.create_surrounding_rectangle(first_root_dec)
-        second_root_rec = self.create_surrounding_rectangle(second_root_dec)
-        
-        
-        
-        
-        
+        step_6_label, step_6_exp = sol_step_6[0], sol_step_6[1]
 
         # Find elements in step_1_exp to highlight and animate
         b_in_frac = self.find_element("-3", step_1_exp, nth=0, opacity=0, color=B_COLOR)
@@ -259,23 +244,25 @@ class QuadraticFormula4(MathTutorialScene):
             sol_step_3,
             sol_step_4,
             sol_step_5,
+            sol_step_6
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
 
-        solution_steps.next_to(mid_solution_steps, DOWN, buff=0.4)
-        solution_steps.align_to(mid_solution_steps, LEFT)
+        solution_steps.next_to(intro, DOWN, buff=0.4)
+        solution_steps.align_to(intro, LEFT)
         
-        
-
-        
-        
-        ordered_steps = VGroup(  
+        ordered_steps = VGroup(
+            mid_sol_step_0_exp,
+            mid_sol_step_0_label,
+            *start_coefficients,
+            *coefficient_values,
             step_0_label, step_0_exp,
             step_1_label, step_1_exp,
             *substitution,
             step_2_label, step_2_exp,
             step_3_label, step_3_exp,
             step_4_label, step_4_exp,
-            step_5_label, step_5_exp
+            step_5_label, step_5_exp,
+            step_6_label, step_6_exp
         )
 
         scroll_mgr = ScrollManager(ordered_steps)
@@ -302,24 +289,34 @@ class QuadraticFormula4(MathTutorialScene):
         self.play(FadeIn(add_9))
         self.play(Write(final_equation))
         
-        self.play(FadeOut(pre_solution))
-
-        self.play(ReplacementTransform(final_equation, mid_sol_step_0_exp))      
-
-        self.play(Write(mid_sol_step_0_label))
+        self.play(FadeOut(pre_solving))
         
-        self.play(
-            FadeIn(a[0][:2], b[0][:2], c[0][:2])
-        )
+        
+   
+        
+        # Transform final_equation to mid_sol_step_0_exp
+        self.play(ReplacementTransform(final_equation, mid_sol_step_0_exp))
 
+        # Update ScrollManager state - mid_sol_step_0_exp is now visible
+        scroll_mgr.current_position = 1  # first element (index 0) is visible
+        scroll_mgr.last_in_view = 0  # nothing has been scrolled out
+        
+        scroll_mgr.prepare_next(self)  # Shows mid_sol_step_0_label
+        
+        scroll_mgr.prepare_next(self)  # Shows start_coefficients
+        scroll_mgr.prepare_next(self)  # Shows start_coefficients
+        scroll_mgr.prepare_next(self)  # Shows start_coefficients
+        
+        
         self.play(self.indicate(quad_form_a))
-        self.play(FadeIn(a_value, target_position=a_in_q_equation), run_time=2)
+        scroll_mgr.fade_in_from_target(self, a_in_q_equation)
 
         self.play(self.indicate(quad_form_b))
-        self.play(FadeIn(b_value, target_position=b_in_q_equation), run_time=2)
+        scroll_mgr.fade_in_from_target(self, b_in_q_equation)
 
         self.play(self.indicate(quad_form_c))
-        self.play(FadeIn(c_value, target_position=c_in_q_equation), run_time=2)
+        scroll_mgr.fade_in_from_target(self, c_in_q_equation)
+        
         
         
         
@@ -328,8 +325,6 @@ class QuadraticFormula4(MathTutorialScene):
         scroll_mgr.prepare_next(self)  # Shows step_0_exp
         scroll_mgr.prepare_next(self)  # Shows step_1_label
         scroll_mgr.prepare_next(self)  # Shows step_1_exp
-        
-        
 
         # Animate the coefficient substitutions
         scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
@@ -337,45 +332,31 @@ class QuadraticFormula4(MathTutorialScene):
         scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
         scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
         scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
-        
-        scroll_mgr.scroll_down(self, steps=2)
 
+        
 
         # Show steps 2 and 3
         scroll_mgr.prepare_next(self)  # Shows step_2_label
         scroll_mgr.prepare_next(self)  # Shows step_2_exp
-        
-        scroll_mgr.scroll_down(self, steps=2)
-        
         scroll_mgr.prepare_next(self)  # Shows step_3_label
         scroll_mgr.prepare_next(self)  # Shows step_3_exp
+
+        scroll_mgr.scroll_down(self, steps=8)
         
-        # Scroll again
-        scroll_mgr.scroll_down(self, steps=steps_to_scroll)
+        
         
         # Show steps 4 and 5
         scroll_mgr.prepare_next(self)  # Shows step_4_label
         scroll_mgr.prepare_next(self)  # Shows step_4_exp
-        
-        scroll_mgr.scroll_down(self, steps=2)
-        
         scroll_mgr.prepare_next(self)  # Shows step_5_label
         scroll_mgr.prepare_next(self)  # Shows step_5_exp
         
+        # Scroll again
+        scroll_mgr.scroll_down(self, steps=steps_to_scroll)
+
+        # Final scroll and show solution
+        
+        scroll_mgr.prepare_next(self)  # Shows step_6_label
+        scroll_mgr.prepare_next(self)  # Shows step_6_exp
 
         self.wait(2)
-        
-        
-        self.play(ReplacementTransform(step_5_exp.copy(), first_root))
-        self.play(ReplacementTransform(step_5_exp.copy(), second_root))
-        
-        self.wait(2)
-        
-        self.play(Write(first_root_dec))
-        self.play(Write(second_root_dec))
-        
-        self.wait(2)
-        
-        self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
-        
-        

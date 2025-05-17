@@ -8,11 +8,16 @@ from .smart_tex import *
 from .custom_axes import CustomAxes
 
 
+
+
+
 MATH_SCALE = 0.60
 MATH_SCALE_SMALL = 0.55
-TEXT_SCALE = 0.55
 
-TEX_SCALE = 0.70
+
+TEXT_SCALE = 0.55
+TEX_SCALE = 0.75
+
 
 FOOTNOTE_SCALE = 0.6
 
@@ -267,8 +272,8 @@ class MathTutorialScene(VoiceoverScene):
                 label_text,
                 expressions,
                 color_map=None,
-                label_color=GREY,
-                label_scale=0.5,
+                label_color="#DBDBDB",
+                label_scale=0.6,
                 label_buff=0.2,
         ):
             label = Tex(label_text, color=label_color).scale(label_scale)
@@ -285,9 +290,9 @@ class MathTutorialScene(VoiceoverScene):
                 label_text,
                 expressions,
                 color_map=None,
-                label_color=GREY,
-                label_scale=0.5,
-                label_buff=0.2,
+                label_color="#757575",
+                label_scale=0.6,
+                label_buff=0.15,
                 eq_hbuff=0.2,
                 tex_scale=TEX_SCALE
         ):
