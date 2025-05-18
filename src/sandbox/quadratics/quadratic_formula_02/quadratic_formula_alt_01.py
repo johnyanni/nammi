@@ -3,6 +3,8 @@ from src.components.common.base_scene import *
 from src.components.common.quick_tip import QuickTip
 from src.components.common.scroll_manager import ScrollManager
 
+config.verbosity = "ERROR"
+
 class QuadraticFormula4(MathTutorialScene):
     def construct(self):
         
@@ -130,6 +132,10 @@ class QuadraticFormula4(MathTutorialScene):
         b_value = self.find_element("-3", b)
         c_value = self.find_element("9", c)
 
+        a_label = self.find_element("a =", a, as_group=True)
+        b_label = self.find_element("b =", b, as_group=True)
+        c_label = self.find_element("c =", c, as_group=True)
+
         # Arrange coefficients horizontally
         coefficients = VGroup(a, b, c).arrange(RIGHT, buff=0.6)
 
@@ -140,11 +146,6 @@ class QuadraticFormula4(MathTutorialScene):
 
         mid_solution_steps.next_to(question_title_group, DOWN, buff=0.4)
         mid_solution_steps.align_to(question_title_group, LEFT)
-
-
-
-
-
 
 
         ###############################################################################
@@ -218,10 +219,6 @@ class QuadraticFormula4(MathTutorialScene):
         first_root_rec = self.create_surrounding_rectangle(first_root_dec)
         second_root_rec = self.create_surrounding_rectangle(second_root_dec)
         
-        
-        
-        
-        
 
         # Find elements in step_1_exp to highlight and animate
         b_in_frac = self.find_element("-3", step_1_exp, nth=0, opacity=0, color=B_COLOR)
@@ -263,12 +260,10 @@ class QuadraticFormula4(MathTutorialScene):
 
         solution_steps.next_to(mid_solution_steps, DOWN, buff=0.4)
         solution_steps.align_to(mid_solution_steps, LEFT)
-        
-        
 
-        
-        
-        ordered_steps = VGroup(  
+        ordered_steps = VGroup(
+            final_equation, mid_sol_step_0_label,
+            a_label, b_label, c_label, a_value, b_value, c_value,
             step_0_label, step_0_exp,
             step_1_label, step_1_exp,
             *substitution,
@@ -279,15 +274,12 @@ class QuadraticFormula4(MathTutorialScene):
         )
 
         scroll_mgr = ScrollManager(ordered_steps)
-        steps_to_scroll = len(substitution) + 2
-        
+        scroll_mgr.start_position = ordered_steps[1].copy()
         
         ###############################################################################
         # ANIMATIONS
         ###############################################################################
 
-
-        
         self.play(
             FadeIn(
                 quadratic_group,
@@ -300,36 +292,40 @@ class QuadraticFormula4(MathTutorialScene):
         self.play(Write(pre_sol_step_0_label))
         self.play(Write(pre_sol_step_0_exp))
         self.play(FadeIn(add_9))
-        self.play(Write(final_equation))
-        
+
+        # final_equation
+        scroll_mgr.prepare_next(self)
+
         self.play(FadeOut(pre_solution))
 
-        self.play(ReplacementTransform(final_equation, mid_sol_step_0_exp))      
+        # replace with mid_sol_step_0_exp
+        scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
 
-        self.play(Write(mid_sol_step_0_label))
+        # mid_sol_step_0_label
+        scroll_mgr.prepare_next(self)
         
-        self.play(
-            FadeIn(a[0][:2], b[0][:2], c[0][:2])
-        )
+        # a =   b =   c =
+        scroll_mgr.prepare_next(self, steps=3)
 
+        # Animate the coefficient
         self.play(self.indicate(quad_form_a))
-        self.play(FadeIn(a_value, target_position=a_in_q_equation), run_time=2)
+        scroll_mgr.fade_in_from_target(self, quad_form_a)  # Fades in a_value from quad_form_a
 
         self.play(self.indicate(quad_form_b))
-        self.play(FadeIn(b_value, target_position=b_in_q_equation), run_time=2)
+        scroll_mgr.fade_in_from_target(self, quad_form_b)  # Fades in a_value from quad_form_b
 
         self.play(self.indicate(quad_form_c))
-        self.play(FadeIn(c_value, target_position=c_in_q_equation), run_time=2)
-        
-        
-        
+        scroll_mgr.fade_in_from_target(self, quad_form_c)  # Fades in a_value from quad_form_c
+
         # Show step_0 and step_1
         scroll_mgr.prepare_next(self)  # Shows step_0_label
         scroll_mgr.prepare_next(self)  # Shows step_0_exp
+
+        # scroll mid_sol_step_0_label mid_sol_step_0_exp
+        scroll_mgr.scroll_down(self, steps=2)
+
         scroll_mgr.prepare_next(self)  # Shows step_1_label
         scroll_mgr.prepare_next(self)  # Shows step_1_exp
-        
-        
 
         # Animate the coefficient substitutions
         scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
@@ -337,22 +333,19 @@ class QuadraticFormula4(MathTutorialScene):
         scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
         scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
         scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
-        
-        scroll_mgr.scroll_down(self, steps=2)
 
+        # scroll step_0_exp, step_0_label, labels, and coefficients
+        scroll_mgr.scroll_down(self, steps=8)
 
         # Show steps 2 and 3
         scroll_mgr.prepare_next(self)  # Shows step_2_label
         scroll_mgr.prepare_next(self)  # Shows step_2_exp
-        
-        # Scroll the substitution with step_1_exp and step_1_label
-        scroll_mgr.scroll_down(self, steps=7)
-        
+                
         scroll_mgr.prepare_next(self)  # Shows step_3_label
         scroll_mgr.prepare_next(self)  # Shows step_3_exp
         
-        # Scroll again
-        scroll_mgr.scroll_down(self, steps=2)
+        # Scroll the substitution with step_1_exp and step_1_label
+        scroll_mgr.scroll_down(self, steps=7)
         
         # Show steps 4 and 5
         scroll_mgr.prepare_next(self)  # Shows step_4_label
