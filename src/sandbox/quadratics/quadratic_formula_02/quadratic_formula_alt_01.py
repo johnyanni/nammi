@@ -345,13 +345,14 @@ class QuadraticFormula4(MathTutorialScene):
         scroll_mgr.prepare_next(self)  # Shows step_2_label
         scroll_mgr.prepare_next(self)  # Shows step_2_exp
         
-        scroll_mgr.scroll_down(self, steps=2)
+        # Scroll the substitution with step_1_exp and step_1_label
+        scroll_mgr.scroll_down(self, steps=7)
         
         scroll_mgr.prepare_next(self)  # Shows step_3_label
         scroll_mgr.prepare_next(self)  # Shows step_3_exp
         
         # Scroll again
-        scroll_mgr.scroll_down(self, steps=steps_to_scroll)
+        scroll_mgr.scroll_down(self, steps=2)
         
         # Show steps 4 and 5
         scroll_mgr.prepare_next(self)  # Shows step_4_label
