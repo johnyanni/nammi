@@ -283,8 +283,26 @@ class MathTutorialScene(VoiceoverScene):
                 self.apply_smart_colorize(exp_group, color_map)
                 
             return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-        
-        
+
+
+    def create_multi_exp_labeled_step(
+            self,
+            label_text,
+            *expressions,
+            color_map=None,
+            label_color="#DBDBDB",
+            label_scale=0.6,
+            label_buff=0.2,
+            exps_buff=0.2,
+        ):
+            label = Tex(label_text, color=label_color).scale(label_scale)
+            exp_group = VGroup(expressions).arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+            if color_map:
+                self.apply_smart_colorize(exp_group, color_map)
+
+            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+
+
     def create_labeled_step_alt(
                 self,
                 label_text,
