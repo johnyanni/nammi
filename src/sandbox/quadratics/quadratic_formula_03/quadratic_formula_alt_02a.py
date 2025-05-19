@@ -114,23 +114,23 @@ class QuadraticFormula(MathTutorialScene):
         
         final_equation = MathTex("x^2 + 10x + 13 = 0").scale(TEX_SCALE)
         
+        subtract_12 = self.add_annotations(
+            "-12",
+            self.find_element("25", pre_sol_step_3_exp),
+            self.find_element("12", pre_sol_step_3_exp),
+            color=RED,
+        )
+
         pre_solution_steps = VGroup(
             pre_sol_step_0,
             pre_sol_step_1,
             pre_sol_step_1_2,
             pre_sol_step_2,
-            pre_sol_step_3,
+            VGroup(pre_sol_step_3, subtract_12),
             final_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.4).to_edge(UP, buff=0.4).to_edge(LEFT, buff=1)
         
-        subtract_12 = self.add_annotations(
-            "-12", 
-            self.find_element("25", pre_sol_step_3_exp),
-            self.find_element("12", pre_sol_step_3_exp),
-            color=RED,
-        )
-        
-        
+
         pre_solution = Group(pre_sol_step_0, pre_sol_step_1, pre_sol_step_2, pre_sol_step_3, subtract_12, pre_sol_step_1_2)
         
         ###############################################################################
