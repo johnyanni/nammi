@@ -118,7 +118,7 @@ class QuadraticFormula4(MathTutorialScene):
         mid_sol_step_0_label, mid_sol_step_0_exp = mid_sol_step_0[0], mid_sol_step_0[1]
         
         # Find elements in q_equation to highlight
-        a_in_q_equation = self.find_element("-1", mid_sol_step_0_exp, opacity=0, color=A_COLOR)  # Implied coefficient of x²
+        a_in_q_equation = self.find_element("-", mid_sol_step_0_exp, color=A_COLOR)  # Implied coefficient of x²
         b_in_q_equation = self.find_element("-3", mid_sol_step_0_exp, color=B_COLOR)      
         c_in_q_equation = self.find_element("9", mid_sol_step_0_exp, color=C_COLOR)      
 
@@ -309,13 +309,13 @@ class QuadraticFormula4(MathTutorialScene):
 
         # Animate the coefficient
         self.play(self.indicate(quad_form_a))
-        scroll_mgr.fade_in_from_target(self, quad_form_a)  # Fades in a_value from quad_form_a
+        scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
 
         self.play(self.indicate(quad_form_b))
-        scroll_mgr.fade_in_from_target(self, quad_form_b)  # Fades in a_value from quad_form_b
+        scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in a_value from quad_form_b
 
         self.play(self.indicate(quad_form_c))
-        scroll_mgr.fade_in_from_target(self, quad_form_c)  # Fades in a_value from quad_form_c
+        scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in a_value from quad_form_c
 
         # Show step_0 and step_1
         scroll_mgr.prepare_next(self)  # Shows step_0_label
