@@ -140,7 +140,7 @@ class ScrollManager(VGroup):
         return None  # If not found
 
         
-    def replace_in_place(self, scene, index, new_content, animation_type=ReplacementTransform, run_time=None, animation_kwargs=None):
+    def replace_in_place(self, scene, index, new_content, animation_type=ReplacementTransform, run_time=None, animation_kwargs=None, move_new_content=True):
         """Replaces an equation at its current position
         
         Args:
@@ -150,6 +150,7 @@ class ScrollManager(VGroup):
             animation_type: Animation to use for replacement (default: Transform)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
+            move_new_content: Whether to move the new content the position of the old one (optional)
         """
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
@@ -164,7 +165,8 @@ class ScrollManager(VGroup):
         self.replacements[index] = original
         
         # Position the new content where the original is
-        new_content.move_to(original.get_center())
+        if move_new_content:
+            new_content.move_to(original.get_center())
         
         # Perform the replacement animation
         scene.play(animation_type(original, new_content, **animation_kwargs), **run_time)
