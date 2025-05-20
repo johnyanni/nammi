@@ -81,7 +81,7 @@ class QuadraticFormula(MathTutorialScene):
         
         
         
-        pre_sol_step_0 = self.create_labeled_step(
+        pre_sol_step_0 = self.create_multi_exp_labeled_step(
             "Get the equation in standard form",
             MathTex("4(x+5)^2=48").scale(TEX_SCALE)
         )
@@ -89,22 +89,22 @@ class QuadraticFormula(MathTutorialScene):
         pre_sol_step_0_label, pre_sol_step_0_exp = pre_sol_step_0[0], pre_sol_step_0[1]
         
         pre_sol_step_1 = self.create_multi_exp_labeled_step(
-            "Solve",
-            MathTex("4(x+5)^2=48").scale(TEX_SCALE),
-            MathTex("(x+5)^2=12").scale(TEX_SCALE)
+            "Divide both sides by 4",
+            MathTex("4(x+5)^2=48").scale(TEX_SCALE)
         )
         
-        pre_sol_step_1_label, pre_sol_step_1_exp1, pre_sol_step_1_exp2 = pre_sol_step_1[0], pre_sol_step_1[1][0], pre_sol_step_1[1][1]
+        pre_sol_step_1_label, pre_sol_step_1_exp = pre_sol_step_1[0], pre_sol_step_1[1]
         
+        pre_sol_step_1_1 = MathTex("(x+5)^2=12").scale(TEX_SCALE)
         
-        pre_sol_step_2 = self.create_labeled_step(
+        pre_sol_step_2 = self.create_multi_exp_labeled_step(
             "Expand the squared term",
             MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE)
         )
         
         pre_sol_step_2_label, pre_sol_step_2_exp = pre_sol_step_2[0], pre_sol_step_2[1]
         
-        pre_sol_step_3 = self.create_labeled_step(
+        pre_sol_step_3 = self.create_multi_exp_labeled_step(
             "Subtract 12 from both sides",
             MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE)
         )
@@ -115,27 +115,28 @@ class QuadraticFormula(MathTutorialScene):
         
         div_4 = self.add_annotations(
             r"\div 4",
-            self.find_element("25", pre_sol_step_1_exp1),
-            self.find_element("12", pre_sol_step_1_exp1),
+            self.find_element("4", pre_sol_step_1_exp[0]),
+            self.find_element("48", pre_sol_step_1_exp[0]),
             color=GREEN,
         )
         
         subtract_12 = self.add_annotations(
             "-12",
-            self.find_element("25", pre_sol_step_3_exp),
-            self.find_element("12", pre_sol_step_3_exp),
+            self.find_element("25", pre_sol_step_3_exp[0]),
+            self.find_element("12", pre_sol_step_3_exp[0]),
             color=RED,
         )
 
         pre_solution_steps = VGroup(
             pre_sol_step_0,
-            pre_sol_step_1,
+            VGroup(pre_sol_step_1, div_4),
+            pre_sol_step_1_1,
             pre_sol_step_2,
             VGroup(pre_sol_step_3, subtract_12),
             final_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.4).to_edge(UP, buff=0.4).to_edge(LEFT, buff=1)
         
-        pre_solution = Group(pre_sol_step_0, pre_sol_step_1, pre_sol_step_2, pre_sol_step_3, subtract_12)
+        pre_solution = Group(pre_sol_step_0, pre_sol_step_1, pre_sol_step_1_1, pre_sol_step_2, pre_sol_step_3, subtract_12)
        
         
         ###############################################################################
@@ -321,6 +322,9 @@ class QuadraticFormula(MathTutorialScene):
         
         self.play(Write(pre_sol_step_1_label))
         self.play(Write(pre_sol_step_1_exp))
+        self.play(FadeIn(div_4))
+        
+        self.play(Write(pre_sol_step_1_1))
         
         self.play(Write(pre_sol_step_2_label))
         self.play(Write(pre_sol_step_2_exp))
