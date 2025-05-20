@@ -329,7 +329,8 @@ class MathTutorialScene(VoiceoverScene):
             self,
             mobject,
             color="#9A48D0",
-            corner_radius=0.1, buff=0.1
+            corner_radius=0.1,
+            buff=0.1
     ):
         return SurroundingRectangle(mobject, color=color, corner_radius=corner_radius, buff=buff)
     
