@@ -136,7 +136,7 @@ class QuadraticFormula(MathTutorialScene):
             final_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.4).to_edge(UP, buff=0.4).to_edge(LEFT, buff=1)
         
-        pre_solution = Group(pre_sol_step_0, pre_sol_step_1, pre_sol_step_1_1, pre_sol_step_2, pre_sol_step_3, subtract_12)
+        pre_solution = Group(pre_sol_step_0, div_4,pre_sol_step_1, pre_sol_step_1_1, pre_sol_step_2, pre_sol_step_3, subtract_12)
        
         
         ###############################################################################
