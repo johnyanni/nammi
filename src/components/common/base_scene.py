@@ -378,6 +378,9 @@ class MathTutorialScene(VoiceoverScene):
 
         return terms
     
+    
+    
+    
     def create_callout(
             self,
             text,
@@ -972,3 +975,71 @@ class MathTutorialScene(VoiceoverScene):
         print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
             (f" within context '{context}'" if context else ""))
         return None
+    
+    
+    
+    
+    
+    def create_annotated_expression(self, main_expr, annotations=None, buff=0.3, h_spacing=0):
+        # Create main expression
+        if isinstance(main_expr, str):
+            expr = MathTex(main_expr).scale(TEX_SCALE)
+        else:
+            expr = main_expr
+        
+        # If no annotations, just return the expression
+        if not annotations:
+            return VGroup(expr)
+        
+        # Create annotations to measure actual height
+        annotation_terms = []
+        for text, target1, target2, color in annotations:
+            terms = VGroup(*[MathTex(rf"{text}").scale(FOOTNOTE_SCALE) for _ in range(2)])
+            if color:
+                terms.set_color(color)
+            annotation_terms.append(terms)
+        
+        annotation_height = max(term.height for term in annotation_terms) if annotation_terms else 0.3
+        
+        # Create placeholder rectangle ONLY for the space below the expression
+        placeholder = Rectangle(
+            width=expr.width,
+            height=buff + annotation_height,  # Only buffer + annotation height
+            fill_opacity=0,
+            stroke_opacity=0
+        )
+        
+        # Position the placeholder below the expression
+        placeholder.next_to(expr, DOWN, buff=0)
+        
+        # Create the result group with expression and placeholder
+        result = VGroup(expr, placeholder)
+        
+        # Position annotations
+        for i, (text, target1, target2, color) in enumerate(annotations):
+            terms = annotation_terms[i]
+            
+            # Find targets
+            target1_obj = self.find_element(target1, expr)
+            target2_obj = self.find_element(target2, expr)
+            
+            if target1_obj and target2_obj:
+                # Position annotations
+                terms[0].next_to(target1_obj, DOWN, buff=buff)
+                terms[1].next_to(target2_obj, DOWN, buff=buff)
+                
+                # Apply horizontal spacing
+                if h_spacing != 0:
+                    terms[0].shift(LEFT * h_spacing)
+                    terms[1].shift(RIGHT * h_spacing)
+                
+                # Align vertically
+                if terms[0].get_y() < terms[1].get_y():
+                    terms[1].align_to(terms[0], DOWN)
+                else:
+                    terms[0].align_to(terms[1], DOWN)
+                
+                # Add to result
+                result.add(terms)
+        
+        return result
