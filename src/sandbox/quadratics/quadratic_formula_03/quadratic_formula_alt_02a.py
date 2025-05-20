@@ -88,14 +88,13 @@ class QuadraticFormula(MathTutorialScene):
         
         pre_sol_step_0_label, pre_sol_step_0_exp = pre_sol_step_0[0], pre_sol_step_0[1]
         
-        pre_sol_step_1 = self.create_labeled_step(
+        pre_sol_step_1 = self.create_multi_exp_labeled_step(
             "Solve",
-            MathTex("4(x+5)^2=48").scale(TEX_SCALE)
+            MathTex("4(x+5)^2=48").scale(TEX_SCALE),
+            MathTex("(x+5)^2=12").scale(TEX_SCALE)
         )
         
         pre_sol_step_1_label, pre_sol_step_1_exp = pre_sol_step_1[0], pre_sol_step_1[1]
-        
-        pre_sol_step_1_2 = MathTex("(x+5)^2=12").scale(TEX_SCALE)
         
         
         pre_sol_step_2 = self.create_labeled_step(
@@ -124,14 +123,13 @@ class QuadraticFormula(MathTutorialScene):
         pre_solution_steps = VGroup(
             pre_sol_step_0,
             pre_sol_step_1,
-            pre_sol_step_1_2,
             pre_sol_step_2,
             VGroup(pre_sol_step_3, subtract_12),
             final_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.4).to_edge(UP, buff=0.4).to_edge(LEFT, buff=1)
         
-
         pre_solution = Group(pre_sol_step_0, pre_sol_step_1, pre_sol_step_2, pre_sol_step_3, subtract_12, pre_sol_step_1_2)
+       
         
         ###############################################################################
         # IDENTIFY COEFFICIENTS
@@ -316,8 +314,6 @@ class QuadraticFormula(MathTutorialScene):
         
         self.play(Write(pre_sol_step_1_label))
         self.play(Write(pre_sol_step_1_exp))
-        
-        self.play(Write(pre_sol_step_1_2))
         
         self.play(Write(pre_sol_step_2_label))
         self.play(Write(pre_sol_step_2_exp))
