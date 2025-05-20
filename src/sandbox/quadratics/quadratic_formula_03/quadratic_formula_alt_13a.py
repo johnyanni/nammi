@@ -100,7 +100,7 @@ class QuadraticFormula(MathTutorialScene):
         step2_expr2 = MathTex("(x+5)^2=12").scale(TEX_SCALE)
         
         # Group the first expression with its annotation
-        step2_expr1_with_anno = VGroup(step2_expr1, div_4).arrange(DOWN, buff=ELEMENT_BUFF)
+        step2_expr1_with_anno = VGroup(step2_expr1, div_4)
         
         # Group both expressions together
         step2_exprs = VGroup(step2_expr1_with_anno, step2_expr2).arrange(DOWN, buff=ELEMENT_BUFF)
@@ -126,13 +126,13 @@ class QuadraticFormula(MathTutorialScene):
         # Create the annotation for subtraction
         subtract_12 = self.add_annotations(
             "-12",
-            self.find_element("25", step4_expr1[0]),
-            self.find_element("12", step4_expr1[0]),
+            self.find_element("25", step4_expr1),
+            self.find_element("12", step4_expr1),
             color=RED
         )
         
         # Group the first expression with its annotation
-        step4_expr1_with_anno = VGroup(step4_expr1, subtract_12).arrange(DOWN, buff=ELEMENT_BUFF)
+        step4_expr1_with_anno = VGroup(step4_expr1, subtract_12)
         
         step4_expr2 = MathTex("x^2 + 10x + 13 = 0").scale(TEX_SCALE)
         
