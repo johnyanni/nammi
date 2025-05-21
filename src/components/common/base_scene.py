@@ -9,10 +9,24 @@ from .custom_axes import CustomAxes
 
 
 
+#NEW CONSTANTS
+
+#FONT SIZES
+MATH_SCALE = 0.75
+TEXT_SCALE = 0.60
+LABEL_SCALE = 0.55
+ANNOTATION_SCALE = 0.60
+
+#SPACING
+LABEL_BUFF = 0.20
+EXP_BUFF = 0.25
+STEP_BUFF = 0.4
 
 
-MATH_SCALE = 0.60
-MATH_SCALE_SMALL = 0.55
+
+
+# MATH_SCALE = 0.60
+# MATH_SCALE_SMALL = 0.55
 
 
 TEXT_SCALE = 0.55
@@ -261,89 +275,11 @@ class MathTutorialScene(VoiceoverScene):
             
         # Group the background and text
         return VGroup(background, text)
-
-
-    # ------------------------------------------------------------
-    # QUADRATICS TEMPLATE 
-    # ------------------------------------------------------------
-
-    def create_labeled_step(
-                self,
-                label_text,
-                expressions,
-                color_map=None,
-                label_color="#DBDBDB",
-                label_scale=0.6,
-                label_buff=0.2,
-        ):
-            label = Tex(label_text, color=label_color).scale(label_scale)
-            exp_group = expressions
-                
-            if color_map:
-                self.apply_smart_colorize(exp_group, color_map)
-                
-            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-        
-    # def create_multi_exp_labeled_step(
-    #         self,
-    #         label_text,
-    #         *expressions,
-    #         color_map=None,
-    #         label_color="#DBDBDB",
-    #         label_scale=0.6,
-    #         label_buff=0.2,
-    #         exps_buff=0.2,
-    #     ):
-    #         label = Tex(label_text, color=label_color).scale(label_scale)
-    #         exp_group = VGroup(expressions).arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
-    #         if color_map:
-    #             self.apply_smart_colorize(exp_group, color_map)
-
-    #         return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-        
-        
-        
-    def create_multi_exp_labeled_step(
-        self,
-        label_text,
-        *expressions,
-        color_map=None,
-        label_color="#DBDBDB",
-        label_scale=0.6,
-        label_buff=0.2,
-        exps_buff=0.2,
-    ):
-        label = Tex(label_text, color=label_color).scale(label_scale)
-        # Fix: Use * to unpack the expressions instead of passing them as a tuple
-        exp_group = VGroup(*expressions).arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
-        if color_map:
-            self.apply_smart_colorize(exp_group, color_map)
-
-        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-        
-        
-    def create_labeled_step_alt(
-                self,
-                label_text,
-                expressions,
-                color_map=None,
-                label_color="#757575",
-                label_scale=0.6,
-                label_buff=0.15,
-                eq_hbuff=0.2,
-                tex_scale=TEX_SCALE
-        ):
-            label = Tex(label_text, color=label_color).scale(label_scale)
-            exp_group = VGroup(*[MathTex(exp).scale(tex_scale) for exp in expressions])
-            exp_group.arrange(RIGHT, buff=eq_hbuff)
-            
-            if color_map:
-                self.apply_smart_colorize(exp_group, color_map)
-            
-            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-        
-        
-        
+    
+    
+    
+    
+         
     def create_surrounding_rectangle(
             self,
             mobject,
@@ -358,8 +294,8 @@ class MathTutorialScene(VoiceoverScene):
         return Indicate(mobject, color=color, run_time=run_time)
     
     
-    def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0):
-        terms = VGroup(*[MathTex(rf"{term_added}").scale(FOOTNOTE_SCALE) for _ in range(2)])
+    def add_annotations(self, term_added, left_term, right_term, color=RED, h_spacing=0):
+        terms = VGroup(*[MathTex(rf"{term_added}").scale(ANNOTATION_SCALE) for _ in range(2)])
         if color:
             terms.set_color(color)
             
@@ -378,6 +314,144 @@ class MathTutorialScene(VoiceoverScene):
 
         return terms
     
+    
+    
+    def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, color=RED, scale=MATH_SCALE):
+        """Create an equation with annotations in one step.
+        
+        Args:
+            equation_text: Text for the equation
+            annotation_text: Text for the annotation (e.g., "\\div 4")
+            from_term: Term to annotate from (e.g., "4")
+            to_term: Term to annotate to (e.g., "48")
+            color: Color for the annotation (default: GREEN)
+            scale: Scale for the equation (default: TEX_SCALE)
+            
+        Returns:
+            VGroup containing the equation and its annotations
+        """
+        equation = MathTex(equation_text).scale(scale)
+        
+        annotations = self.add_annotations(
+            annotation_text,
+            self.find_element(from_term, equation),
+            self.find_element(to_term, equation),
+            color=color
+        )
+        
+        return VGroup(equation, annotations)
+    
+    
+    def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, context=None):
+        """
+        Enhanced find_element that automatically handles negative numbers, context, and other patterns.
+        
+        Args:
+            pattern: The text pattern to search for (e.g., "x", "1", "-5")
+            exp: The MathTex or Tex object to search within
+            nth: Which occurrence to return (0-based index)
+            color: Optional color to set for the element
+            opacity: Optional opacity to set for the element
+            as_group: If True, returns the element wrapped in a VGroup
+            context: Optional context pattern to disambiguate elements
+                (e.g., "4ac" for finding "a" in "4ac")
+        
+        Returns:
+            The matching element, or a VGroup containing the element if as_group=True
+            None if not found
+        """
+        # If context is provided, try context-aware finding first
+        if context:
+            try:
+                # Find all occurrences of the pattern
+                pattern_indices = search_shape_in_text(exp, MathTex(pattern))
+                
+                if pattern_indices:
+                    # Find the context pattern
+                    context_indices = search_shape_in_text(exp, MathTex(context))
+                    
+                    if context_indices:
+                        # Find matches within or adjacent to the context
+                        context_matches = []
+                        for p_idx in pattern_indices:
+                            for c_idx in context_indices:
+                                # Check if pattern is within or adjacent to the context
+                                if isinstance(p_idx, slice) and isinstance(c_idx, slice):
+                                    # Within context
+                                    if (p_idx.start >= c_idx.start and p_idx.stop <= c_idx.stop):
+                                        context_matches.append(p_idx)
+                                    # Adjacent to context (just before or after)
+                                    elif (abs(p_idx.stop - c_idx.start) <= 1) or (abs(p_idx.start - c_idx.stop) <= 1):
+                                        context_matches.append(p_idx)
+                        
+                        # Use the nth match found in context
+                        if context_matches and nth < len(context_matches):
+                            element = exp[0][context_matches[nth]]
+                            
+                            if color is not None:
+                                element.set_color(color)
+                            
+                            if opacity is not None:
+                                element.set_opacity(opacity)
+                            
+                            return VGroup(element) if as_group else element
+            except Exception as e:
+                print(f"Context search failed: {e}, falling back to standard search")
+                # Continue with regular search methods
+        
+        # First try direct search
+        try:
+            indices = search_shape_in_text(exp, MathTex(pattern))
+            if indices and nth < len(indices):
+                element = exp[0][indices[nth]]
+                
+                if color is not None:
+                    element.set_color(color)
+                
+                if opacity is not None:
+                    element.set_opacity(opacity)
+                
+                return VGroup(element) if as_group else element
+        except Exception:
+            pass  # If direct search fails, try adjacent elements approach
+        
+        # If pattern looks like it might be a negative number, try adjacent search
+        if pattern.startswith('-') and len(pattern) > 1:
+            try:
+                num_part = pattern[1:]  # Remove the minus sign
+                minus_indices = search_shape_in_text(exp, MathTex("-"))
+                num_indices = search_shape_in_text(exp, MathTex(num_part))
+                
+                # Find adjacent pairs
+                adjacent_pairs = []
+                for minus_idx in minus_indices:
+                    for num_idx in num_indices:
+                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+                            if minus_idx.stop == num_idx.start:
+                                adjacent_pairs.append((minus_idx, num_idx))
+                
+                if adjacent_pairs and nth < len(adjacent_pairs):
+                    minus_idx, num_idx = adjacent_pairs[nth]
+                    minus_element = exp[0][minus_idx]
+                    num_element = exp[0][num_idx]
+                    
+                    # Create a group with both elements
+                    result = VGroup(minus_element, num_element)
+                    
+                    if color is not None:
+                        result.set_color(color)
+                    
+                    if opacity is not None:
+                        result.set_opacity(opacity)
+                    
+                    return result
+            except Exception:
+                pass  # If adjacent search fails, fall back to default behavior
+        
+        # If we get here, both context search and standard searches failed
+        print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
+            (f" within context '{context}'" if context else ""))
+        return None
     
     
     
@@ -513,634 +587,410 @@ class MathTutorialScene(VoiceoverScene):
         return manager
 
 
-    # def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
-    #     """
-    #     Find a specific occurrence of a pattern within an expression.
-        
-    #     Args:
-    #         pattern: The text pattern to search for (e.g., "x", "1")
-    #         exp: The MathTex or Tex object to search within
-    #         nth: Which occurrence to return (0-based index)
-    #         as_group: If True, returns the element wrapped in a VGroup
-    #         color: Optional color to set for the element
-    #         opacity: Optional opacity to set for the element
-        
-    #     Returns:
-    #         The matching element, or a VGroup containing the element if as_group=True
-    #         None if not found
-    #     """
-    #     try:
-    #         # Create a temporary MathTex object for matching
-    #         # We don't add this to the scene - it's just for pattern matching
-    #         pattern_tex = MathTex(pattern)
-            
-    #         # Find the pattern in the expression
-    #         indices = search_shape_in_text(exp, pattern_tex)
-            
-    #         if not indices or nth >= len(indices):
-    #             print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-    #             return None
-            
-    #         # Get the specific element
-    #         element = exp[0][indices[nth]]
-            
-    #         # Apply color and opacity if specified
-    #         if color:
-    #             element.set_color(color)
-            
-    #         if opacity is not None:
-    #             element.set_opacity(opacity)
-            
-    #         # Return as appropriate format
-    #         return VGroup(element) if as_group else element
-            
-    #     except Exception as e:
-    #         print(f"Error finding pattern '{pattern}': {e}")
-    #     return None
-    
-    
-
-    # def find_element(self, pattern, exp, nth=0, as_group=False, color=None, opacity=None):
-    #     """
-    #     Find a specific occurrence of a pattern within an expression.
-        
-    #     Args:
-    #         pattern: The text pattern to search for (e.g., "x", "1")
-    #         exp: The MathTex or Tex object to search within
-    #         nth: Which occurrence to return (0-based index)
-    #         as_group: If True, returns the element wrapped in a VGroup
-    #         color: Optional color to set for the element
-    #         opacity: Optional opacity to set for the element
-        
-    #     Returns:
-    #         The matching element, or a VGroup containing the element if as_group=True
-    #         None if not found
-    #     """
-    #     indices = search_shape_in_text(exp, MathTex(pattern))
-    #     if not indices or nth >= len(indices):
-    #         print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-    #         return None
-        
-    #     element = exp[0][indices[nth]]
-        
-    #     # Apply color if specified
-    #     if color is not None:
-    #         element.set_color(color)
-        
-    #     # Apply opacity if specified
-    #     if opacity is not None:
-    #         element.set_opacity(opacity)
-        
-    #     # Return element, wrapped in VGroup if requested
-    #     if as_group:
-    #         return VGroup(element)
-    #     return element
 
 
 
 
-    # def find_elements(self, pattern, exp, as_group=True, color=None, opacity=None):
-    #     """
-    #     Find all occurrences of a pattern within an expression.
+
         
-    #     Args:
-    #         pattern: The text pattern to search for (e.g., "x", "1")
-    #         exp: The MathTex or Tex object to search within
-    #         as_group: If True, returns all elements as a VGroup
-    #         color: Optional color to set for all found elements
-    #         opacity: Optional opacity to set for all found elements
+
         
-    #     Returns:
-    #         A VGroup of all matching elements if as_group=True
-    #         A list of all matching elements if as_group=False
-    #         None if no matches found
-    #     """
-    #     indices = search_shape_in_text(exp, MathTex(pattern))
-    #     if not indices:
-    #         print(f"Warning: No occurrences of '{pattern}' found")
-    #         return None
-        
-    #     elements = []
-    #     for idx in indices:
-    #         element = exp[0][idx]
-            
-    #         if color:
-    #             element.set_color(color)
-            
-    #         if opacity is not None:
-    #             element.set_opacity(opacity)
-                
-    #         elements.append(element)
-        
-    #     return VGroup(*elements) if as_group else elements
-    
     
 
+   
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ### Labeled Steps ###
+    
+    
+    
+    # def create_labeled_step_vertical(
+    #     self,
+    #     label_text,
+    #     expressions,
+    #     color_map=None,
+    #     label_color="#757575",
+    #     label_scale=0.6,
+    #     label_buff=0.15,
+    #     exps_buff=0.2,
+    #     tex_scale=TEX_SCALE,
+    #     preserve_arrangement=False
+    # ):
+    #     """Create a labeled step with expressions arranged vertically.
+    #     Supports mixed types of expressions (strings and MathTex objects).
+    #     """
+    #     label = Tex(label_text, color=label_color).scale(label_scale)
+        
+    #     # Process each expression based on its type
+    #     processed_expressions = []
+    #     for exp in expressions:
+    #         if isinstance(exp, str):
+    #             # Convert string to MathTex
+    #             processed_expressions.append(MathTex(exp).scale(tex_scale))
+    #         else:
+    #             # Use pre-created object as is
+    #             processed_expressions.append(exp)
+        
+    #     # Create VGroup and arrange
+    #     if isinstance(expressions, VGroup) and preserve_arrangement:
+    #         exp_group = expressions
+    #     else:
+    #         exp_group = VGroup(*processed_expressions)
+    #         if not preserve_arrangement:
+    #             exp_group.arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+        
+    #     if color_map:
+    #         self.apply_smart_colorize(exp_group, color_map)
+            
+    #     return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
 
-    # def find_adjacent_elements(self, pattern1, pattern2, exp, nth1=0, nth2=0, color=None):
-    #     """Find two adjacent patterns and group them together."""
-        
-    #     # Count occurrences to provide better warnings
-    #     indices1 = search_shape_in_text(exp, MathTex(pattern1))
-    #     indices2 = search_shape_in_text(exp, MathTex(pattern2))
-        
-    #     if not indices1:
-    #         print(f"Warning: Pattern '{pattern1}' not found in expression")
-    #         return None
-        
-    #     if not indices2:
-    #         print(f"Warning: Pattern '{pattern2}' not found in expression")
-    #         return None
-        
-    #     # Validate nth1 is in range
-    #     if abs(nth1) > len(indices1):
-    #         print(f"Warning: Requested occurrence {nth1} for '{pattern1}' is out of range (found {len(indices1)} occurrences)")
-    #         return None
-        
-    #     # Validate nth2 is in range
-    #     if abs(nth2) > len(indices2):
-    #         print(f"Warning: Requested occurrence {nth2} for '{pattern2}' is out of range (found {len(indices2)} occurrences)")
-    #         return None
-        
-    #     # Get the elements
-    #     elem1 = exp[0][indices1[nth1 % len(indices1)]]
-    #     elem2 = exp[0][indices2[nth2 % len(indices2)]]
-        
-    #     group = VGroup(elem1, elem2)
-        
-    #     if color:
-    #         group.set_color(color)
-        
-    #     return group
-    
-    
-    
-        
-    # def find_adjacent_elements(self, first_pattern, second_pattern, exp, color=None, opacity=None):
-    #     """
-    #     Find two adjacent elements within an expression and return them as a VGroup.
-        
-    #     Args:
-    #         first_pattern: The text pattern to search for first element (e.g., "-")
-    #         second_pattern: The text pattern to search for second element (e.g., "5")
-    #         exp: The MathTex or Tex object to search within
-    #         color: Optional color to set for the elements
-    #         opacity: Optional opacity to set for the elements
-        
-    #     Returns:
-    #         A VGroup containing the two adjacent elements
-    #         None if not found
-    #     """
-    #     # Find indices of both patterns
-    #     first_indices = search_shape_in_text(exp, MathTex(first_pattern))
-    #     second_indices = search_shape_in_text(exp, MathTex(second_pattern))
-        
-    #     if not first_indices or not second_indices:
-    #         print(f"Warning: Could not find '{first_pattern}' or '{second_pattern}'")
-    #         return None
-        
-    #     # Check for adjacency - find pairs where second follows first
-    #     adjacent_pairs = []
-    #     for first_idx in first_indices:
-    #         for second_idx in second_indices:
-    #             # Check if they're adjacent (second follows first)
-    #             if isinstance(first_idx, slice) and isinstance(second_idx, slice):
-    #                 if first_idx.stop == second_idx.start:
-    #                     adjacent_pairs.append((first_idx, second_idx))
-        
-    #     if not adjacent_pairs:
-    #         print(f"Warning: No adjacent occurrences of '{first_pattern}' and '{second_pattern}' found")
-    #         return None
-        
-    #     # Use the first adjacent pair found
-    #     first_idx, second_idx = adjacent_pairs[0]
-        
-    #     # Get the elements
-    #     first_element = exp[0][first_idx]
-    #     second_element = exp[0][second_idx]
-        
-    #     # Create a VGroup with both elements
-    #     result = VGroup(first_element, second_element)
-        
-    #     # Apply color if specified
-    #     if color is not None:
-    #         result.set_color(color)
-        
-    #     # Apply opacity if specified
-    #     if opacity is not None:
-    #         result.set_opacity(opacity)
-        
-    #     return result
-    
-    
-    
-    # def find_adjacent_elements(self, first_pattern, second_pattern, exp, nth=0, color=None, opacity=None):
-    #     """
-    #     Find the nth occurrence of two adjacent elements within an expression and return them as a VGroup.
-        
-    #     Args:
-    #         first_pattern: The text pattern to search for first element (e.g., "-")
-    #         second_pattern: The text pattern to search for second element (e.g., "5")
-    #         exp: The MathTex or Tex object to search within
-    #         nth: Which occurrence to find (default: 0)
-    #         color: Optional color to set for the elements
-    #         opacity: Optional opacity to set for the elements
-        
-    #     Returns:
-    #         A VGroup containing the two adjacent elements
-    #         None if not found
-    #     """
-    #     # Find indices of both patterns
-    #     first_indices = search_shape_in_text(exp, MathTex(first_pattern))
-    #     second_indices = search_shape_in_text(exp, MathTex(second_pattern))
-        
-    #     if not first_indices or not second_indices:
-    #         print(f"Warning: Could not find '{first_pattern}' or '{second_pattern}'")
-    #         return None
-        
-    #     # Check for adjacency - find pairs where second follows first
-    #     adjacent_pairs = []
-    #     for first_idx in first_indices:
-    #         for second_idx in second_indices:
-    #             # Check if they're adjacent (second follows first)
-    #             if isinstance(first_idx, slice) and isinstance(second_idx, slice):
-    #                 if first_idx.stop == second_idx.start:
-    #                     adjacent_pairs.append((first_idx, second_idx))
-        
-    #     if not adjacent_pairs or nth >= len(adjacent_pairs):
-    #         print(f"Warning: No adjacent occurrences at index {nth} of '{first_pattern}' and '{second_pattern}' found")
-    #         return None
-        
-    #     # Use the nth adjacent pair found
-    #     first_idx, second_idx = adjacent_pairs[nth]
-        
-    #     # Get the elements
-    #     first_element = exp[0][first_idx]
-    #     second_element = exp[0][second_idx]
-        
-    #     # Create a VGroup with both elements
-    #     result = VGroup(first_element, second_element)
-        
-    #     # Apply color if specified
-    #     if color is not None:
-    #         result.set_color(color)
-        
-    #     # Apply opacity if specified
-    #     if opacity is not None:
-    #         result.set_opacity(opacity)
-        
-    #     return result
-    
-    
-    
-    
-    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False):
-    #     """
-    #     Enhanced find_element that automatically handles negative numbers and other patterns.
-        
-    #     Args:
-    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
-    #         exp: The MathTex or Tex object to search within
-    #         nth: Which occurrence to return (0-based index)
-    #         color: Optional color to set for the element
-    #         opacity: Optional opacity to set for the element
-    #         as_group: If True, returns the element wrapped in a VGroup
-        
-    #     Returns:
-    #         The matching element, or a VGroup containing the element if as_group=True
-    #         None if not found
-    #     """
-    #     # First try direct search
-    #     try:
-    #         indices = search_shape_in_text(exp, MathTex(pattern))
-    #         if indices and nth < len(indices):
-    #             element = exp[0][indices[nth]]
+
+
+
+    def create_labeled_step(
+                self,
+                label_text,
+                expressions,
+                color_map=None,
+                label_color="#DBDBDB",
+                label_scale=0.6,
+                label_buff=0.2,
+        ):
+            label = Tex(label_text, color=label_color).scale(label_scale)
+            exp_group = expressions
                 
-    #             if color is not None:
-    #                 element.set_color(color)
+            if color_map:
+                self.apply_smart_colorize(exp_group, color_map)
                 
-    #             if opacity is not None:
-    #                 element.set_opacity(opacity)
-                
-    #             return VGroup(element) if as_group else element
-    #     except Exception:
-    #         pass  # If direct search fails, try adjacent elements approach
+            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
         
-    #     # If pattern looks like it might be a negative number, try adjacent search
-    #     if pattern.startswith('-') and len(pattern) > 1:
-    #         try:
-    #             num_part = pattern[1:]  # Remove the minus sign
-    #             minus_indices = search_shape_in_text(exp, MathTex("-"))
-    #             num_indices = search_shape_in_text(exp, MathTex(num_part))
-                
-    #             # Find adjacent pairs
-    #             adjacent_pairs = []
-    #             for minus_idx in minus_indices:
-    #                 for num_idx in num_indices:
-    #                     if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
-    #                         if minus_idx.stop == num_idx.start:
-    #                             adjacent_pairs.append((minus_idx, num_idx))
-                
-    #             if adjacent_pairs and nth < len(adjacent_pairs):
-    #                 minus_idx, num_idx = adjacent_pairs[nth]
-    #                 minus_element = exp[0][minus_idx]
-    #                 num_element = exp[0][num_idx]
-                    
-    #                 # Create a group with both elements
-    #                 result = VGroup(minus_element, num_element)
-                    
-    #                 if color is not None:
-    #                     result.set_color(color)
-                    
-    #                 if opacity is not None:
-    #                     result.set_opacity(opacity)
-                    
-    #                 return result
-    #         except Exception:
-    #             pass  # If adjacent search fails, fall back to default behavior
-        
-    #     # If all else fails, warn and return None
-    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-    #     return None
-    
-    
-    
-    def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, context=None):
-        """
-        Enhanced find_element that automatically handles negative numbers, context, and other patterns.
-        
-        Args:
-            pattern: The text pattern to search for (e.g., "x", "1", "-5")
-            exp: The MathTex or Tex object to search within
-            nth: Which occurrence to return (0-based index)
-            color: Optional color to set for the element
-            opacity: Optional opacity to set for the element
-            as_group: If True, returns the element wrapped in a VGroup
-            context: Optional context pattern to disambiguate elements
-                (e.g., "4ac" for finding "a" in "4ac")
-        
-        Returns:
-            The matching element, or a VGroup containing the element if as_group=True
-            None if not found
-        """
-        # If context is provided, try context-aware finding first
-        if context:
-            try:
-                # Find all occurrences of the pattern
-                pattern_indices = search_shape_in_text(exp, MathTex(pattern))
-                
-                if pattern_indices:
-                    # Find the context pattern
-                    context_indices = search_shape_in_text(exp, MathTex(context))
-                    
-                    if context_indices:
-                        # Find matches within or adjacent to the context
-                        context_matches = []
-                        for p_idx in pattern_indices:
-                            for c_idx in context_indices:
-                                # Check if pattern is within or adjacent to the context
-                                if isinstance(p_idx, slice) and isinstance(c_idx, slice):
-                                    # Within context
-                                    if (p_idx.start >= c_idx.start and p_idx.stop <= c_idx.stop):
-                                        context_matches.append(p_idx)
-                                    # Adjacent to context (just before or after)
-                                    elif (abs(p_idx.stop - c_idx.start) <= 1) or (abs(p_idx.start - c_idx.stop) <= 1):
-                                        context_matches.append(p_idx)
-                        
-                        # Use the nth match found in context
-                        if context_matches and nth < len(context_matches):
-                            element = exp[0][context_matches[nth]]
-                            
-                            if color is not None:
-                                element.set_color(color)
-                            
-                            if opacity is not None:
-                                element.set_opacity(opacity)
-                            
-                            return VGroup(element) if as_group else element
-            except Exception as e:
-                print(f"Context search failed: {e}, falling back to standard search")
-                # Continue with regular search methods
-        
-        # First try direct search
-        try:
-            indices = search_shape_in_text(exp, MathTex(pattern))
-            if indices and nth < len(indices):
-                element = exp[0][indices[nth]]
-                
-                if color is not None:
-                    element.set_color(color)
-                
-                if opacity is not None:
-                    element.set_opacity(opacity)
-                
-                return VGroup(element) if as_group else element
-        except Exception:
-            pass  # If direct search fails, try adjacent elements approach
-        
-        # If pattern looks like it might be a negative number, try adjacent search
-        if pattern.startswith('-') and len(pattern) > 1:
-            try:
-                num_part = pattern[1:]  # Remove the minus sign
-                minus_indices = search_shape_in_text(exp, MathTex("-"))
-                num_indices = search_shape_in_text(exp, MathTex(num_part))
-                
-                # Find adjacent pairs
-                adjacent_pairs = []
-                for minus_idx in minus_indices:
-                    for num_idx in num_indices:
-                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
-                            if minus_idx.stop == num_idx.start:
-                                adjacent_pairs.append((minus_idx, num_idx))
-                
-                if adjacent_pairs and nth < len(adjacent_pairs):
-                    minus_idx, num_idx = adjacent_pairs[nth]
-                    minus_element = exp[0][minus_idx]
-                    num_element = exp[0][num_idx]
-                    
-                    # Create a group with both elements
-                    result = VGroup(minus_element, num_element)
-                    
-                    if color is not None:
-                        result.set_color(color)
-                    
-                    if opacity is not None:
-                        result.set_opacity(opacity)
-                    
-                    return result
-            except Exception:
-                pass  # If adjacent search fails, fall back to default behavior
-        
-        # If we get here, both context search and standard searches failed
-        print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
-            (f" within context '{context}'" if context else ""))
-        return None
-    
-    
-    
-    
-    
-    def create_annotated_expression(self, main_expr, annotations=None, buff=0.3, h_spacing=0):
-        # Create main expression
-        if isinstance(main_expr, str):
-            expr = MathTex(main_expr).scale(TEX_SCALE)
-        else:
-            expr = main_expr
-        
-        # If no annotations, just return the expression
-        if not annotations:
-            return VGroup(expr)
-        
-        # Create annotations to measure actual height
-        annotation_terms = []
-        for text, target1, target2, color in annotations:
-            terms = VGroup(*[MathTex(rf"{text}").scale(FOOTNOTE_SCALE) for _ in range(2)])
-            if color:
-                terms.set_color(color)
-            annotation_terms.append(terms)
-        
-        annotation_height = max(term.height for term in annotation_terms) if annotation_terms else 0.3
-        
-        # Create placeholder rectangle ONLY for the space below the expression
-        placeholder = Rectangle(
-            width=expr.width,
-            height=buff + annotation_height,  # Only buffer + annotation height
-            fill_opacity=0,
-            stroke_opacity=0
-        )
-        
-        # Position the placeholder below the expression
-        placeholder.next_to(expr, DOWN, buff=0)
-        
-        # Create the result group with expression and placeholder
-        result = VGroup(expr, placeholder)
-        
-        # Position annotations
-        for i, (text, target1, target2, color) in enumerate(annotations):
-            terms = annotation_terms[i]
-            
-            # Find targets
-            target1_obj = self.find_element(target1, expr)
-            target2_obj = self.find_element(target2, expr)
-            
-            if target1_obj and target2_obj:
-                # Position annotations
-                terms[0].next_to(target1_obj, DOWN, buff=buff)
-                terms[1].next_to(target2_obj, DOWN, buff=buff)
-                
-                # Apply horizontal spacing
-                if h_spacing != 0:
-                    terms[0].shift(LEFT * h_spacing)
-                    terms[1].shift(RIGHT * h_spacing)
-                
-                # Align vertically
-                if terms[0].get_y() < terms[1].get_y():
-                    terms[1].align_to(terms[0], DOWN)
-                else:
-                    terms[0].align_to(terms[1], DOWN)
-                
-                # Add to result
-                result.add(terms)
-        
-        return result
 
     
-    def create_labeled_step_with_annotations(
-        self, 
-        label_text, 
-        expressions,
-        annotations=None,
+    # backward compatibility
+    
+    def create_multi_exp_labeled_step(
+        self,
+        label_text,
+        *expressions,
         color_map=None,
         label_color="#DBDBDB",
         label_scale=0.6,
         label_buff=0.2,
-        expression_buff=0.2
+        exps_buff=0.2,
     ):
-        """Create a step with a label, multiple expressions, and annotations between them."""
-        # Create the label
+        label = Tex(label_text, color=label_color).scale(label_scale)
+        # Fix: Use * to unpack the expressions instead of passing them as a tuple
+        exp_group = VGroup(*expressions).arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+        if color_map:
+            self.apply_smart_colorize(exp_group, color_map)
+
+        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    # final version of multi exp labeled step
+    def create_multi_exp_labeled_step_tex(
+        self,
+        label_text,
+        *expressions,
+        color_map=None,
+        label_color="#757575",
+        label_scale=TEXT_SCALE,
+        label_buff=0.2,
+        exps_buff=0.2,
+        default_scale=MATH_SCALE  # Add default_scale parameter
+    ):
         label = Tex(label_text, color=label_color).scale(label_scale)
         
-        # Create expression mobjects
-        expression_mobjects = []
-        for expr in expressions:
-            if isinstance(expr, str):
-                expr_obj = MathTex(expr).scale(TEX_SCALE)
+        # Process expressions to convert strings to MathTex with default scaling
+        processed_expressions = []
+        for exp in expressions:
+            if isinstance(exp, str):
+                # Convert string to MathTex with default scaling
+                processed_expressions.append(MathTex(exp).scale(default_scale))
             else:
-                expr_obj = expr
-            expression_mobjects.append(expr_obj)
+                # Use pre-created object as is
+                processed_expressions.append(exp)
         
-        # Apply colorization if needed
+        # Create VGroup and arrange
+        exp_group = VGroup(*processed_expressions).arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+        
         if color_map:
-            for expr in expression_mobjects:
-                self.apply_smart_colorize([expr], color_map)
+            self.apply_smart_colorize(exp_group, color_map)
+
+        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+    
+    
+    
+    
+    
+    # v1 Vertical labeled step without mathtex conversion 
+    
+    def create_labeled_step_vertical(
+        self,
+        label_text,
+        expressions,
+        color_map=None,
+        label_color="#757575",
+        label_scale=0.6,
+        label_buff=0.15,
+        exps_buff=0.2,
+        preserve_arrangement=False
+    ):
+        """Create a labeled step with expressions arranged vertically."""
+        label = Tex(label_text, color=label_color).scale(label_scale)
         
-        # Create groups for expressions and their annotations
-        expression_groups = []
-        annotation_groups = []
+        # Create group and arrange
+        if isinstance(expressions, VGroup) and preserve_arrangement:
+            exp_group = expressions
+        else:
+            exp_group = VGroup(*expressions)
+            if not preserve_arrangement:
+                exp_group.arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+        
+        if color_map:
+            self.apply_smart_colorize(exp_group, color_map)
+            
+        # Create the final group with label and expressions
+        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+    
+
+    # v2 version of vertical tex labeled step with mathtex conversion
+    
+    # def create_labeled_step_vertical_tex(
+    #     self,
+    #     label_text,
+    #     expressions,
+    #     color_map=None,
+    #     label_color="#757575",
+    #     label_scale=TEXT_SCALE,
+    #     label_buff=0.2,
+    #     exps_buff=0.25,
+    #     default_scale=MATH_SCALE,  # Default scaling for string conversions
+    #     preserve_arrangement=False
+    # ):
+
+    #     label = Tex(label_text, color=label_color).scale(label_scale)
+        
+    #     # Handle single expression
+    #     if not isinstance(expressions, (list, tuple, VGroup)):
+    #         expressions = [expressions]
+        
+    #     # Process each expression
+    #     processed_expressions = []
+    #     for exp in expressions:
+    #         if isinstance(exp, str):
+    #             # Convert string to MathTex with default scaling
+    #             processed_expressions.append(MathTex(exp).scale(default_scale))
+    #         else:
+    #             # Use pre-created object as is (assume it has the scaling you want)
+    #             processed_expressions.append(exp)
+        
+    #     # Create group and arrange
+    #     if isinstance(expressions, VGroup) and preserve_arrangement:
+    #         exp_group = expressions
+    #     else:
+    #         exp_group = VGroup(*processed_expressions)
+    #         if not preserve_arrangement:
+    #             exp_group.arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
+        
+    #     if color_map:
+    #         self.apply_smart_colorize(exp_group, color_map)
+            
+    #     return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+
+
+
+
+    #v3 version of vertical tex labeled step with mathtex conversion
+
+    def create_labeled_step_vertical_tex(
+        self,
+        label_text,
+        expressions,
+        color_map=None,
+        label_color="#757575",
+        label_scale=TEXT_SCALE,
+        label_buff=0.2,
+        exps_buff=0.25,
+        default_scale=MATH_SCALE  # Default scaling for string conversions
+    ):
+
+        label = Tex(label_text, color=label_color).scale(label_scale)
+        
+        # Handle single expression
+        if not isinstance(expressions, (list, tuple, VGroup)):
+            expressions = [expressions]
         
         # Process each expression
-        for i, expr in enumerate(expression_mobjects):
-            # For the first expression, check if it has annotations
-            if i == 0 and annotations:
-                # Create the annotations
-                annotation_objs = []
-                for text, from_term, to_term, color in annotations:
-                    from_element = self.find_element(from_term, expr)
-                    to_element = self.find_element(to_term, expr)
-                    
-                    if from_element and to_element:
-                        anno = self.add_annotations(text, from_element, to_element, color=color)
-                        annotation_objs.append(anno)
-                
-                # Group annotations separately
-                if annotation_objs:
-                    annotation_group = VGroup(*annotation_objs)
-                    annotation_groups.append(annotation_group)
-                else:
-                    annotation_groups.append(None)
-                
-                # Just add the expression alone
-                expression_groups.append(VGroup(expr))
+        processed_expressions = []
+        for exp in expressions:
+            if isinstance(exp, str):
+                # Convert string to MathTex with default scaling
+                processed_expressions.append(MathTex(exp).scale(default_scale))
             else:
-                expression_groups.append(VGroup(expr))
-                annotation_groups.append(None)
+                # Use pre-created object as is
+                processed_expressions.append(exp)
         
-        # Correctly position the annotations relative to their expressions
-        for i, (expr_group, anno_group) in enumerate(zip(expression_groups, annotation_groups)):
-            if anno_group:
-                # Combine for positioning but don't include annotations in the expression group
-                combined = VGroup(expr_group, anno_group)
-                # We'll position these manually in the final arrangement
+        # Create group and always arrange vertically
+        exp_group = VGroup(*processed_expressions)
+        exp_group.arrange(DOWN, aligned_edge=LEFT, buff=exps_buff)
         
-        # Arrange expressions vertically
-        expressions_vgroup = VGroup(*expression_groups)
-        for i, (expr, anno) in enumerate(zip(expression_groups, annotation_groups)):
-            if i > 0:
-                expr.next_to(expression_groups[i-1], DOWN, buff=expression_buff, aligned_edge=LEFT)
+        if color_map:
+            self.apply_smart_colorize(exp_group, color_map)
+            
+        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def create_labeled_step_horizontal(
+            self,
+            label_text,
+            expressions,
+            color_map=None,
+            label_color="#757575",
+            label_scale=0.6,
+            label_buff=0.15,
+            exps_buff=0.2,
+            tex_scale=MATH_SCALE,
+            preserve_arrangement=False
+        ):
+            """Create a labeled step with expressions arranged horizontally.
+            
+            Args:
+                label_text: Text for the label
+                expressions: Either a list of strings, list of MathTex objects, or a pre-arranged VGroup
+                color_map: Dictionary mapping text to colors for smart colorization
+                label_color: Color for the label
+                label_scale: Scale factor for the label
+                label_buff: Buffer between label and expressions
+                exps_buff: Buffer between expressions (if newly arranged)
+                tex_scale: Scale factor for MathTex objects (if created from strings)
+                preserve_arrangement: If True, won't rearrange pre-created expression objects
+                
+            Returns:
+                VGroup containing the label and expressions arranged vertically (label above horizontal expressions)
+            """
+            label = Tex(label_text, color=label_color).scale(label_scale)
+            
+            # Check if expressions are strings that need to be converted
+            if all(isinstance(exp, str) for exp in expressions):
+                exp_group = VGroup(*[MathTex(exp).scale(tex_scale) for exp in expressions])
+                # Only arrange if we created new objects
+                exp_group.arrange(RIGHT, buff=exps_buff)
+            else:
+                # If given pre-created objects
+                if isinstance(expressions, VGroup) and preserve_arrangement:
+                    # Use the VGroup as is if it should be preserved
+                    exp_group = expressions
+                else:
+                    # Create a new VGroup and arrange if needed
+                    exp_group = VGroup(*expressions)
+                    if not preserve_arrangement:
+                        exp_group.arrange(RIGHT, buff=exps_buff)
+            
+            if color_map:
+                self.apply_smart_colorize(exp_group, color_map)
+                
+            return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
         
-        # Position annotations with their expressions
-        for expr, anno in zip(expression_groups, annotation_groups):
-            if anno:
-                # Annotations are already positioned relative to their expression terms
-                pass
         
-        # Arrange the whole step
-        step = VGroup(label)
-        for expr, anno in zip(expression_groups, annotation_groups):
-            step.add(expr)
-            if anno:
-                step.add(anno)
         
-        # Position the label
-        expressions_vgroup = VGroup(*[expr for expr in expression_groups])
-        label.next_to(expressions_vgroup, UP, buff=label_buff, aligned_edge=LEFT)
         
-        # Create an easy-to-use structure for animations
-        result = VGroup(label, expressions_vgroup)
         
-        # Add extra attributes for easier access
-        result.label = label
-        result.expressions = expression_groups
-        result.annotations = annotation_groups
         
-        return result
+        
+        
+        
+        
+    def create_multi_exp_labeled_step_horizontal_tex(
+        self,
+        label_text,
+        *expressions,
+        color_map=None,
+        label_color="#757575",
+        label_scale=TEXT_SCALE,
+        label_buff=0.2,
+        exps_buff=0.2,
+        default_scale=MATH_SCALE  # Default scaling for string conversions
+    ):
+        """Create a labeled step with expressions arranged horizontally.
+        Takes expressions as variadic parameters for easier use.
+        
+        Args:
+            label_text: Text for the label
+            *expressions: Variable number of expressions (strings or MathTex objects)
+            color_map: Dictionary mapping text to colors for smart colorization
+            label_color: Color for the label
+            label_scale: Scale factor for the label
+            label_buff: Buffer between label and expressions
+            exps_buff: Buffer between expressions
+            default_scale: Default scale to apply to string expressions
+            
+        Returns:
+            VGroup containing the label and expressions arranged with label above and expressions in a horizontal row
+        """
+        label = Tex(label_text, color=label_color).scale(label_scale)
+        
+        # Process expressions to convert strings to MathTex with default scaling
+        processed_expressions = []
+        for exp in expressions:
+            if isinstance(exp, str):
+                # Convert string to MathTex with default scaling
+                processed_expressions.append(MathTex(exp).scale(default_scale))
+            else:
+                # Use pre-created object as is
+                processed_expressions.append(exp)
+        
+        # Create VGroup and arrange HORIZONTALLY
+        exp_group = VGroup(*processed_expressions).arrange(RIGHT, buff=exps_buff)
+        
+        if color_map:
+            self.apply_smart_colorize(exp_group, color_map)
+
+        # Arrange label above the horizontal expressions
+        return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)

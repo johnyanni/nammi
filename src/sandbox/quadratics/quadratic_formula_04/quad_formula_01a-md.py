@@ -106,7 +106,11 @@ class QuadraticFormula(MathTutorialScene):
         
         pre_sol_step_3 = self.create_multi_exp_labeled_step(
             "Subtract 12 from both sides",
-            MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE)
+            MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE),
+            color_map={
+                "10": RED,
+                "12": BLUE
+            }
         )
         
         pre_sol_step_3_label, pre_sol_step_3_exp = pre_sol_step_3[0], pre_sol_step_3[1]
@@ -126,6 +130,15 @@ class QuadraticFormula(MathTutorialScene):
             self.find_element("12", pre_sol_step_3_exp[0]),
             color=RED,
         )
+        
+        
+        # self.apply_smart_colorize(
+        #     pre_sol_step_3,
+        #     {
+        #         "10": RED,
+        #         "12": BLUE
+        #     }
+        # )
 
         pre_solution_steps = VGroup(
             pre_sol_step_0,
@@ -333,88 +346,88 @@ class QuadraticFormula(MathTutorialScene):
         self.play(Write(pre_sol_step_3_exp))
         self.play(FadeIn(subtract_12))
 
-        # Final standard form equation
-        scroll_mgr.prepare_next(self)
+        # # Final standard form equation
+        # scroll_mgr.prepare_next(self)
 
-        # Transition to coefficient identification
-        self.play(FadeOut(pre_solution))
+        # # Transition to coefficient identification
+        # self.play(FadeOut(pre_solution))
 
-        # Replace with labeled equation
-        scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
+        # # Replace with labeled equation
+        # scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
 
-        # Show label for coefficient step
-        scroll_mgr.prepare_next(self)
+        # # Show label for coefficient step
+        # scroll_mgr.prepare_next(self)
         
-        # Show a, b, c labels
-        scroll_mgr.prepare_next(self, steps=3)
+        # # Show a, b, c labels
+        # scroll_mgr.prepare_next(self, steps=3)
 
-        # Animate each coefficient identification with highlighting
-        self.play(self.indicate(quad_form_a))
-        scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
+        # # Animate each coefficient identification with highlighting
+        # self.play(self.indicate(quad_form_a))
+        # scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
 
-        self.play(self.indicate(quad_form_b))
-        scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in b_value from quad_form_b
+        # self.play(self.indicate(quad_form_b))
+        # scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in b_value from quad_form_b
 
-        self.play(self.indicate(quad_form_c))
-        scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in c_value from quad_form_c
+        # self.play(self.indicate(quad_form_c))
+        # scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in c_value from quad_form_c
 
-        # Show quadratic formula step
-        scroll_mgr.prepare_next(self)  # Shows step_0_label
-        scroll_mgr.prepare_next(self)  # Shows step_0_exp
+        # # Show quadratic formula step
+        # scroll_mgr.prepare_next(self)  # Shows step_0_label
+        # scroll_mgr.prepare_next(self)  # Shows step_0_exp
 
-        # Show substitution step
-        scroll_mgr.prepare_next(self)  # Shows step_1_label
-        scroll_mgr.prepare_next(self)  # Shows step_1_exp
+        # # Show substitution step
+        # scroll_mgr.prepare_next(self)  # Shows step_1_label
+        # scroll_mgr.prepare_next(self)  # Shows step_1_exp
 
-        # Animate coefficient substitutions
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
-        scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
+        # # Animate coefficient substitutions
+        # scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
+        # scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
+        # scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
+        # scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
+        # scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
         
-        # Scroll to keep in view
-        scroll_mgr.scroll_down(self, steps=2)
+        # # Scroll to keep in view
+        # scroll_mgr.scroll_down(self, steps=2)
 
-        # Show initial simplification
-        scroll_mgr.prepare_next(self)  # Shows step_2_label
-        scroll_mgr.prepare_next(self)  # Shows step_2_exp
+        # # Show initial simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_2_label
+        # scroll_mgr.prepare_next(self)  # Shows step_2_exp
         
-        # Scroll as needed
-        scroll_mgr.scroll_down(self, steps=8)
+        # # Scroll as needed
+        # scroll_mgr.scroll_down(self, steps=8)
                 
-        # Continue simplification
-        scroll_mgr.prepare_next(self)  # Shows step_3_label
-        scroll_mgr.prepare_next(self)  # Shows step_3_exp
+        # # Continue simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_3_label
+        # scroll_mgr.prepare_next(self)  # Shows step_3_exp
         
-        # Scroll to keep in view
-        scroll_mgr.scroll_down(self, steps=7)
+        # # Scroll to keep in view
+        # scroll_mgr.scroll_down(self, steps=7)
         
-        # Show square root simplification
-        scroll_mgr.prepare_next(self)  # Shows step_4_label
-        scroll_mgr.prepare_next(self)  # Shows step_4_exp
+        # # Show square root simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_4_label
+        # scroll_mgr.prepare_next(self)  # Shows step_4_exp
         
-        scroll_mgr.scroll_down(self, steps=2)
+        # scroll_mgr.scroll_down(self, steps=2)
         
-        # Show final simplification
-        scroll_mgr.prepare_next(self)  # Shows step_5_label
-        scroll_mgr.prepare_next(self)  # Shows step_5_exp
+        # # Show final simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_5_label
+        # scroll_mgr.prepare_next(self)  # Shows step_5_exp
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Show the first solution
-        self.play(ReplacementTransform(step_5_exp.copy(), first_root))
-        self.play(ReplacementTransform(step_5_exp.copy(), second_root))
+        # # Show the first solution
+        # self.play(ReplacementTransform(step_5_exp.copy(), first_root))
+        # self.play(ReplacementTransform(step_5_exp.copy(), second_root))
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Show decimal approximations
-        self.play(Write(first_root_dec))
-        self.play(Write(second_root_dec))
+        # # Show decimal approximations
+        # self.play(Write(first_root_dec))
+        # self.play(Write(second_root_dec))
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Highlight final answers
-        self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
+        # # Highlight final answers
+        # self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
         
-        self.wait(2)
+        # self.wait(2)
