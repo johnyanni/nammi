@@ -1,6 +1,7 @@
 from manim import *
 from src.components.common.base_scene import *
 from src.components.common.scroll_manager import ScrollManager
+from src.components.common.annotation import Annotation
 
 config.verbosity = "ERROR"
 
@@ -93,63 +94,100 @@ class QuadraticFormula(MathTutorialScene):
         ###############################################################################
         
         
-        step1_label = Tex("Get the equation in standard form", color="#DBDBDB").scale(TEXT_SCALE)
-        step1_expr = MathTex("4(x+5)^2=48").scale(TEX_SCALE)
-        step1 = VGroup(step1_label, step1_expr).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
+        ########################################## STEP 1 Before #######################
+        # step1_label = Tex("Get the equation in standard form", color="#DBDBDB").scale(TEXT_SCALE)
+        # step1_expr = MathTex("4(x+5)^2=48").scale(TEX_SCALE)
+        # step1 = VGroup(step1_label, step1_expr).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
         
+        step1_list = [
+            "Get the equation in standard form",
+            MathTex("4(x+5)^2=48")
+        ]
 
-        step2_label = Tex("Divide both sides by 4", color="#DBDBDB").scale(TEXT_SCALE)
-        step2_expr1 = self.create_annotated_expression(
-            "4(x+5)^2=48", 
-            annotations=[(r"\div 4", "4", "48", GREEN)]
-        )
+        ########################################## STEP 2 Before #######################
+        # step2_label = Tex("Divide both sides by 4", color="#DBDBDB").scale(TEXT_SCALE)
+        # step2_expr1 = self.create_annotated_expression(
+        #     "4(x+5)^2=48", 
+        #     annotations=[(r"\div 4", "4", "48", GREEN)]
+        # )
 
-        step2_expr2 = MathTex("(x+5)^2=12").scale(TEX_SCALE)
+        # step2_expr2 = MathTex("(x+5)^2=12").scale(TEX_SCALE)
         
-        # Group the expressions
-        step2_exprs = VGroup(step2_expr1, step2_expr2).arrange(DOWN, buff=ELEMENT_BUFF)
-        step2 = VGroup(step2_label, step2_exprs).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
-        
+        # # Group the expressions
+        # step2_exprs = VGroup(step2_expr1, step2_expr2).arrange(DOWN, buff=ELEMENT_BUFF)
+        # step2 = VGroup(step2_label, step2_exprs).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
 
-        step3_label = Tex("Expand the squared term", color="#DBDBDB").scale(TEXT_SCALE)
-        step3_expr1 = MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE)
-        
-        step3 = VGroup(step3_label, step3_expr1).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
-        
+        step2_list = [
+            "Divide both sides by 4",
+            MathTex("4(x+5)^2=48"),
+            Annotation(r"\div 4", "4", "48", color = GREEN),
+            MathTex("(x+5)^2=12")
+        ]
 
-        step4_label = Tex("Subtract 12 from both sides", color="#DBDBDB").scale(TEXT_SCALE)
-        step4_expr1 = self.create_annotated_expression(
-            "x^2 + 10x + 25 = 12",
-            annotations=[("-12", "25", "12", RED)]
-        )
-        
-        step4_expr2 = MathTex("x^2 + 10x + 13 = 0").scale(TEX_SCALE)
+        ########################################## STEP 3 Before #######################
+        # step3_label = Tex("Expand the squared term", color="#DBDBDB").scale(TEXT_SCALE)
+        # step3_expr1 = MathTex("x^2 + 10x + 25 = 12").scale(TEX_SCALE)
+        # step3 = VGroup(step3_label, step3_expr1).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
 
-        step4_exprs = VGroup(step4_expr1, step4_expr2).arrange(DOWN, aligned_edge=LEFT, buff=ELEMENT_BUFF)
-        step4 = VGroup(step4_label, step4_exprs).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
+        step3_list = [
+            "Expand the squared term",
+            MathTex("x^2 + 10x + 25 = 12")
+        ]
 
-        solution = VGroup(step1, step2, step3, step4).arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
+        ########################################## STEP 4 Before #######################
+        # step4_label = Tex("Subtract 12 from both sides", color="#DBDBDB").scale(TEXT_SCALE)
+        # step4_expr1 = self.create_annotated_expression(
+        #     "x^2 + 10x + 25 = 12",
+        #     annotations=[("-12", "25", "12", RED)]
+        # )
+        # step4_expr2 = MathTex("x^2 + 10x + 13 = 0").scale(TEX_SCALE)
+        # step4_exprs = VGroup(step4_expr1, step4_expr2).arrange(DOWN, aligned_edge=LEFT, buff=ELEMENT_BUFF)
+        # step4 = VGroup(step4_label, step4_exprs).arrange(DOWN, aligned_edge=LEFT, buff=LABEL_BUFFER)
         
+        step4_list = [
+            "Subtract 12 from both sides",
+            MathTex("x^2 + 10x + 25 = 12"),
+            # annotation automatically follows the preceeding expression 
+            Annotation(
+               "-12",
+                self.find_element_lazy("25"),
+                self.find_element_lazy("12"),
+                color=RED,
+            ),
+            MathTex("x^2 + 10x + 13 = 0")
+        ]
+
+
+        # solution = VGroup(step1, step2, step3, step4).arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
+            
+        solution = self.create_ordered_steps(step1_list, step2_list, step3_list, step4_list)
         solution.next_to(question_title_group, DOWN, buff=0.8).align_to(question_title_group, LEFT)
-        
-        step2_annotation = step2_expr1[2]  # The annotation part is the third element in the group
+
+        step1, step2, step3, step4 = solution
+        print(len(step2))
+        step2_annotation = step2[2]
+        step4_annotation = step4[2]
+        # step2_annotation = step2_expr1[2]  # The annotation part is the third element in the group
         # Step 4 annotations (subtraction of 12)
         # Extract the annotation terms from step4_expr1
-        step4_annotation = step4_expr1[2]  # The annotation part is the third element in the group
+        # step4_annotation = step4_expr1[2]  # The annotation part is the third element in the group
 
         # self.add(step2_annotation)
         # self.add(step4_annotation)
-        
         # Create individual step elements for ScrollManager including annotations
         pre_ordered_steps = VGroup(
-            step1_label, step1_expr,
-            step2_label, step2_expr1[0],  # Main expression from step2_expr1
-            step2_annotation,             # Annotation from step2_expr1
-            step2_expr2,
-            step3_label, step3_expr1,
-            step4_label, step4_expr1[0],  # Main expression from step4_expr1
-            step4_annotation,             # Annotation from step4_expr1
-            step4_expr2
+            # step1_label, step1_expr,
+            # step2_label, step2_expr1[0],  # Main expression from step2_expr1
+            # step2_annotation,             # Annotation from step2_expr1
+            # step2_expr2,
+            # step3_label, step3_expr1,
+            # step4_label, step4_expr1[0],  # Main expression from step4_expr1
+            # step4_annotation,             # Annotation from step4_expr1
+            # step4_expr2
+            *step1,
+            *step2,
+            *step3,
+            *step4,
         )
         
         pre_scroll_mgr = ScrollManager(pre_ordered_steps)
@@ -303,20 +341,20 @@ class QuadraticFormula(MathTutorialScene):
         solution_steps.next_to(mid_solution_steps, DOWN, buff=0.6)
         solution_steps.align_to(mid_solution_steps, LEFT)
 
-        ordered_steps = VGroup(
-            step4_expr2, mid_sol_step_0_label,
-            a_label, b_label, c_label, a_value, b_value, c_value,
-            step_0_label, step_0_exp,
-            step_1_label, step_1_exp,
-            *substitution,
-            step_2_label, step_2_exp,
-            step_3_label, step_3_exp,
-            step_4_label, step_4_exp,
-            step_5_label, step_5_exp
-        )
+        # ordered_steps = VGroup(
+        #     step4_expr2, mid_sol_step_0_label,
+        #     a_label, b_label, c_label, a_value, b_value, c_value,
+        #     step_0_label, step_0_exp,
+        #     step_1_label, step_1_exp,
+        #     *substitution,
+        #     step_2_label, step_2_exp,
+        #     step_3_label, step_3_exp,
+        #     step_4_label, step_4_exp,
+        #     step_5_label, step_5_exp
+        # )
 
-        scroll_mgr = ScrollManager(ordered_steps)
-        scroll_mgr.start_position = ordered_steps[1].copy()
+        # scroll_mgr = ScrollManager(ordered_steps)
+        # scroll_mgr.start_position = ordered_steps[1].copy()
         
         ###############################################################################
         # ANIMATIONS
@@ -359,87 +397,87 @@ class QuadraticFormula(MathTutorialScene):
         
         self.play(FadeOut(solution))
         
-        scroll_mgr.prepare_next(self)
+        # scroll_mgr.prepare_next(self)
 
         
-        # Replace with labeled equation
-        scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
+        # # Replace with labeled equation
+        # scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
         
         
 
-        # Show label for coefficient step
-        scroll_mgr.prepare_next(self)
+        # # Show label for coefficient step
+        # scroll_mgr.prepare_next(self)
         
-        # Show a, b, c labels
-        scroll_mgr.prepare_next(self, steps=3)
+        # # Show a, b, c labels
+        # scroll_mgr.prepare_next(self, steps=3)
 
-        # Animate each coefficient identification with highlighting
-        self.play(self.indicate(quad_form_a))
-        scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
+        # # Animate each coefficient identification with highlighting
+        # self.play(self.indicate(quad_form_a))
+        # scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
 
-        self.play(self.indicate(quad_form_b))
-        scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in b_value from quad_form_b
+        # self.play(self.indicate(quad_form_b))
+        # scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in b_value from quad_form_b
 
-        self.play(self.indicate(quad_form_c))
-        scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in c_value from quad_form_c
+        # self.play(self.indicate(quad_form_c))
+        # scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in c_value from quad_form_c
 
-        # Show quadratic formula step
-        scroll_mgr.prepare_next(self)  # Shows step_0_label
-        scroll_mgr.prepare_next(self)  # Shows step_0_exp
+        # # Show quadratic formula step
+        # scroll_mgr.prepare_next(self)  # Shows step_0_label
+        # scroll_mgr.prepare_next(self)  # Shows step_0_exp
 
-        # Show substitution step
-        scroll_mgr.prepare_next(self)  # Shows step_1_label
-        scroll_mgr.prepare_next(self)  # Shows step_1_exp
+        # # Show substitution step
+        # scroll_mgr.prepare_next(self)  # Shows step_1_label
+        # scroll_mgr.prepare_next(self)  # Shows step_1_exp
 
-        # Animate coefficient substitutions
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
-        scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
+        # # Animate coefficient substitutions
+        # scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
+        # scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
+        # scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
+        # scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
+        # scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
         
-        # Scroll to keep in view
-        scroll_mgr.scroll_down(self, steps=2)
+        # # Scroll to keep in view
+        # scroll_mgr.scroll_down(self, steps=2)
 
-        # Show initial simplification
-        scroll_mgr.prepare_next(self)  # Shows step_2_label
-        scroll_mgr.prepare_next(self)  # Shows step_2_exp
+        # # Show initial simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_2_label
+        # scroll_mgr.prepare_next(self)  # Shows step_2_exp
         
-        # Scroll as needed
-        scroll_mgr.scroll_down(self, steps=8)
+        # # Scroll as needed
+        # scroll_mgr.scroll_down(self, steps=8)
                 
-        # Continue simplification
-        scroll_mgr.prepare_next(self)  # Shows step_3_label
-        scroll_mgr.prepare_next(self)  # Shows step_3_exp
+        # # Continue simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_3_label
+        # scroll_mgr.prepare_next(self)  # Shows step_3_exp
         
-        # Scroll to keep in view
-        scroll_mgr.scroll_down(self, steps=7)
+        # # Scroll to keep in view
+        # scroll_mgr.scroll_down(self, steps=7)
         
-        # Show square root simplification
-        scroll_mgr.prepare_next(self)  # Shows step_4_label
-        scroll_mgr.prepare_next(self)  # Shows step_4_exp
+        # # Show square root simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_4_label
+        # scroll_mgr.prepare_next(self)  # Shows step_4_exp
         
-        scroll_mgr.scroll_down(self, steps=2)
+        # scroll_mgr.scroll_down(self, steps=2)
         
-        # Show final simplification
-        scroll_mgr.prepare_next(self)  # Shows step_5_label
-        scroll_mgr.prepare_next(self)  # Shows step_5_exp
+        # # Show final simplification
+        # scroll_mgr.prepare_next(self)  # Shows step_5_label
+        # scroll_mgr.prepare_next(self)  # Shows step_5_exp
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Show the first solution
-        self.play(ReplacementTransform(step_5_exp.copy(), first_root))
-        self.play(ReplacementTransform(step_5_exp.copy(), second_root))
+        # # Show the first solution
+        # self.play(ReplacementTransform(step_5_exp.copy(), first_root))
+        # self.play(ReplacementTransform(step_5_exp.copy(), second_root))
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Show decimal approximations
-        self.play(Write(first_root_dec))
-        self.play(Write(second_root_dec))
+        # # Show decimal approximations
+        # self.play(Write(first_root_dec))
+        # self.play(Write(second_root_dec))
         
-        self.wait(2)
+        # self.wait(2)
         
-        # Highlight final answers
-        self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
+        # # Highlight final answers
+        # self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
         
         self.wait(2)
