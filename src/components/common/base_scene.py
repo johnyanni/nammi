@@ -1043,3 +1043,104 @@ class MathTutorialScene(VoiceoverScene):
                 result.add(terms)
         
         return result
+
+    
+    def create_labeled_step_with_annotations(
+        self, 
+        label_text, 
+        expressions,
+        annotations=None,
+        color_map=None,
+        label_color="#DBDBDB",
+        label_scale=0.6,
+        label_buff=0.2,
+        expression_buff=0.2
+    ):
+        """Create a step with a label, multiple expressions, and annotations between them."""
+        # Create the label
+        label = Tex(label_text, color=label_color).scale(label_scale)
+        
+        # Create expression mobjects
+        expression_mobjects = []
+        for expr in expressions:
+            if isinstance(expr, str):
+                expr_obj = MathTex(expr).scale(TEX_SCALE)
+            else:
+                expr_obj = expr
+            expression_mobjects.append(expr_obj)
+        
+        # Apply colorization if needed
+        if color_map:
+            for expr in expression_mobjects:
+                self.apply_smart_colorize([expr], color_map)
+        
+        # Create groups for expressions and their annotations
+        expression_groups = []
+        annotation_groups = []
+        
+        # Process each expression
+        for i, expr in enumerate(expression_mobjects):
+            # For the first expression, check if it has annotations
+            if i == 0 and annotations:
+                # Create the annotations
+                annotation_objs = []
+                for text, from_term, to_term, color in annotations:
+                    from_element = self.find_element(from_term, expr)
+                    to_element = self.find_element(to_term, expr)
+                    
+                    if from_element and to_element:
+                        anno = self.add_annotations(text, from_element, to_element, color=color)
+                        annotation_objs.append(anno)
+                
+                # Group annotations separately
+                if annotation_objs:
+                    annotation_group = VGroup(*annotation_objs)
+                    annotation_groups.append(annotation_group)
+                else:
+                    annotation_groups.append(None)
+                
+                # Just add the expression alone
+                expression_groups.append(VGroup(expr))
+            else:
+                expression_groups.append(VGroup(expr))
+                annotation_groups.append(None)
+        
+        # Correctly position the annotations relative to their expressions
+        for i, (expr_group, anno_group) in enumerate(zip(expression_groups, annotation_groups)):
+            if anno_group:
+                # Combine for positioning but don't include annotations in the expression group
+                combined = VGroup(expr_group, anno_group)
+                # We'll position these manually in the final arrangement
+        
+        # Arrange expressions vertically
+        expressions_vgroup = VGroup(*expression_groups)
+        for i, (expr, anno) in enumerate(zip(expression_groups, annotation_groups)):
+            if i > 0:
+                expr.next_to(expression_groups[i-1], DOWN, buff=expression_buff, aligned_edge=LEFT)
+        
+        # Position annotations with their expressions
+        for expr, anno in zip(expression_groups, annotation_groups):
+            if anno:
+                # Annotations are already positioned relative to their expression terms
+                pass
+        
+        # Arrange the whole step
+        step = VGroup(label)
+        for expr, anno in zip(expression_groups, annotation_groups):
+            step.add(expr)
+            if anno:
+                step.add(anno)
+        
+        # Position the label
+        expressions_vgroup = VGroup(*[expr for expr in expression_groups])
+        label.next_to(expressions_vgroup, UP, buff=label_buff, aligned_edge=LEFT)
+        
+        # Create an easy-to-use structure for animations
+        result = VGroup(label, expressions_vgroup)
+        
+        # Add extra attributes for easier access
+        result.label = label
+        result.expressions = expression_groups
+        result.annotations = annotation_groups
+        
+        return result
