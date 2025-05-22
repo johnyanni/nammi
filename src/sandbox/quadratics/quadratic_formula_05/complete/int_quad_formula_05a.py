@@ -44,7 +44,8 @@ class QuadraticFormulaLIST(MathTutorialScene):
                     "4", "48"
                 ), 
                 r"(x+5)^2=12"
-            ]
+            ],
+            default_scale=1.5
         )
 
         step_2 = self.create_labeled_step_vertical_tex(
@@ -73,17 +74,19 @@ class QuadraticFormulaLIST(MathTutorialScene):
         solution.next_to(question_group, DOWN, buff=0.3).align_to(question_group, LEFT)
 
 
-        step_3_label = step_3[0]
-        # step_3_exp1 = step_3[1][0][0]
-        # step_3_exp1_annotation = step_3[1][0][1]
-        # step_3_exp2 = step_3[1][1]
+        # step_3_label = step_3[0]
+        # # step_3_exp1 = step_3[1][0][0]
+        # # step_3_exp1_annotation = step_3[1][0][1]
+        # # step_3_exp2 = step_3[1][1]
         
-        self.play(Write(step_3_label))
+        # self.play(Write(step_3_label))
         
-        step_3_exp1 = step_3_annotated[0]
-        step_3_exp1_annotation = step_3_annotated[1]
+        # step_3_exp1 = step_3_annotated[0]
+        # step_3_exp1_annotation = step_3_annotated[1]
         
-        self.play(Write(step_3_exp1))
-        self.play(Write(step_3_exp1_annotation))
+        # self.play(Write(step_3_exp1))
+        # self.play(Write(step_3_exp1_annotation))
         
+        
+        self.add(solution)
        
