@@ -1083,7 +1083,9 @@ class MathTutorialScene(VoiceoverScene):
         if color_map:
             self.apply_smart_colorize(exp_group, color_map)
 
-        arrange_group.arrange(DOWN, aligned_edge=LEFT, buff=min_arrange)
+        arrange_group.arrange(DOWN, aligned_edge=LEFT, buff=min_arrange).to_edge(
+            UP, buff=0.4
+        ).to_edge(LEFT, buff=1)
         return step_group
 
     def create_ordered_steps(

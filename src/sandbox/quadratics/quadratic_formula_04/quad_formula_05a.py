@@ -164,7 +164,7 @@ class QuadraticFormula(MathTutorialScene):
         solution.next_to(question_title_group, DOWN, buff=0.8).align_to(question_title_group, LEFT)
 
         step1, step2, step3, step4 = solution
-        solution.arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
+        # solution.arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
         print(len(step2))
         step2_annotation = step2[2]
         step4_annotation = step4[2]
@@ -172,7 +172,7 @@ class QuadraticFormula(MathTutorialScene):
         # Step 4 annotations (subtraction of 12)
         # Extract the annotation terms from step4_expr1
         # step4_annotation = step4_expr1[2]  # The annotation part is the third element in the group
-
+        self.add(step2[3])
         # self.add(step2_annotation)
         # self.add(step4_annotation)
         # Create individual step elements for ScrollManager including annotations
