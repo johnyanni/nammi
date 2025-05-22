@@ -164,6 +164,7 @@ class QuadraticFormula(MathTutorialScene):
         solution.next_to(question_title_group, DOWN, buff=0.8).align_to(question_title_group, LEFT)
 
         step1, step2, step3, step4 = solution
+        solution.arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
         print(len(step2))
         step2_annotation = step2[2]
         step4_annotation = step4[2]
