@@ -5,18 +5,30 @@ from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 
-from .annotation import Annotation
 from .smart_tex import *
 from .custom_axes import CustomAxes
 
 from functools import partial, partialmethod
 
 
-MATH_SCALE = 0.60
+
+# NEW SCALE VALUES
+
+MATH_SCALE = 0.75
 MATH_SCALE_SMALL = 0.55
 
+LABEL_SCALE = 0.60
+TEXT_SCALE = 0.65
 
-TEXT_SCALE = 0.55
+ANNOTATION_SCALE = 0.55
+
+
+
+
+
+
+
+
 TEX_SCALE = 0.75
 
 
