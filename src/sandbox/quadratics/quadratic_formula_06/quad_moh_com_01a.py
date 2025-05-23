@@ -378,8 +378,7 @@ class QuadraticFormula(MathTutorialScene):
         pre_scroll_mgr.prepare_next(self)  # Shows step2_label
         pre_scroll_mgr.prepare_next(self)  # Shows main expression (step2_expr1[0])
         
-        self.play(FadeIn(step2_annotation))
-        pre_scroll_mgr.current_position += 1  # Manually update position
+
         
         pre_scroll_mgr.prepare_next(self)  # Shows step2_expr2
         
@@ -392,8 +391,7 @@ class QuadraticFormula(MathTutorialScene):
 
         pre_scroll_mgr.prepare_next(self)  # Shows step4_label
         pre_scroll_mgr.prepare_next(self)  # Shows step4_expr1
-        self.play(FadeIn(step4_annotation))
-        pre_scroll_mgr.current_position += 1  # Manually update position
+
         pre_scroll_mgr.prepare_next(self)  # Shows step4_expr2
         
         self.play(FadeOut(solution))

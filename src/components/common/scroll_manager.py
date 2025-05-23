@@ -17,30 +17,52 @@ class ScrollManager(VGroup):
         )  # Key: scroll index, Value: list of callout managers
         self.scroll_count = 0  # Track number of scrolls
 
-    def prepare_next(
-        self,
-        scene=None,
-        target_slice=slice(None),
-        same_item=False,
-        animation_type=Write,
-        steps=1,
-        run_time=None,
-        animation_kwargs=None,
-    ):
-        """Writes the next equation(s) without scrolling.
-
-        Args:
-            scene: The manim scene to animate on (optional)
-            steps: Number of equations to write (default: 1)
-            run_time: Animation duration in seconds (optional)
-            animation_kwargs: Additional keyword arguments for the animation (optional)
-        """
-        run_time = {} if run_time is None else {"run_time": run_time}
+    def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
+                    animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
+        """Enhanced prepare_next with automatic annotation detection."""
+        
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
         if same_item:
             self.current_position -= self.last_steps
+                
+        if self.current_position >= len(self.equations):
+            print("No more equations to display.")
+            return self
+        
+        # DEBUG: Add this line
+        print(f"prepare_next called for position {self.current_position}")
+        
+        # NEW: Auto-detect annotated equations
+        current_item = self.equations[self.current_position]
+        print(f"Current item type: {type(current_item)}")
+        if (isinstance(current_item, VGroup) and 
+            hasattr(current_item, '_is_annotated_equation') and 
+            current_item._is_annotated_equation):
             
+            print(f"Auto-detected annotated equation at position {self.current_position}")
+            
+            if scene is not None:
+                # Show equation first, then annotations
+                equation = current_item.equation
+                if run_time is not None:
+                    scene.play(animation_type(equation[target_slice], **animation_kwargs), run_time=run_time)
+                else:
+                    scene.play(animation_type(equation[target_slice], **animation_kwargs))
+                
+                # Then show annotations
+                if hasattr(current_item, 'annotations') and len(current_item.annotations) > 0:
+                    print(f"Showing {len(current_item.annotations)} annotations")
+                    if run_time is not None:
+                        scene.play(FadeIn(current_item.annotations), run_time=run_time)
+                    else:
+                        scene.play(FadeIn(current_item.annotations))
+            
+            self.last_steps = steps
+            self.current_position += steps
+            return self
+        
+        # EXISTING: Regular handling for non-annotated elements
         if scene is not None:
             animations = [
                 animation_type(
@@ -49,10 +71,14 @@ class ScrollManager(VGroup):
                 for i in range(steps)
             ]
 
-            scene.play(*animations, **run_time)
+            if run_time is not None:
+                scene.play(*animations, run_time=run_time)
+            else:
+                scene.play(*animations)
 
         self.last_steps = steps
         self.current_position += steps
+        return self
 
     def attach_callout_at_scroll(self, scroll_index, callout_manager):
         """Attach a callout manager to fade out at a specific scroll index."""
@@ -332,4 +358,6 @@ class ScrollManager(VGroup):
         self.current_position += steps
         
         return self
+    
+
     

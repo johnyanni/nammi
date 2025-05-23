@@ -318,30 +318,103 @@ class MathTutorialScene(VoiceoverScene):
     
     
     
-    def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, color=RED, scale=MATH_SCALE):
-        """Create an equation with annotations in one step.
+    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, color=RED, scale=MATH_SCALE):
+    #     """Create an equation with annotations in one step.
         
-        Args:
-            equation_text: Text for the equation
-            annotation_text: Text for the annotation (e.g., "\\div 4")
-            from_term: Term to annotate from (e.g., "4")
-            to_term: Term to annotate to (e.g., "48")
-            color: Color for the annotation (default: GREEN)
-            scale: Scale for the equation (default: TEX_SCALE)
+    #     Args:
+    #         equation_text: Text for the equation
+    #         annotation_text: Text for the annotation (e.g., "\\div 4")
+    #         from_term: Term to annotate from (e.g., "4")
+    #         to_term: Term to annotate to (e.g., "48")
+    #         color: Color for the annotation (default: GREEN)
+    #         scale: Scale for the equation (default: TEX_SCALE)
             
-        Returns:
-            VGroup containing the equation and its annotations
-        """
-        equation = MathTex(equation_text).scale(scale)
+    #     Returns:
+    #         VGroup containing the equation and its annotations
+    #     """
+    #     equation = MathTex(equation_text).scale(scale)
         
-        annotations = self.add_annotations(
-            annotation_text,
-            self.find_element(from_term, equation),
-            self.find_element(to_term, equation),
-            color=color
-        )
+    #     annotations = self.add_annotations(
+    #         annotation_text,
+    #         self.find_element(from_term, equation),
+    #         self.find_element(to_term, equation),
+    #         color=color
+    #     )
         
-        return VGroup(equation, annotations)
+    #     return VGroup(equation, annotations)
+    
+    
+    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, 
+    #                             color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0):
+    #     """Create an equation with annotations in one step.
+        
+    #     Args:
+    #         equation_text: Text for the equation
+    #         annotation_text: Text for the annotation (e.g., "\\div 4")
+    #         from_term: Term to annotate from (e.g., "4")
+    #         to_term: Term to annotate to (e.g., "48")
+    #         color: Color for the annotation (default: RED)
+    #         scale: Scale for the equation (default: MATH_SCALE)
+    #         nth_from: Which occurrence of from_term to use (default: 0)
+    #         nth_to: Which occurrence of to_term to use (default: 0)
+    #         h_spacing: Horizontal spacing adjustment (default: 0)
+            
+    #     Returns:
+    #         VGroup containing the equation and its annotations
+    #     """
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     # Use nth parameters in find_element calls
+    #     from_element = self.find_element(from_term, equation, nth=nth_from)
+    #     to_element = self.find_element(to_term, equation, nth=nth_to)
+        
+    #     if from_element is None or to_element is None:
+    #         print(f"Warning: Could not find elements for annotation. from_term='{from_term}' (nth={nth_from}), to_term='{to_term}' (nth={nth_to})")
+    #         return VGroup(equation)  # Return just the equation if annotation fails
+        
+    #     # Create annotations with h_spacing parameter
+    #     annotations = self.add_annotations(
+    #         annotation_text,
+    #         from_element,
+    #         to_element,
+    #         color=color,
+    #         h_spacing=h_spacing
+    #     )
+        
+    #     result = VGroup(equation, *annotations)  # <-- Flatten the group
+    #     result._is_annotated_equation = True
+    #     return result
+    
+    
+    # def create_annotated_equation(
+    #     self, equation_text, annotation_text, from_term, to_term,
+    #     color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0
+    # ):
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     from_element = self.find_element(from_term, equation, nth=nth_from)
+    #     to_element = self.find_element(to_term, equation, nth=nth_to)
+
+    #     if from_element is None or to_element is None:
+    #         print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
+    #         annotated = VGroup(equation)
+    #         annotated.equation = equation
+    #         annotated.annotations = VGroup()
+    #         return annotated
+
+    #     annotations = self.add_annotations(
+    #         annotation_text, from_element, to_element, color=color, h_spacing=h_spacing
+    #     )
+
+    #     annotated = VGroup(equation, *annotations)
+    #     annotated._is_annotated_equation = True
+
+    #     # ✅ Named access
+    #     annotated.equation = equation
+    #     annotated.annotations = annotations
+
+    #     return annotated
+    
     
     
     def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, context=None):
@@ -1119,3 +1192,767 @@ class MathTutorialScene(VoiceoverScene):
             steps_group.add(step_)
         steps_group.arrange(DOWN, aligned_edge=LEFT, buff=step_step_buff)
         return steps_group
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # def create_smart_step(
+    #     self,
+    #     *elements,
+    #     color_map=None,
+    #     label_color="#DBDBDB", 
+    #     label_scale=0.6,
+    #     math_tex_scale=MATH_SCALE,
+    #     element_buff=0.25,
+    # ):
+    #     """
+    #     Smart step creation focused on element type handling.
+    #     For annotations, use create_annotated_equation first.
+    #     """
+    #     processed_elements = []
+        
+    #     for elem in elements:
+    #         if isinstance(elem, str):
+    #             # String becomes a label
+    #             label = Tex(elem, color=label_color).scale(label_scale)
+    #             processed_elements.append(label)
+                
+    #         elif isinstance(elem, MathTex):
+    #             # Scale MathTex objects
+    #             math_expr = elem.scale(math_tex_scale)
+    #             processed_elements.append(math_expr)
+                
+    #         else:
+    #             # Everything else (VGroups, pre-created objects, etc.) - add as-is
+    #             processed_elements.append(elem)
+        
+    #     # Create result and arrange
+    #     result = VGroup(*processed_elements)
+    #     result.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+    #     # Apply coloring
+    #     if color_map:
+    #         self.apply_smart_colorize(result, color_map)
+        
+    #     return result
+    
+    
+    
+    
+    # def create_smart_steps(
+    #     self, 
+    #     *step_element_lists, 
+    #     step_spacing=0.5,
+    #     **step_kwargs
+    # ):
+    #     """Create and arrange multiple smart steps"""
+    #     steps = []
+    #     for step_elements in step_element_lists:
+    #         step = self.create_smart_step(*step_elements, **step_kwargs)
+    #         steps.append(step)
+        
+    #     result = VGroup(*steps).arrange(DOWN, aligned_edge=LEFT, buff=step_spacing)
+    #     return result
+    
+    
+    
+    
+    
+    
+    # def create_smart_step(
+    #     self,
+    #     *elements,
+    #     # Content control
+    #     color_map=None,
+    #     element_buff=0.25,
+        
+    #     # Label detection and styling
+    #     label_positions="auto",     # "auto", list of indices, or None
+    #     auto_label_first=True,      # When "auto", make first string a label
+    #     label_color="#DBDBDB",
+    #     label_scale=0.6,
+        
+    #     # Text styling (non-label strings)
+    #     text_color=GRAY,
+    #     text_scale=0.5,
+        
+    #     # MathTex scaling
+    #     element_scales=None,        # List of scales for each element [None, 1.2, 0.8, None]
+    #     default_math_tex_scale=MATH_SCALE,
+    # ):
+    #     """
+    #     Enhanced smart step creation with auto-detection and individual element control.
+        
+    #     Args:
+    #         *elements: Mixed elements (str, MathTex, VGroup, etc.)
+    #         label_positions: "auto" (detect first string as label), list of indices, or None (no labels)
+    #         auto_label_first: When "auto", whether to make first string a label
+    #         element_scales: List of scales for each element - None for non-MathTex elements
+    #         element_buff: Spacing between elements in this step
+            
+    #     Examples:
+    #         # Auto-detect first string as label
+    #         step = self.create_smart_step("Step 1", MathTex("x=5"), "explanation text")
+            
+    #         # No labels - all strings are text
+    #         step = self.create_smart_step("text", MathTex("x=5"), label_positions=None)
+            
+    #         # Custom labels
+    #         step = self.create_smart_step("Main", MathTex("x=5"), "Sub", MathTex("y=3"), 
+    #                                     label_positions=[0, 2])
+            
+    #         # Custom scaling
+    #         step = self.create_smart_step("Step", MathTex("big"), MathTex("small"),
+    #                                     element_scales=[None, 1.5, 0.8])
+    #     """
+        
+    #     # Handle label position detection
+    #     if label_positions == "auto":
+    #         label_positions = []
+    #         if auto_label_first:
+    #             # Find first string and make it a label
+    #             for i, elem in enumerate(elements):
+    #                 if isinstance(elem, str):
+    #                     label_positions = [i]
+    #                     break
+    #     elif label_positions is None:
+    #         label_positions = []  # No labels, all strings are text
+    #     # else: use the provided list as-is
+        
+    #     # Process elements
+    #     processed_elements = []
+        
+    #     for i, elem in enumerate(elements):
+    #         if isinstance(elem, str):
+    #             if i in label_positions:
+    #                 # This string is a label
+    #                 processed = Tex(elem, color=label_color).scale(label_scale)
+    #             else:
+    #                 # This string is regular text
+    #                 processed = Text(elem, color=text_color).scale(text_scale)
+    #             processed_elements.append(processed)
+                
+    #         elif isinstance(elem, MathTex):
+    #             # Apply custom scale if provided, otherwise use default
+    #             if element_scales and i < len(element_scales) and element_scales[i] is not None:
+    #                 scale = element_scales[i]
+    #             else:
+    #                 scale = default_math_tex_scale
+                
+    #             math_expr = elem.scale(scale)
+    #             processed_elements.append(math_expr)
+                
+    #         else:
+    #             # VGroups, pre-created objects, etc. - add as-is
+    #             processed_elements.append(elem)
+        
+    #     # Create result and arrange with custom spacing
+    #     result = VGroup(*processed_elements)
+    #     result.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+    #     # Apply coloring if specified
+    #     if color_map:
+    #         self.apply_smart_colorize(result, color_map)
+        
+    #     return result
+    
+    
+    
+    
+    # def create_smart_step(
+    #     self,
+    #     *elements,
+    #     # Content control
+    #     color_map=None,
+        
+    #     # Spacing control
+    #     label_buff=0.15,
+    #     element_buff=0.25,
+        
+    #     # Label styling
+    #     label_color="#DBDBDB", 
+    #     label_scale=0.6,                    # Separate label scaling
+        
+    #     # Text styling
+    #     text_color=GRAY,
+    #     text_scale=0.5,
+        
+    #     # MathTex scaling for content only
+    #     content_scales=None,                # List of scales for content elements only [1.2, None, 0.8]
+    #     default_math_tex_scale=MATH_SCALE,
+    # ):
+    #     """
+    #     Smart step creation with separate label and content scaling.
+        
+    #     Args:
+    #         *elements: Mixed elements - auto-detects label vs content
+    #         label_scale: Scale for the label (if present)
+    #         content_scales: List of scales for content elements only (excludes label)
+    #                     [1.5, None, 3.6] applies to content elements in order
+            
+    #     Examples:
+    #         step = self.create_smart_step(
+    #             "Step 1",                    # Uses label_scale
+    #             MathTex("x = 4"),           # Uses content_scales[0] = 1.5
+    #             "Text explanation",          # Uses text_scale (content_scales[1] ignored)
+    #             MathTex("y = 2"),           # Uses content_scales[2] = 3.6
+                
+    #             label_scale=0.8,            # Label scaling
+    #             content_scales=[1.5, None, 3.6]  # Content scaling
+    #         )
+    #     """
+        
+    #     if len(elements) == 0:
+    #         return VGroup()
+        
+    #     # Auto-detect label
+    #     if isinstance(elements[0], str) and len(elements) > 1:
+    #         has_label = True
+    #         label_text = elements[0]
+    #         content_elements = elements[1:]
+    #     else:
+    #         has_label = False
+    #         label_text = None
+    #         content_elements = elements
+        
+    #     # Process content elements
+    #     processed_content = []
+        
+    #     for i, elem in enumerate(content_elements):
+    #         if isinstance(elem, str):
+    #             # Non-label strings become text (uses text_scale)
+    #             text = Text(elem, color=text_color).scale(text_scale)
+    #             processed_content.append(text)
+                
+    #         elif isinstance(elem, MathTex):
+    #             # Apply content scale if provided
+    #             if (content_scales and 
+    #                 i < len(content_scales) and 
+    #                 content_scales[i] is not None):
+    #                 scale = content_scales[i]
+    #             else:
+    #                 scale = default_math_tex_scale
+                
+    #             math_expr = elem.scale(scale)
+    #             processed_content.append(math_expr)
+                
+    #         else:
+    #             # VGroups, annotations, etc. - no scaling applied
+    #             processed_content.append(elem)
+        
+    #     # Create content structure
+    #     if len(processed_content) == 0:
+    #         content_group = VGroup()
+    #     elif len(processed_content) == 1:
+    #         content_group = processed_content[0]
+    #     else:
+    #         content_group = VGroup(*processed_content)
+    #         content_group.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+    #     # Create final result
+    #     if has_label:
+    #         # Apply label_scale to label
+    #         label = Tex(label_text, color=label_color).scale(label_scale)
+    #         result = VGroup(label, content_group)
+    #         result.arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+    #     else:
+    #         result = content_group
+        
+    #     if color_map:
+    #         self.apply_smart_colorize(result, color_map)
+        
+    #     return result
+    
+    
+    
+    
+    
+    # Using the smart flattening function I mentioned earlier
+    # def unpack_steps_smart(*steps):
+    #     """Smart unpacking that handles annotated equations"""
+    #     all_elements = []
+    #     for step in steps:
+    #         for element in step:
+    #             if (isinstance(element, VGroup) and 
+    #                 hasattr(element, '_is_annotated_equation')):
+    #                 # Unpack annotated equation
+    #                 all_elements.extend(element)
+    #             else:
+    #                 all_elements.append(element)
+    #     return VGroup(*all_elements)
+
+    # Usage:
+    # all_elements = unpack_steps_smart(step2)
+    # Results in: [label, equation, annotation, result_equation]
+    
+    
+    
+    
+    # def unpack_steps_for_scroll_manager(self, *steps, preserve_annotations=True):
+    #     """Smart unpacking that preserves annotation dependencies."""
+    #     all_elements = []
+        
+    #     for step_index, step in enumerate(steps):
+    #         print(f"Processing step {step_index}: {type(step)}, length: {len(step)}")
+            
+    #         # Add the label (always step[0])
+    #         all_elements.append(step[0])
+    #         print(f"  Added label: {step[0]}")
+            
+    #         # Handle content (step[1])
+    #         content = step[1]
+    #         print(f"  Content type: {type(content)}")
+            
+    #         if isinstance(content, VGroup):
+    #             print(f"  Content is VGroup with {len(content)} items")
+    #             for item_index, item in enumerate(content):
+    #                 print(f"    Item {item_index}: {type(item)}")
+    #                 print(f"    HasAttr _is_annotated_equation: {hasattr(item, '_is_annotated_equation')}")
+                    
+    #                 if (preserve_annotations and 
+    #                     isinstance(item, VGroup) and 
+    #                     hasattr(item, '_is_annotated_equation')):
+    #                     print(f"    PRESERVING annotated equation as single unit")
+    #                     all_elements.append(item)
+    #                 else:
+    #                     print(f"    Adding regular item")
+    #                     all_elements.append(item)
+    #         else:
+    #             print(f"  Adding single content item")
+    #             all_elements.append(content)
+        
+    #     print(f"Final elements count: {len(all_elements)}")
+    #     return VGroup(*all_elements)
+    
+    
+    
+    
+    
+    
+    
+    
+    def create_annotated_equation(
+        self, equation_text, annotation_text, from_term, to_term,
+        color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0
+    ):
+        """Create an equation with annotations that works with ScrollManager."""
+        equation = MathTex(equation_text).scale(scale)
+        
+        from_element = self.find_element(from_term, equation, nth=nth_from)
+        to_element = self.find_element(to_term, equation, nth=nth_to)
+
+        if from_element is None or to_element is None:
+            print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
+            # Even if no annotations, still mark it properly
+            annotated = VGroup(equation)
+            annotated._is_annotated_equation = True
+            annotated.equation = equation
+            annotated.annotations = VGroup()
+            return annotated
+
+        annotations = self.add_annotations(
+            annotation_text, from_element, to_element, color=color, h_spacing=h_spacing
+        )
+
+        # Create the annotated group - IMPORTANT: equation first, then annotations
+        annotated = VGroup(equation, *annotations)
+        
+        # CRITICAL: Mark this as an annotated equation for ScrollManager
+        annotated._is_annotated_equation = True
+        annotated._annotation_count = len(annotations)
+        
+        # Named access for convenience
+        annotated.equation = equation
+        annotated.annotations = annotations
+        
+        print(f"Created annotated equation with {len(annotations)} annotations")
+        print(f"  Equation: {equation}")
+        print(f"  Annotations: {annotations}")
+        print(f"  Marked with _is_annotated_equation: {annotated._is_annotated_equation}")
+
+        return annotated
+    
+    
+
+
+
+    # PATCH 4: Enhanced create_smart_step that works with ScrollManager
+    # def create_smart_step(
+    #     self,
+    #     *elements,
+    #     color_map=None,
+    #     label_buff=0.15,
+    #     element_buff=0.25,
+    #     label_color="#DBDBDB", 
+    #     label_scale=0.6,
+    #     default_math_tex_scale=MATH_SCALE,
+    #     content_scales=None,
+    #     mark_annotations=True,  # NEW: Auto-mark annotated equations
+    # ):
+    #     """
+    #     Smart step creation with ScrollManager annotation support.
+    #     """
+    #     if len(elements) == 0:
+    #         return VGroup()
+        
+    #     # Auto-detect label
+    #     if isinstance(elements[0], str) and len(elements) > 1:
+    #         has_label = True
+    #         label_text = elements[0]
+    #         content_elements = elements[1:]
+    #     else:
+    #         has_label = False
+    #         label_text = None
+    #         content_elements = elements
+        
+    #     # Process content elements
+    #     processed_content = []
+        
+    #     for i, elem in enumerate(content_elements):
+    #         if isinstance(elem, str):
+    #             text = Text(elem, color=GRAY).scale(0.5)
+    #             processed_content.append(text)
+    #         elif isinstance(elem, MathTex):
+    #             if (content_scales and 
+    #                 i < len(content_scales) and 
+    #                 content_scales[i] is not None):
+    #                 scale = content_scales[i]
+    #             else:
+    #                 scale = default_math_tex_scale
+                
+    #             math_expr = elem.scale(scale)
+    #             processed_content.append(math_expr)
+    #         else:
+    #             # VGroups, annotations, etc.
+    #             # Check if this looks like an annotated equation and mark it
+    #             if (mark_annotations and isinstance(elem, VGroup) and 
+    #                 len(elem) > 1 and not hasattr(elem, '_is_annotated_equation')):
+    #                 # Heuristic: if it's a VGroup with MathTex + other elements, likely annotated
+    #                 if (isinstance(elem[0], MathTex) and 
+    #                     any(hasattr(item, 'get_center') for item in elem[1:])):
+    #                     elem._is_annotated_equation = True
+    #                     elem.equation = elem[0]
+    #                     elem.annotations = VGroup(*elem[1:])
+                
+    #             processed_content.append(elem)
+        
+    #     # Create content structure
+    #     if len(processed_content) == 0:
+    #         content_group = VGroup()
+    #     elif len(processed_content) == 1:
+    #         content_group = processed_content[0]
+    #     else:
+    #         content_group = VGroup(*processed_content)
+    #         content_group.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+    #     # Create final result
+    #     if has_label:
+    #         label = Tex(label_text, color=label_color).scale(label_scale)
+    #         result = VGroup(label, content_group)
+    #         result.arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+    #     else:
+    #         result = content_group
+        
+    #     if color_map:
+    #         self.apply_smart_colorize(result, color_map)
+        
+    #     return result
+
+
+
+
+
+
+    def create_smart_step(
+        self,
+        label_text,
+        *content_elements,
+        
+        # Spacing
+        label_buff=0.15,
+        element_buff=0.25,
+        
+        # Styling
+        label_color="#DBDBDB", 
+        label_scale=0.6,
+        default_math_tex_scale=MATH_SCALE,
+        
+        # Coloring
+        color_map=None,
+    ):
+        """
+        Simplified smart step: Always label + content elements.
+        
+        Args:
+            label_text: String for the label (always first)
+            *content_elements: Any number of content elements (MathTex, VGroup, etc.)
+            color_map: Applied to content only (not label)
+        """
+        
+        # Create label
+        label = Tex(label_text, color=label_color).scale(label_scale)
+        
+        # Process content elements
+        processed_content = []
+        for elem in content_elements:
+            if isinstance(elem, str):
+                # Convert string to MathTex
+                processed_content.append(MathTex(elem).scale(default_math_tex_scale))
+            elif isinstance(elem, MathTex):
+                # Scale MathTex if not already scaled
+                processed_content.append(elem.scale(default_math_tex_scale))
+            else:
+                # VGroups, annotated equations, etc. - use as-is
+                processed_content.append(elem)
+        
+        # Create content structure
+        if len(processed_content) == 1:
+            content_group = processed_content[0]
+        else:
+            content_group = VGroup(*processed_content)
+            content_group.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+        # Create final result
+        result = VGroup(label, content_group)
+        result.arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+        
+        # Apply color mapping to content only (not label)
+        if color_map:
+            if isinstance(content_group, VGroup):
+                self.apply_smart_colorize(content_group, color_map)
+            else:
+                self.apply_smart_colorize([content_group], color_map)
+        
+        return result
+    
+    
+    def create_smart_steps(
+        self, 
+        *step_element_lists, 
+        # Global spacing controls
+        step_spacing=0.5,
+        element_buff=0.25,        # ← NEW: Controls spacing within each step
+        label_buff=0.15,          # ← NEW: Controls label-to-content spacing
+        
+        # Global styling controls  
+        label_color="#DBDBDB",
+        label_scale=0.6,
+        default_math_tex_scale=MATH_SCALE,
+        color_map=None,
+        **step_kwargs                # For any other create_smart_step parameters
+    ):
+        """Create multiple smart steps with global control over spacing and styling."""
+        
+        steps = []
+        for step_elements in step_element_lists:
+            step = self.create_smart_step(
+                *step_elements, 
+                element_buff=element_buff,      # ← Apply global spacing
+                label_buff=label_buff,          # ← Apply global spacing
+                label_color=label_color,        # ← Apply global styling
+                label_scale=label_scale,        # ← Apply global styling
+                default_math_tex_scale=default_math_tex_scale,
+                color_map=color_map,
+                **step_kwargs
+            )
+            steps.append(step)
+        
+        result = VGroup(*steps).arrange(DOWN, aligned_edge=LEFT, buff=step_spacing)
+        return result
+    
+    
+    
+    # def create_smart_step(
+    #     self,
+    #     first_element,
+    #     *content_elements,
+        
+    #     # Spacing
+    #     label_buff=0.15,
+    #     element_buff=0.25,
+        
+    #     # Styling
+    #     label_color="#DBDBDB", 
+    #     label_scale=0.6,
+    #     default_math_tex_scale=MATH_SCALE,
+        
+    #     # Coloring
+    #     color_map=None,
+    # ):
+    #     """
+    #     Simplified smart step with flexible first element.
+        
+    #     Args:
+    #         first_element: String (becomes label) OR MathTex/VGroup (no label)
+    #         *content_elements: Any number of content elements
+    #         default_math_tex_scale: Scale applied to strings converted to MathTex
+    #         color_map: Applied to content only (not label)
+    #     """
+        
+    #     # Handle first element check
+    #     if isinstance(first_element, str):
+    #         # Has label case
+    #         label = Tex(first_element, color=label_color).scale(label_scale)
+    #         elements_to_process = content_elements
+    #         has_label = True
+    #     else:
+    #         # No label case - first element is content
+    #         elements_to_process = [first_element] + list(content_elements)
+    #         has_label = False
+        
+    #     # Process content elements
+    #     processed_content = []
+    #     for elem in elements_to_process:
+    #         if isinstance(elem, str):
+    #             # Convert string to MathTex with default scaling
+    #             processed_content.append(MathTex(elem).scale(default_math_tex_scale))
+    #         elif isinstance(elem, MathTex):
+    #             # Use pre-created MathTex as-is (respects custom styling)
+    #             processed_content.append(elem)
+    #         else:
+    #             # VGroups, annotated equations, etc. - use as-is
+    #             processed_content.append(elem)
+        
+    #     # Create content structure
+    #     if len(processed_content) == 1:
+    #         content_group = processed_content[0]
+    #     else:
+    #         content_group = VGroup(*processed_content)
+    #         content_group.arrange(DOWN, aligned_edge=LEFT, buff=element_buff)
+        
+    #     # Create final result
+    #     if has_label:
+    #         result = VGroup(label, content_group)
+    #         result.arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
+    #     else:
+    #         result = content_group
+        
+    #     # Apply color mapping to content only (not label)
+    #     if color_map:
+    #         if isinstance(content_group, VGroup):
+    #             self.apply_smart_colorize(content_group, color_map)
+    #         else:
+    #             self.apply_smart_colorize([content_group], color_map)
+        
+    #     return result
+
+
+    # def create_smart_steps(
+    #     self, 
+    #     *step_element_lists, 
+        
+    #     # Global spacing controls
+    #     step_spacing=0.5,
+    #     element_buff=0.25,
+    #     label_buff=0.15,
+        
+    #     # Global styling controls  
+    #     label_color="#DBDBDB",
+    #     label_scale=0.6,
+    #     default_math_tex_scale=MATH_SCALE,
+        
+    #     # Global coloring
+    #     color_map=None,
+        
+    #     **step_kwargs  # For any other create_smart_step parameters
+    # ):
+    #     """
+    #     Create multiple smart steps with global control over spacing and styling.
+        
+    #     Args:
+    #         *step_element_lists: Each argument is a list of elements for one step
+    #         step_spacing: Vertical spacing between steps
+    #         element_buff: Spacing within each step between elements
+    #         label_buff: Spacing between label and content
+    #         default_math_tex_scale: Default scale for strings converted to MathTex
+    #         color_map: Color mapping applied to all steps
+    #     """
+        
+    #     steps = []
+    #     for step_elements in step_element_lists:
+    #         step = self.create_smart_step(
+    #             *step_elements, 
+    #             # Apply global parameters
+    #             element_buff=element_buff,
+    #             label_buff=label_buff,
+    #             label_color=label_color,
+    #             label_scale=label_scale,
+    #             default_math_tex_scale=default_math_tex_scale,
+    #             color_map=color_map,
+    #             **step_kwargs
+    #         )
+    #         steps.append(step)
+        
+    #     result = VGroup(*steps).arrange(DOWN, aligned_edge=LEFT, buff=step_spacing)
+    #     return result
+    
+        
+        # PATCH 3: Update the unpack function to handle annotations properly
+    def unpack_steps_for_scroll_manager(self, *items, preserve_annotations=True):
+        """Smart unpacking that only preserves annotated equations."""
+        all_elements = []
+        
+        for item_index, item in enumerate(items):
+            print(f"Processing item {item_index}: {type(item)}")
+            
+            # Check if this is a single element (not a step)
+            if isinstance(item, (MathTex, Tex, Text)):
+                print(f"  Adding single element: {type(item)}")
+                all_elements.append(item)
+                continue
+            
+            # Check if this is an annotated equation (preserve it)
+            if (isinstance(item, VGroup) and hasattr(item, '_is_annotated_equation')):
+                print(f"  PRESERVING annotated equation as single unit")
+                all_elements.append(item)
+                continue
+            
+            # Handle steps (VGroups with label + content structure)
+            if isinstance(item, VGroup) and len(item) >= 2:
+                print(f"  Processing step with {len(item)} parts")
+                
+                # Add the label (always item[0])
+                all_elements.append(item[0])
+                print(f"    Added label: {item[0]}")
+                
+                # Handle content (item[1]) - ALWAYS UNPACK unless it's an annotation
+                content = item[1]
+                print(f"    Content type: {type(content)}")
+                
+                if isinstance(content, VGroup):
+                    # UNPACK all VGroups except annotations
+                    for sub_item_index, sub_item in enumerate(content):
+                        if (preserve_annotations and 
+                            isinstance(sub_item, VGroup) and 
+                            hasattr(sub_item, '_is_annotated_equation')):
+                            print(f"      PRESERVING annotated equation as single unit")
+                            all_elements.append(sub_item)
+                        else:
+                            print(f"      UNPACKING: Adding {type(sub_item)}")
+                            # If it's a VGroup, unpack it further
+                            if isinstance(sub_item, VGroup):
+                                for nested_item in sub_item:
+                                    print(f"        Adding unpacked item: {type(nested_item)}")
+                                    all_elements.append(nested_item)
+                            else:
+                                all_elements.append(sub_item)
+                else:
+                    print(f"    Adding single content item")
+                    all_elements.append(content)
+            else:
+                # Fallback: unpack if it's a VGroup, otherwise add as single element
+                if isinstance(item, VGroup):
+                    print(f"  UNPACKING VGroup with {len(item)} items")
+                    for nested_item in item:
+                        all_elements.append(nested_item)
+                else:
+                    print(f"  Adding as single element: {type(item)}")
+                    all_elements.append(item)
+        
+        print(f"Final elements count: {len(all_elements)}")
+        return VGroup(*all_elements)

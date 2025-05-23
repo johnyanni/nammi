@@ -70,7 +70,7 @@ class QuadraticFormula(MathTutorialScene):
         solution = self.create_ordered_steps(step1_list, step2_list, step3_list, step4_list)
         step1, step2, step3, step4 = solution
         
-        solution.arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
+        
         solution.next_to(question_group, DOWN, buff=0.8).align_to(question_group, LEFT)
 
         
