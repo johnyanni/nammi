@@ -5,12 +5,15 @@ from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 
-# from .annotation import Annotation
+from .annotation import Annotation
 from .smart_tex import *
 from .custom_axes import CustomAxes
 from .annotated_equation import AnnotatedEquation
 
 from functools import partial, partialmethod
+
+
+
 
 #NEW CONSTANTS
 
@@ -28,20 +31,22 @@ STEP_BUFF = 0.4
 
 
 
+
+
+
+
+
+#BACKWARD COMPATIBILITY
+
 # MATH_SCALE = 0.60
 # MATH_SCALE_SMALL = 0.55
-
-
 TEXT_SCALE = 0.55
 TEX_SCALE = 0.75
-
-
 FOOTNOTE_SCALE = 0.6
-
-
 QUICK_PAUSE = 0.5
 STANDARD_PAUSE = 1.0
 COMPREHENSION_PAUSE = 2.0
+
 
 
 # Common settings
@@ -576,9 +581,72 @@ class MathTutorialScene(VoiceoverScene):
     
     
     
-    
+        
 
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
