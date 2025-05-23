@@ -12,7 +12,6 @@ from .base_scene import MathTutorialScene
 from .smart_tex import *  # Import all smart_tex utilities
 from .scroll_manager import ScrollManager
 from .quick_tip import QuickTip
-from .annotation import Annotation
 
 # Define what gets exported with 'from src.components.common import *'
 __all__ = [
@@ -24,6 +23,5 @@ __all__ = [
     'group_shapes_in_text',
     'all_sizes_symbol',
     'ScrollManager',
-    'QuickTip',
-    'Annotation'
+    'QuickTip'
 ]
