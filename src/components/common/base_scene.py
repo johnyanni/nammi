@@ -5,9 +5,10 @@ from fractions import Fraction
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.azure import AzureService
 
-from .annotation import Annotation
+# from .annotation import Annotation
 from .smart_tex import *
 from .custom_axes import CustomAxes
+from .annotated_equation import AnnotatedEquation
 
 from functools import partial, partialmethod
 
@@ -279,8 +280,6 @@ class MathTutorialScene(VoiceoverScene):
         return VGroup(background, text)
     
     
-    
-    
          
     def create_surrounding_rectangle(
             self,
@@ -294,126 +293,6 @@ class MathTutorialScene(VoiceoverScene):
     def indicate(self, mobject, color="#9A48D0", run_time=2.0):
         """Indicate a mobject with a color."""
         return Indicate(mobject, color=color, run_time=run_time)
-    
-    
-    def add_annotations(self, term_added, left_term, right_term, color=RED, h_spacing=0):
-        terms = VGroup(*[MathTex(rf"{term_added}").scale(ANNOTATION_SCALE) for _ in range(2)])
-        if color:
-            terms.set_color(color)
-            
-        terms[0].next_to(left_term, DOWN)
-        terms[1].next_to(right_term, DOWN)
-        
-        # Apply horizontal spacing adjustment
-        terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
-        terms[1].shift(RIGHT * h_spacing)  # Move right annotation further right
-        
-        
-        if terms[0].get_y() < terms[1].get_y():
-            terms[1].align_to(terms[0], DOWN)
-        else:
-            terms[0].align_to(terms[1], DOWN)
-
-        return terms
-    
-    
-    
-    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, color=RED, scale=MATH_SCALE):
-    #     """Create an equation with annotations in one step.
-        
-    #     Args:
-    #         equation_text: Text for the equation
-    #         annotation_text: Text for the annotation (e.g., "\\div 4")
-    #         from_term: Term to annotate from (e.g., "4")
-    #         to_term: Term to annotate to (e.g., "48")
-    #         color: Color for the annotation (default: GREEN)
-    #         scale: Scale for the equation (default: TEX_SCALE)
-            
-    #     Returns:
-    #         VGroup containing the equation and its annotations
-    #     """
-    #     equation = MathTex(equation_text).scale(scale)
-        
-    #     annotations = self.add_annotations(
-    #         annotation_text,
-    #         self.find_element(from_term, equation),
-    #         self.find_element(to_term, equation),
-    #         color=color
-    #     )
-        
-    #     return VGroup(equation, annotations)
-    
-    
-    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, 
-    #                             color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0):
-    #     """Create an equation with annotations in one step.
-        
-    #     Args:
-    #         equation_text: Text for the equation
-    #         annotation_text: Text for the annotation (e.g., "\\div 4")
-    #         from_term: Term to annotate from (e.g., "4")
-    #         to_term: Term to annotate to (e.g., "48")
-    #         color: Color for the annotation (default: RED)
-    #         scale: Scale for the equation (default: MATH_SCALE)
-    #         nth_from: Which occurrence of from_term to use (default: 0)
-    #         nth_to: Which occurrence of to_term to use (default: 0)
-    #         h_spacing: Horizontal spacing adjustment (default: 0)
-            
-    #     Returns:
-    #         VGroup containing the equation and its annotations
-    #     """
-    #     equation = MathTex(equation_text).scale(scale)
-        
-    #     # Use nth parameters in find_element calls
-    #     from_element = self.find_element(from_term, equation, nth=nth_from)
-    #     to_element = self.find_element(to_term, equation, nth=nth_to)
-        
-    #     if from_element is None or to_element is None:
-    #         print(f"Warning: Could not find elements for annotation. from_term='{from_term}' (nth={nth_from}), to_term='{to_term}' (nth={nth_to})")
-    #         return VGroup(equation)  # Return just the equation if annotation fails
-        
-    #     # Create annotations with h_spacing parameter
-    #     annotations = self.add_annotations(
-    #         annotation_text,
-    #         from_element,
-    #         to_element,
-    #         color=color,
-    #         h_spacing=h_spacing
-    #     )
-        
-    #     result = VGroup(equation, *annotations)  # <-- Flatten the group
-    #     result._is_annotated_equation = True
-    #     return result
-    
-    
-    # def create_annotated_equation(
-    #     self, equation_text, annotation_text, from_term, to_term,
-    #     color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0
-    # ):
-    #     equation = MathTex(equation_text).scale(scale)
-        
-    #     from_element = self.find_element(from_term, equation, nth=nth_from)
-    #     to_element = self.find_element(to_term, equation, nth=nth_to)
-
-    #     if from_element is None or to_element is None:
-    #         print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
-    #         annotated = VGroup(equation)
-    #         annotated.equation = equation
-    #         annotated.annotations = VGroup()
-    #         return annotated
-
-    #     annotations = self.add_annotations(
-    #         annotation_text, from_element, to_element, color=color, h_spacing=h_spacing
-    #     )
-
-    #     annotated = VGroup(equation, *annotations)
-    #     annotated._is_annotated_equation = True
-
-    #     # ✅ Named access
-    #     annotated.equation = equation
-    #     annotated.annotations = annotations
-
-    #     return annotated
     
     
     
@@ -668,19 +547,305 @@ class MathTutorialScene(VoiceoverScene):
 
 
 
+    def add_annotations(self, term_added, left_term, right_term, color=RED, h_spacing=0):
+        terms = VGroup(*[MathTex(rf"{term_added}").scale(ANNOTATION_SCALE) for _ in range(2)])
+        if color:
+            terms.set_color(color)
+            
+        terms[0].next_to(left_term, DOWN)
+        terms[1].next_to(right_term, DOWN)
+        
+        # Apply horizontal spacing adjustment
+        terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
+        terms[1].shift(RIGHT * h_spacing)  # Move right annotation further right
+        
+        
+        if terms[0].get_y() < terms[1].get_y():
+            terms[1].align_to(terms[0], DOWN)
+        else:
+            terms[0].align_to(terms[1], DOWN)
 
+        return terms
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
         
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
     
+    ####### OLD FUNCTIONS #######
+    
+    
+    
+    
+    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, color=RED, scale=MATH_SCALE):
+    #     """Create an equation with annotations in one step.
+        
+    #     Args:
+    #         equation_text: Text for the equation
+    #         annotation_text: Text for the annotation (e.g., "\\div 4")
+    #         from_term: Term to annotate from (e.g., "4")
+    #         to_term: Term to annotate to (e.g., "48")
+    #         color: Color for the annotation (default: GREEN)
+    #         scale: Scale for the equation (default: TEX_SCALE)
+            
+    #     Returns:
+    #         VGroup containing the equation and its annotations
+    #     """
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     annotations = self.add_annotations(
+    #         annotation_text,
+    #         self.find_element(from_term, equation),
+    #         self.find_element(to_term, equation),
+    #         color=color
+    #     )
+        
+    #     return VGroup(equation, annotations)
+    
+    
+    # def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term, 
+    #                             color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0):
+    #     """Create an equation with annotations in one step.
+        
+    #     Args:
+    #         equation_text: Text for the equation
+    #         annotation_text: Text for the annotation (e.g., "\\div 4")
+    #         from_term: Term to annotate from (e.g., "4")
+    #         to_term: Term to annotate to (e.g., "48")
+    #         color: Color for the annotation (default: RED)
+    #         scale: Scale for the equation (default: MATH_SCALE)
+    #         nth_from: Which occurrence of from_term to use (default: 0)
+    #         nth_to: Which occurrence of to_term to use (default: 0)
+    #         h_spacing: Horizontal spacing adjustment (default: 0)
+            
+    #     Returns:
+    #         VGroup containing the equation and its annotations
+    #     """
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     # Use nth parameters in find_element calls
+    #     from_element = self.find_element(from_term, equation, nth=nth_from)
+    #     to_element = self.find_element(to_term, equation, nth=nth_to)
+        
+    #     if from_element is None or to_element is None:
+    #         print(f"Warning: Could not find elements for annotation. from_term='{from_term}' (nth={nth_from}), to_term='{to_term}' (nth={nth_to})")
+    #         return VGroup(equation)  # Return just the equation if annotation fails
+        
+    #     # Create annotations with h_spacing parameter
+    #     annotations = self.add_annotations(
+    #         annotation_text,
+    #         from_element,
+    #         to_element,
+    #         color=color,
+    #         h_spacing=h_spacing
+    #     )
+        
+    #     result = VGroup(equation, *annotations)  # <-- Flatten the group
+    #     result._is_annotated_equation = True
+    #     return result
+    
+    
+    # def create_annotated_equation(
+    #     self, equation_text, annotation_text, from_term, to_term,
+    #     color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0
+    # ):
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     from_element = self.find_element(from_term, equation, nth=nth_from)
+    #     to_element = self.find_element(to_term, equation, nth=nth_to)
 
-   
- 
-    
-    
-    
-    
+    #     if from_element is None or to_element is None:
+    #         print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
+    #         annotated = VGroup(equation)
+    #         annotated.equation = equation
+    #         annotated.annotations = VGroup()
+    #         return annotated
+
+    #     annotations = self.add_annotations(
+    #         annotation_text, from_element, to_element, color=color, h_spacing=h_spacing
+    #     )
+
+    #     annotated = VGroup(equation, *annotations)
+    #     annotated._is_annotated_equation = True
+
+    #     # ✅ Named access
+    #     annotated.equation = equation
+    #     annotated.annotations = annotations
+
+    #     return annotated
     
     
     
@@ -936,32 +1101,6 @@ class MathTutorialScene(VoiceoverScene):
             self.apply_smart_colorize(exp_group, color_map)
             
         return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1578,6 +1717,33 @@ class MathTutorialScene(VoiceoverScene):
         return annotated
     
     
+    
+    # def create_annotated_equation(
+    #     self, equation_text, annotation_text, from_term, to_term,
+    #     color=RED, scale=MATH_SCALE, nth_from=0, nth_to=0, h_spacing=0
+    # ):
+    #     """Create an equation with annotations that works with ScrollManager."""
+    #     equation = MathTex(equation_text).scale(scale)
+        
+    #     from_element = self.find_element(from_term, equation, nth=nth_from)
+    #     to_element = self.find_element(to_term, equation, nth=nth_to)
+
+    #     if from_element is None or to_element is None:
+    #         print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
+    #         # Return AnnotatedEquation with empty annotations
+    #         return AnnotatedEquation(equation, [])
+
+    #     annotations = self.add_annotations(
+    #         annotation_text, from_element, to_element, color=color, h_spacing=h_spacing
+    #     )
+
+    #     # Create and return an AnnotatedEquation instance
+    #     annotated = AnnotatedEquation(equation, annotations)
+        
+    #     print(f"Created annotated equation with {len(annotations)} annotations")
+        
+    #     return annotated
+        
 
 
 
@@ -1956,3 +2122,7 @@ class MathTutorialScene(VoiceoverScene):
         
         print(f"Final elements count: {len(all_elements)}")
         return VGroup(*all_elements)
+    
+
+   
+ 

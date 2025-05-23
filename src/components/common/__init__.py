@@ -13,6 +13,7 @@ from .smart_tex import *  # Import all smart_tex utilities
 from .scroll_manager import ScrollManager
 from .quick_tip import QuickTip
 from .annotation import Annotation
+from .annotated_equation import AnnotatedEquation
 
 # Define what gets exported with 'from src.components.common import *'
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     'ScrollManager',
     'QuickTip',
     'Annotation'
+    'AnnotatedEquation'
 ]
