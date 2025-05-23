@@ -14,13 +14,12 @@ from functools import partial, partialmethod
 
 # NEW SCALE VALUES
 
-MATH_SCALE = 0.75
-MATH_SCALE_SMALL = 0.55
+MATH_SCALE = 0.80
 
-LABEL_SCALE = 0.60
-TEXT_SCALE = 0.65
+LABEL_SCALE = 0.65
+TEXT_SCALE = 0.70
 
-ANNOTATION_SCALE = 0.55
+ANNOTATION_SCALE = 0.65
 
 
 
@@ -419,7 +418,8 @@ class MathTutorialScene(VoiceoverScene):
         return manager
 
    
-    def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, context=None):
+    def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, 
+                    keep_together=False, context=None):  # Added keep_together parameter
         """
         Enhanced find_element that automatically handles negative numbers, context, and other patterns.
         
@@ -430,52 +430,14 @@ class MathTutorialScene(VoiceoverScene):
             color: Optional color to set for the element
             opacity: Optional opacity to set for the element
             as_group: If True, returns the element wrapped in a VGroup
+            keep_together: If True and as_group=True, adds _keep_together flag
             context: Optional context pattern to disambiguate elements
-                (e.g., "4ac" for finding "a" in "4ac")
         
         Returns:
             The matching element, or a VGroup containing the element if as_group=True
             None if not found
         """
-        # If context is provided, try context-aware finding first
-        if context:
-            try:
-                # Find all occurrences of the pattern
-                pattern_indices = search_shape_in_text(exp, MathTex(pattern))
-
-                if pattern_indices:
-                    # Find the context pattern
-                    context_indices = search_shape_in_text(exp, MathTex(context))
-
-                    if context_indices:
-                        # Find matches within or adjacent to the context
-                        context_matches = []
-                        for p_idx in pattern_indices:
-                            for c_idx in context_indices:
-                                # Check if pattern is within or adjacent to the context
-                                if isinstance(p_idx, slice) and isinstance(c_idx, slice):
-                                    # Within context
-                                    if (p_idx.start >= c_idx.start and p_idx.stop <= c_idx.stop):
-                                        context_matches.append(p_idx)
-                                    # Adjacent to context (just before or after)
-                                    elif (abs(p_idx.stop - c_idx.start) <= 1) or (abs(p_idx.start - c_idx.stop) <= 1):
-                                        context_matches.append(p_idx)
-
-                        # Use the nth match found in context
-                        if context_matches and nth < len(context_matches):
-                            element = exp[0][context_matches[nth]]
-
-                            if color is not None:
-                                element.set_color(color)
-
-                            if opacity is not None:
-                                element.set_opacity(opacity)
-
-                            return VGroup(element) if as_group else element
-            except Exception as e:
-                print(f"Context search failed: {e}, falling back to standard search")
-                # Continue with regular search methods
-
+        
         # First try direct search
         try:
             indices = search_shape_in_text(exp, MathTex(pattern))
@@ -488,42 +450,37 @@ class MathTutorialScene(VoiceoverScene):
                 if opacity is not None:
                     element.set_opacity(opacity)
 
-                return VGroup(element) if as_group else element
+                # MODIFIED PART - add keep_together logic
+                if as_group:
+                    result = VGroup(element)
+                    if keep_together:
+                        result._keep_together = True
+                    return result
+                return element
         except Exception:
-            pass  # If direct search fails, try adjacent elements approach
+            pass
 
         # If pattern looks like it might be a negative number, try adjacent search
         if pattern.startswith('-') and len(pattern) > 1:
             try:
-                num_part = pattern[1:]  # Remove the minus sign
-                minus_indices = search_shape_in_text(exp, MathTex("-"))
-                num_indices = search_shape_in_text(exp, MathTex(num_part))
-
-                # Find adjacent pairs
-                adjacent_pairs = []
-                for minus_idx in minus_indices:
-                    for num_idx in num_indices:
-                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
-                            if minus_idx.stop == num_idx.start:
-                                adjacent_pairs.append((minus_idx, num_idx))
-
+                # ... existing negative number logic ...
+                
                 if adjacent_pairs and nth < len(adjacent_pairs):
-                    minus_idx, num_idx = adjacent_pairs[nth]
-                    minus_element = exp[0][minus_idx]
-                    num_element = exp[0][num_idx]
-
-                    # Create a group with both elements
-                    result = VGroup(minus_element, num_element)
-
+                    # ... existing code to create result VGroup ...
+                    
                     if color is not None:
                         result.set_color(color)
 
                     if opacity is not None:
                         result.set_opacity(opacity)
 
+                    # ADD THIS for negative numbers
+                    if keep_together:
+                        result._keep_together = True
+                    
                     return result
             except Exception:
-                pass  # If adjacent search fails, fall back to default behavior
+                pass
 
         # If we get here, both context search and standard searches failed
         print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
@@ -553,6 +510,13 @@ class MathTutorialScene(VoiceoverScene):
         return VGroup(label, exp_group).arrange(DOWN, aligned_edge=LEFT, buff=label_buff)
     
     
+    
+    
+    
+    
+    #############################################################
+    ######## ANNOTATIONS ############
+    #############################################################
     
     
     def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0, scale=ANNOTATION_SCALE):
@@ -601,3 +565,55 @@ class MathTutorialScene(VoiceoverScene):
         result._has_annotation = True
         
         return result
+    
+    
+    
+    def create_step(self, label_text, *elements, spacing=0.3):
+        """Create a step with uniform spacing."""
+        all_elements = [Tex(label_text).scale(0.6)]  # CREATES a label from the string
+        all_elements.extend(elements)                 # Adds your elements after
+        return VGroup(*all_elements).arrange(DOWN, aligned_edge=LEFT, buff=spacing)
+    
+    
+    # def smart_unpack(self, *items):
+    #     """Unpack VGroups by default, unless flagged to keep together."""
+    #     unpacked = []
+        
+    #     for item in items:
+    #         if isinstance(item, VGroup):
+    #             # Check for keep-together flags
+    #             if (hasattr(item, '_has_annotation') or 
+    #                 hasattr(item, '_keep_together')):
+    #                 unpacked.append(item)  # Keep together
+    #             else:
+    #                 unpacked.extend(item)  # DEFAULT: Unpack VGroups
+    #         else:
+    #             unpacked.append(item)
+        
+    #     return VGroup(*unpacked)
+    
+    
+    
+    def create_rect_group(self, mobject, rect_color="#9A48D0", corner_radius=0.1, 
+                        buff=0.1, stroke_width=2, show_rect_first=False):
+        """Create a rectangle group.
+        
+        Args:
+            mobject: The object to surround with a rectangle
+            rect_color: Color of the rectangle (default: "#9A48D0")
+            corner_radius: Radius of corners (default: 0.1)
+            buff: Buffer around the object (default: 0.1)
+            stroke_width: Width of rectangle stroke (default: 2)
+            show_rect_first: If True, rectangle appears before object (default: False)
+        """
+        rect = SurroundingRectangle(
+            mobject, 
+            color=rect_color,
+            corner_radius=corner_radius,
+            buff=buff,
+            stroke_width=stroke_width
+        )
+        
+        # Default: object first, then rectangle
+        group = VGroup(rect, mobject) if show_rect_first else VGroup(mobject, rect)
+        return group

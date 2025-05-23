@@ -17,30 +17,72 @@ class ScrollManager(VGroup):
         )  # Key: scroll index, Value: list of callout managers
         self.scroll_count = 0  # Track number of scrolls
 
-    def prepare_next(
-        self,
-        scene=None,
-        target_slice=slice(None),
-        same_item=False,
-        animation_type=Write,
-        steps=1,
-        run_time=None,
-        animation_kwargs=None,
-    ):
-        """Writes the next equation(s) without scrolling.
+    # def prepare_next(
+    #     self,
+    #     scene=None,
+    #     target_slice=slice(None),
+    #     same_item=False,
+    #     animation_type=Write,
+    #     steps=1,
+    #     run_time=None,
+    #     animation_kwargs=None,
+    # ):
+    #     """Writes the next equation(s) without scrolling.
 
-        Args:
-            scene: The manim scene to animate on (optional)
-            steps: Number of equations to write (default: 1)
-            run_time: Animation duration in seconds (optional)
-            animation_kwargs: Additional keyword arguments for the animation (optional)
-        """
-        run_time = {} if run_time is None else {"run_time": run_time}
+    #     Args:
+    #         scene: The manim scene to animate on (optional)
+    #         steps: Number of equations to write (default: 1)
+    #         run_time: Animation duration in seconds (optional)
+    #         animation_kwargs: Additional keyword arguments for the animation (optional)
+    #     """
+    #     run_time = {} if run_time is None else {"run_time": run_time}
+    #     animation_kwargs = {} if animation_kwargs is None else animation_kwargs
+        
+    #     if same_item:
+    #         self.current_position -= self.last_steps
+            
+    #     if scene is not None:
+    #         animations = [
+    #             animation_type(
+    #                 self.equations[self.current_position + i][0][target_slice], **animation_kwargs
+    #             )
+    #             for i in range(steps)
+    #         ]
+
+    #         scene.play(*animations, **run_time)
+
+    #     self.last_steps = steps
+    #     self.current_position += steps
+    
+    def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
+                    animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
+        """Enhanced prepare_next that checks for annotated equations."""
+        
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
         if same_item:
             self.current_position -= self.last_steps
+                
+        if self.current_position >= len(self.equations):
+            print("No more equations to display.")
+            return self
+        
+        current_item = self.equations[self.current_position]
+        
+        # NEW: Check if this is an annotated equation
+        if isinstance(current_item, VGroup) and hasattr(current_item, '_has_annotation'):
+            if scene is not None:
+                # Animate equation first (first element of VGroup)
+                scene.play(animation_type(current_item[0], **animation_kwargs))
+                # Then fade in annotations (remaining elements)
+                if len(current_item) > 1:
+                    scene.play(FadeIn(VGroup(*current_item[1:])))
             
+            self.last_steps = steps
+            self.current_position += steps
+            return self
+        
+        # ORIGINAL CODE for regular items
         if scene is not None:
             animations = [
                 animation_type(
@@ -49,10 +91,14 @@ class ScrollManager(VGroup):
                 for i in range(steps)
             ]
 
-            scene.play(*animations, **run_time)
+            if run_time is not None:
+                scene.play(*animations, run_time=run_time)
+            else:
+                scene.play(*animations)
 
         self.last_steps = steps
         self.current_position += steps
+        return self
 
     def attach_callout_at_scroll(self, scroll_index, callout_manager):
         """Attach a callout manager to fade out at a specific scroll index."""
