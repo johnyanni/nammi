@@ -1,4 +1,4 @@
-from manim import Mobject, ManimColor
+from manim import *
 import functools
 
 
@@ -52,7 +52,7 @@ class Annotation:
         self.color = color
         self.h_spacing = h_spacing
 
-    def __call__(self, scene, exp=None):
+    def __call__(self, scene, exp=None, exp_annotation_buff=0.2):
         left_term = self.left_term
         # if it is find_element_lazy, evaluate it first
         if type(self.left_term) is functools.partial:
@@ -85,4 +85,5 @@ class Annotation:
             right_term=right_term,
             color=self.color,
             h_spacing=self.h_spacing,
+            exp_annotation_buff=exp_annotation_buff,
         )

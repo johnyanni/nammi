@@ -37,14 +37,17 @@ class ScrollManager(VGroup):
         """
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
-        
+
         if same_item:
             self.current_position -= self.last_steps
-            
+
         if scene is not None:
             animations = [
                 animation_type(
-                    self.equations[self.current_position + i][0][target_slice], **animation_kwargs
+                    # FIX: this line is problematic as it takes only the first subelement if the element is vgroup
+                    # Should we just remove the indexing ?
+                    # self.equations[self.current_position + i][0][target_slice], **animation_kwargs
+                    self.equations[self.current_position + i][target_slice], **animation_kwargs
                 )
                 for i in range(steps)
             ]
@@ -60,8 +63,7 @@ class ScrollManager(VGroup):
             self.callouts_by_scroll_index[scroll_index] = []
         self.callouts_by_scroll_index[scroll_index].append(callout_manager)
         return self
-        
-    
+
     def scroll_down(self, scene, steps=1, run_time=None):
         """Scrolls equations up and reveals new equations"""
         run_time = {} if run_time is None else {"run_time": run_time}
@@ -117,6 +119,36 @@ class ScrollManager(VGroup):
 
         return False
 
+    def fade_out_in_view(
+        self, scene, steps=1, animation_type=FadeOut, run_time=None, animation_kwargs={}
+    ):
+        """
+        Fades out number of `steps` from the elements currently in view
+        """
+        run_time = {} if run_time is None else {"run_time": run_time}
+        steps = min(steps, self.current_position - self.last_in_view)
+        animations = [
+            animation_type(self.equations[self.last_in_view + i], **animation_kwargs)
+            for i in range(steps)
+        ]
+
+        scene.play(*animations, **run_time)
+        self.last_in_view += steps
+
+    def fade_out_all_in_view(
+        self, scene, animation_type=FadeOut, run_time=None, animation_kwargs={}
+    ):
+        """
+        Fades out all elements in currently view
+        """
+        self.fade_out_in_view(
+            scene=scene,
+            steps=self.current_position - self.last_in_view,
+            animation_type=animation_type,
+            run_time=run_time,
+            animation_kwargs=animation_kwargs,
+        )
+
     def _is_container_parent_of(self, potential_parent, child):
         """Check if potential_parent is a parent/ancestor of child"""
         # Get the parent of the child
@@ -139,7 +171,6 @@ class ScrollManager(VGroup):
                 return equation
         return None  # If not found
 
-        
     def replace_in_place(self, scene, index, new_content, animation_type=ReplacementTransform, run_time=None, animation_kwargs=None, move_new_content=True):
         """Replaces an equation at its current position
         
@@ -154,28 +185,28 @@ class ScrollManager(VGroup):
         """
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
-        
+
         if index < self.last_in_view or index >= self.current_position:
             raise IndexError(f"Index {index} is out of the currently visible range ({self.last_in_view}-{self.current_position-1})")
-        
+
         if self.equations[index] is None:
             raise ValueError(f"No equation exists at index {index} (it may have been part of a group replacement)")
-            
+
         original = self.equations[index]
         self.replacements[index] = original
-        
+
         # Position the new content where the original is
         if move_new_content:
             new_content.move_to(original.get_center())
-        
+
         # Perform the replacement animation
         scene.play(animation_type(original, new_content, **animation_kwargs), **run_time)
-        
+
         # Update the equations list
         self.equations[index] = new_content
         self.remove(original)
-        #self.add(new_content)
-    
+        # self.add(new_content)
+
     def highlight_and_replace(self, scene, index, new_content, highlight_color=YELLOW, 
                               highlight_time=0.5, replace_time=1, final_color=WHITE):
         """Highlights an equation before replacing it
@@ -191,31 +222,31 @@ class ScrollManager(VGroup):
         """
         if index < self.last_in_view or index >= self.current_position:
             raise IndexError(f"Index {index} is out of the currently visible range ({self.last_in_view}-{self.current_position-1})")
-        
+
         if self.equations[index] is None:
             raise ValueError(f"No equation exists at index {index} (it may have been part of a group replacement)")
-            
+
         original = self.equations[index]
         self.replacements[index] = original
-        
+
         # Highlight the original equation
         scene.play(original.animate.set_color(highlight_color), run_time=highlight_time)
-        
+
         # Position the new content
         new_content.move_to(original.get_center())
         new_content.set_color(highlight_color)
-        
+
         # Replace with the new content
         scene.play(ReplacementTransform(original, new_content), run_time=replace_time)
-        
+
         # Fade to final color
         scene.play(new_content.animate.set_color(final_color), run_time=highlight_time)
-        
+
         # Update the equations list
         self.equations[index] = new_content
         self.remove(original)
         # self.add(new_content)
-    
+
     def restore_original(self, scene, index, animation_type=Transform, run_time=None, animation_kwargs=None):
         """Restores an equation to its original state before replacement
         
@@ -228,31 +259,31 @@ class ScrollManager(VGroup):
         """
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
-        
+
         if index not in self.replacements:
             raise KeyError(f"No original equation stored for index {index}")
-        
+
         current = self.equations[index]
-        
+
         if current is None:
             raise ValueError(f"No equation exists at index {index} (it may have been part of a group replacement)")
-            
+
         original = self.replacements[index].copy()
-        
+
         # Position the original where the current one is
         original.move_to(current.get_center())
-        
+
         # Perform the restoration animation
         scene.play(animation_type(current, original, **animation_kwargs), **run_time)
-        
+
         # Update the equations list
         self.equations[index] = original
         self.remove(current)
         self.add(original)
-        
+
         # Remove from replacements dictionary
         del self.replacements[index]
-    
+
     def cascade_update(self, scene, start_index, new_contents, cascade_delay=0.2, run_time=1, animation_type=ReplacementTransform):
         """Updates multiple equations in a cascading sequence
         
@@ -266,31 +297,30 @@ class ScrollManager(VGroup):
         """
         if start_index < self.last_in_view or start_index + len(new_contents) > self.current_position:
             raise IndexError(f"Replacement range {start_index}-{start_index + len(new_contents) - 1} is outside visible range")
-        
+
         for i, new_content in enumerate(new_contents):
             index = start_index + i
-            
+
             if self.equations[index] is None:
                 continue  
-                
+
             original = self.equations[index]
             self.replacements[index] = original
-            
+
             # Position the new content
             new_content.move_to(original.get_center())
-            
+
             # Perform the replacement animation with delay
             scene.play(animation_type(original, new_content), run_time=run_time)
-            
+
             # Update the equations list
             self.equations[index] = new_content
             self.remove(original)
-            
+
             # Add delay between animations if not the last one
             if i < len(new_contents) - 1:
                 scene.wait(cascade_delay)
-                
-                
+
     def fade_in_from_target(self, scene, target, steps=1, run_time=None, animation_kwargs=None):
         """Fades in the next equation(s) from a target position
         
@@ -306,30 +336,29 @@ class ScrollManager(VGroup):
         """
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
-        
+
         # Make sure we have enough equations left
         if self.current_position + steps > len(self.equations):
             steps = len(self.equations) - self.current_position
             if steps <= 0:
                 print("No more equations to display.")
                 return self
-        
+
         # Get the equations to fade in
         equations_to_fade = [self.equations[self.current_position + i] for i in range(steps)]
-        
+
         # Get target position
         target_position = target.get_center() 
-        
+
         # Fade in each equation from the target position
         animations = [
             FadeIn(eq, target_position=target_position, **animation_kwargs)
             for eq in equations_to_fade
         ]
-        
+
         scene.play(*animations, **run_time)
-        
+
         # Update position counter
         self.current_position += steps
-        
+
         return self
-    
