@@ -348,13 +348,13 @@ class MathTutorialScene(VoiceoverScene):
         """Indicate a mobject with a color."""
         return Indicate(mobject, color=color, run_time=run_time)
 
-    def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0):
+    def add_annotations(self, term_added, left_term, right_term, color=None, h_spacing=0, exp_annotation_buff=0.2):
         terms = VGroup(*[MathTex(rf"{term_added}").scale(FOOTNOTE_SCALE) for _ in range(2)])
         if color:
             terms.set_color(color)
 
-        terms[0].next_to(left_term, DOWN)
-        terms[1].next_to(right_term, DOWN)
+        terms[0].next_to(left_term, DOWN, buff=exp_annotation_buff)
+        terms[1].next_to(right_term, DOWN, buff=exp_annotation_buff)
 
         # Apply horizontal spacing adjustment
         terms[0].shift(LEFT * h_spacing)  # Move left annotation further left
