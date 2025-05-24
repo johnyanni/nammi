@@ -31,6 +31,33 @@ COMPREHENSION_PAUSE = 2.0
 # Common settings
 BACKGROUND_COLOR = ManimColor("#121212")
 
+
+class Step(VGroup):
+    """
+    A class to wrap the step fetching operations.
+    NOTE: this class should be used via the add_* methods.
+    This is to add/fetch elements in the correct order
+    """
+
+    def __init__(self):
+        self.labels = VGroup()
+        self.expressions = VGroup()
+        self.annotations = VGroup()
+        super().__init__()
+
+    def add_annotation(self, annotation):
+        self.annotations.add(annotation)
+        self.add(annotation)
+
+    def add_expression(self, expression):
+        self.expressions.add(expression)
+        self.add(expression)
+
+    def add_label(self, label):
+        self.labels.add(label)
+        self.add(label)
+
+
 class MathTutorialScene(VoiceoverScene):
     """Base scene class that handles Azure voiceover setup."""
 
@@ -171,8 +198,6 @@ class MathTutorialScene(VoiceoverScene):
             VGroup containing the title and content arranged vertically
         """
         return VGroup(title, *content).arrange(DOWN, aligned_edge=LEFT, buff=buff) 
-
-    
 
     def create_axes(self, x_range=[-6, 6, 1], y_range=[-6, 6, 1], x_length=6, y_length=6):
         """Create standardized axes with customizable ranges and lengths.
@@ -1010,21 +1035,20 @@ class MathTutorialScene(VoiceoverScene):
 
         return result
 
-
-
-
-
     def create_step_from_list(
         self,
         *elements,
+        scale_map={},  # idx -> scale
         color_map=None,
         label_color="#DBDBDB",
         label_scale=0.6,
+        expression_scale=TEX_SCALE,
+        annotation_scale=1,
         label_exp_buff=0.1,
         exp_exp_buff=0.2,
         annotation_exp_buff=0.2,
         exp_annotation_buff=0.2,
-    ):
+    ) -> Step:
 
         min_arrange = min(
             label_exp_buff, exp_exp_buff, annotation_exp_buff, exp_annotation_buff
@@ -1035,21 +1059,23 @@ class MathTutorialScene(VoiceoverScene):
                 # will not be added to the output, just a placehoder for spaceing
                 group.add(Rectangle(height=space, width=1).set_opacity(0))
 
-        step_group = VGroup()  # the output group that contains all of the elements
+        step = Step()
         arrange_group = VGroup()  # used only for arranging
         exp_group = VGroup()  # hold only exps for colorizing and more
 
         for i, elem in enumerate(elements):
             if type(elem) is str:
-                label = Tex(elem, color=label_color).scale(label_scale)
-                step_group.add(label)
+                label = Tex(elem, color=label_color).scale(
+                    scale_map.get(i, label_scale)
+                )
+                step.add_label(label)
                 arrange_group.add(label)
                 if i < len(elements) - 1:
                     add_space(arrange_group, label_exp_buff - min_arrange)
             elif type(elem) is MathTex:
-                exp = elem.scale(TEX_SCALE)
+                exp = elem.scale(scale_map.get(i, expression_scale))
                 exp_group.add(exp)
-                step_group.add(exp)
+                step.add_expression(exp)
                 # if there an expression coming
                 if i < len(elements) - 1:
                     # add the exp to the arrangement if the incoming element is exp
@@ -1062,20 +1088,25 @@ class MathTutorialScene(VoiceoverScene):
             elif type(elem) is Annotation:
                 # ensure that we have an exp to annotate and reject multiple annotation
                 # per expression (exp should be followed by zero or one annotation)
+                # TODO: add multiple annotations for the same expr (should they be at the same line or each one in a sep. line)
                 assert len(exp_group) >= 1 and type(elements[i - 1]) is MathTex
+                # assert len(exp_group) >= 1
                 # get the preceeding exp
                 to_annotate = exp_group[-1]
                 # call the Annotation class (do the actual annotation)
-                annotation = elem(self, to_annotate)
-                step_group.add(annotation)
-                print("to: ", to_annotate)
-                arrange_group.add(
-                    VGroup(to_annotate, annotation).arrange(
-                        DOWN, buff=exp_annotation_buff
-                    )
-                )
+                annotation = elem(
+                    self, to_annotate, exp_annotation_buff=exp_annotation_buff
+                ).scale(scale_map.get(i, annotation_scale))
+                step.add_annotation(annotation)
+                # if type(elements[i-1]) is MathTex:
+                arrange_group.add(VGroup(to_annotate, annotation))
+                # add it to the previous group of annot. and exp if there is another annotation
+                # elif type(elements[i-1]) is Annotation:
+                    # annotation_annotation_buff = 0.2
+                    # annotation.shift(DOWN, (len(arrange_group[-1]) - 1) * annotation_annotation_buff)
+                    # arrange_group[-1].add(annotation)
                 # if there is an expression coming
-                if i < len(elements) - 1:
+                if i < len(elements) - 1 and type(elements[i+1]) is MathTex:
                     add_space(arrange_group, annotation_exp_buff - min_arrange)
             else:
                 assert False, "Unreachable"
@@ -1086,14 +1117,17 @@ class MathTutorialScene(VoiceoverScene):
         arrange_group.arrange(DOWN, aligned_edge=LEFT, buff=min_arrange).to_edge(
             UP, buff=0.4
         ).to_edge(LEFT, buff=1)
-        return step_group
+        return step
 
     def create_ordered_steps(
         self,
         *steps,
         color_map=None,
+        scale_maps={},  # idx -> scale_map
         label_color="#DBDBDB",
         label_scale=0.6,
+        expression_scale=TEX_SCALE,
+        annotation_scale=1,
         label_exp_buff=0.1,
         exp_exp_buff=0.2,
         annotation_exp_buff=0.2,
@@ -1101,12 +1135,16 @@ class MathTutorialScene(VoiceoverScene):
         step_step_buff=0.5,
     ):
         steps_group = VGroup()
+
         for i, step in enumerate(steps):
             step_ = self.create_step_from_list(
                 *step,
                 color_map=color_map,
+                scale_map=scale_maps.get(i, {}),
                 label_color=label_color,
                 label_scale=label_scale,
+                expression_scale=expression_scale,
+                annotation_scale=annotation_scale,
                 label_exp_buff=label_exp_buff,
                 exp_exp_buff=exp_exp_buff,
                 annotation_exp_buff=annotation_exp_buff,
