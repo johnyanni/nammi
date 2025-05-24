@@ -379,3 +379,40 @@ class ScrollManager(VGroup):
         
         return self
     
+
+    
+    def transform_between(self, scene, source_index, target_index=None, 
+                        animation_type=ReplacementTransform, run_time=None, 
+                        copy_source=True, auto_advance=True):
+        """Transform between any two elements.
+        
+        Args:
+            scene: The manim scene
+            source_index: Index of source element
+            target_index: Index of target (if None, uses current_position)
+            animation_type: Type of transformation
+            run_time: Duration
+            copy_source: Whether to copy the source
+            auto_advance: Whether to advance current_position
+        """
+        if target_index is None:
+            target_index = self.current_position
+            
+        if source_index >= len(self.equations) or target_index >= len(self.equations):
+            raise IndexError("Index out of range")
+        
+        source = self.equations[source_index]
+        target = self.equations[target_index]
+        
+        if copy_source:
+            source = source.copy()
+        
+        kwargs = {"run_time": run_time} if run_time else {}
+        scene.play(animation_type(source, target), **kwargs)
+        
+        if auto_advance:
+            self.current_position = target_index + 1
+        
+        return self
+    
+    
