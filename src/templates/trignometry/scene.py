@@ -26,10 +26,10 @@ FOOTNOTE_SCALE = 0.55
 
 # Triangle 
 a = None
-b = "78.4"
+b = "72.4"
 c = "y"
 h = None 
-alpha = r"32^\circ"
+alpha = r"8^\circ"
 beta = None
 unknown = "c"
 right_angle_position = "bottom_left" # bottom_right, bottom_left, top_right, top_left

@@ -100,15 +100,22 @@ class StepFunc1(MathTutorialScene):
         
         
         scroll_mgr = ScrollManager(elements)
-        scroll_mgr.prepare_next(self)  # Shows label
-        scroll_mgr.prepare_next(self)  # Shows label
-        scroll_mgr.prepare_next(self)  # Shows label
-        scroll_mgr.prepare_next(self)  # Shows label
-        scroll_mgr.prepare_next(self)  # Shows label
+        scroll_mgr.prepare_next(self)  # Shows "Final Answer" label from step
+        scroll_mgr.prepare_next(self)  # Shows "x = 2" from answer_group
+        scroll_mgr.prepare_next(self)  # Shows rectangle around "x = 2"
+        scroll_mgr.prepare_next(self)  # Shows "x-3" (example_func_num)
+        scroll_mgr.prepare_next(self)  # Shows "x = 3" (new_ex)
         
-        scroll_mgr.prepare_next(self)  # Shows label
-        # scroll_mgr.fade_in_from_target(self, example_func_num, run_time=2)
-        scroll_mgr.prepare_next(self)  # Shows label
+        scroll_mgr.prepare_next(self)  # Shows "Final Answer" label from step1
+        scroll_mgr.prepare_next(self)  # Shows "x =" part from new_ex_start
+        scroll_mgr.prepare_next(self)  # Shows "3" from new_ex_value
+        scroll_mgr.prepare_next(self)  # Shows "4x-10" (example_func_dem)
+        scroll_mgr.prepare_next(self)  # Shows "Important Result" label from step2
+        scroll_mgr.prepare_next(self)  # Shows "y = mx + b" from the rect group
+        scroll_mgr.prepare_next(self)  # Shows "3 - 2x = 2x - 5" from step2
+        scroll_mgr.prepare_next(self)  # Shows "Add 2x to both sides" from step2
+        scroll_mgr.prepare_next(self)  # Shows annotated equation from step2
+        scroll_mgr.prepare_next(self)  # Shows "2x = 2x - 8" from step2
 
 
         
