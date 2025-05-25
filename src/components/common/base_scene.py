@@ -416,6 +416,99 @@ class MathTutorialScene(VoiceoverScene):
             manager.show(run_time=run_time)
 
         return manager
+    
+    
+    
+    # In your MathTutorialScene class, add this method:
+
+    def show_indices(self, mathtex_obj, label="", duration=3, font_size=14, 
+                    label_color=WHITE, index_color=RED, show_console=True):
+        """
+        Display indices for each element in a MathTex object for debugging.
+        
+        Args:
+            mathtex_obj: The MathTex object to analyze
+            label: Optional label to show above (defaults to object's tex_string)
+            duration: How long to show the indices (seconds)
+            font_size: Size of index numbers
+            label_color: Color of the label text
+            index_color: Color of the index numbers
+            show_console: Whether to print info to console
+        
+        Example:
+            formula = MathTex("y = mx + b")
+            self.show_indices(formula)  # Shows for 3 seconds
+            
+            # Or with custom label
+            self.show_indices(formula, "My Formula", duration=5)
+        """
+        # Use tex_string as default label if none provided
+        if not label and hasattr(mathtex_obj, 'tex_string'):
+            label = mathtex_obj.tex_string
+        
+        # Add a header with the label text
+        header = None
+        if label:
+            header = Text(label, font_size=24, color=label_color)
+            header.to_edge(UP)
+            self.add(header)
+        
+        # Create group for index labels
+        index_labels_group = VGroup()
+        
+        # Handle different structures of MathTex
+        if len(mathtex_obj.submobjects) > 0:
+            submob = mathtex_obj[0]
+            
+            for i in range(len(submob)):
+                char = submob[i]
+                
+                # Create index label
+                index_label = Text(str(i), font_size=font_size, color=index_color)
+                index_label.move_to(char.get_center() + UP * 0.3)
+                
+                # Add background for visibility
+                bg = SurroundingRectangle(
+                    index_label, 
+                    color=BLUE, 
+                    stroke_width=1, 
+                    fill_color=BLACK,
+                    fill_opacity=0.7,
+                    buff=0.05
+                )
+                
+                label_group = VGroup(bg, index_label)
+                index_labels_group.add(label_group)
+        
+        # Ensure MathTex is visible
+        if mathtex_obj not in self.mobjects:
+            self.add(mathtex_obj)
+        
+        # Add the index labels
+        self.add(index_labels_group)
+        
+        # Print to console if requested
+        if show_console:
+            print(f"\n{'='*50}")
+            print(f"Indices for: {label}")
+            print(f"{'='*50}")
+            print(f"Total submobjects: {len(mathtex_obj.submobjects)}")
+            
+            if len(mathtex_obj.submobjects) > 0:
+                submob = mathtex_obj[0]
+                print(f"\nIndex mapping:")
+                for i in range(min(len(submob), 20)):  # Limit to first 20
+                    print(f"  [{i}] = {submob[i]}")
+                
+                if len(submob) > 20:
+                    print(f"  ... and {len(submob) - 20} more elements")
+            print(f"{'='*50}\n")
+        
+        # Wait and clean up
+        self.wait(duration)
+        self.remove(index_labels_group)
+        if header:
+            self.remove(header)
 
    
     # def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, 

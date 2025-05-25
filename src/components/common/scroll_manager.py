@@ -416,3 +416,27 @@ class ScrollManager(VGroup):
         return self
     
     
+    def transform_to(self, scene, source, target, run_time=None, add_to_manager=False):
+        """Transform source to target, optionally adding target to scroll manager."""
+        # Perform the transform
+        scene.play(ReplacementTransform(source.copy(), target), 
+                  run_time=run_time if run_time else 1)
+        
+        # Check if target is already managed
+        try:
+            target_index = self.equations.index(target)
+            self.current_position = target_index + 1
+        except ValueError:
+            # Target not in manager
+            if add_to_manager:
+                # Add it at current position
+                self.equations.insert(self.current_position, target)
+                self.add(target)  # Add to VGroup so it moves with us
+                self.current_position += 1
+                print(f"Added target to scroll manager at position {self.current_position - 1}")
+            else:
+                print(f"Note: Target not in scroll manager and won't scroll")
+                
+                
+    # Usage:
+    # scroll_mgr.transform_to(self, label_c[0][0], formula[0][0], add_to_manager=True)
