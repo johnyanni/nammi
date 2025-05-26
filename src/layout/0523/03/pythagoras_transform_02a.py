@@ -132,7 +132,7 @@ class SQ1(MathTutorialScene):
         
         #calculation_step3
         scroll_mgr.prepare_next(self)
-        scroll_mgr.transform_from_copy(self, calc2_c2_equals)
+        scroll_mgr.fade_in_from_target(self, calc2_c2_equals)
         scroll_mgr.prepare_next(self)
         scroll_mgr.prepare_next(self)
         scroll_mgr.transform_from_copy(self, calc2_125)
