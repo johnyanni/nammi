@@ -128,42 +128,42 @@ class SQ2(MathTutorialScene):
             # Step 2 - Rearranged formula
             step2[0],              # Index 2: step2[0] - "Rearrange to solve for b" label
             rearr_b2,              # Index 3: rearr_b2 - b^2 term
-            rearr_equals,          # Index 4: rearr_b2_equals - equals sign
+            rearr_equals,          # Index 4: rearr_equals - equals sign
             VGroup(rearr_c,rearr_c_squared),  # Index 5: rearr_c,rearr_c_squared - c^2 term
             rearr_minus,           # Index 6: rearr_minus - minus sign
             VGroup(rearr_a, rearr_a_squared), # Index 7: rearr_a,rearr_a_squared - a^2 term
             
             # Step 3 - Substituted values
-            step3[0],              # Index 9: step3[0] - "Substitute c = 169 and a = 120" label
-            sub_b2_equals,         # Index 10: sub_b2_equals - b^2 = part
-            sub_169,               # Index 11: sub_169 - c → 169
-            sub_169_squared,       # Index 12: sub_169_squared - ^2 for 169
-            sub_minus,             # Index 13: sub_minus - minus sign
-            sub_120,               # Index 14: sub_120 - a → 120
-            sub_120_squared,       # Index 15: sub_120_squared - ^2 for 120
+            step3[0],              # Index 8: step3[0] - "Substitute c = 169 and a = 120" label
+            sub_b2_equals,         # Index 9: sub_b2_equals - b^2 = part
+            sub_169,               # Index 10: sub_169 - c → 169
+            sub_169_squared,       # Index 11: sub_169_squared - ^2 for 169
+            sub_minus,             # Index 12: sub_minus - minus sign
+            sub_120,               # Index 13: sub_120 - a → 120
+            sub_120_squared,       # Index 14: sub_120_squared - ^2 for 120
             
             # Step 4 - Calculated squares
-            step4[0],              # Index 16: step4[0] - "Calculate the squares" label
-            calc1_b2_equals,       # Index 17: calc1_b2_equals - b^2 = part
-            calc1_28561,           # Index 18: calc1_28561 - 169^2 → 28561
-            calc1_minus,           # Index 19: calc1_minus - minus sign
-            calc1_14400,           # Index 20: calc1_14400 - 120^2 → 14400
+            step4[0],              # Index 15: step4[0] - "Calculate the squares" label
+            calc1_b2_equals,       # Index 16: calc1_b2_equals - b^2 = part
+            calc1_28561,           # Index 17: calc1_28561 - 169^2 → 28561
+            calc1_minus,           # Index 18: calc1_minus - minus sign
+            calc1_14400,           # Index 19: calc1_14400 - 120^2 → 14400
             
-            calc2_b2_equals,       # Index 21: calc2_b2_equals - b^2 = part
-            calc2_14161,           # Index 22: calc2_14161 - 28561 - 14400 → 14161
+            calc2_b2_equals,       # Index 20: calc2_b2_equals - b^2 = part
+            calc2_14161,           # Index 21: calc2_14161 - 28561 - 14400 → 14161
             
             # Step 5 - Square root
-            step5[0],              # Index 23: step5[0] - "Calculate the value of b" label
-            calc3_sqrt,            # Index 24: calc3_sqrt - first square root symbol
-            calc3_b2,              # Index 25: calc3_b2 - b^2 under sqrt
-            calc3_equals,          # Index 26: calc3_equals - equals sign
-            calc3_sqrt2,           # Index 27: calc3_sqrt2 - second square root symbol
-            calc3_14161,           # Index 28: calc3_14161 - 14161 under sqrt
+            step5[0],              # Index 22: step5[0] - "Calculate the value of b" label
+            calc3_sqrt,            # Index 23: calc3_sqrt - first square root symbol
+            calc3_b2,              # Index 24: calc3_b2 - b^2 under sqrt
+            calc3_equals,          # Index 25: calc3_equals - equals sign
+            calc3_sqrt2,           # Index 26: calc3_sqrt2 - second square root symbol
+            calc3_14161,           # Index 27: calc3_14161 - 14161 under sqrt
             
             # Step 6 - Final answer
-            step6[0],              # Index 29: step6[0] - "Final answer" label
-            final_b,               # Index 30: final_b_equals - b = part
-            final_equals,
+            step6[0],              # Index 28: step6[0] - "Final answer" label
+            final_b,               # Index 29: final_b - b term
+            final_equals,          # Index 30: final_equals - equals sign
             final_119_cm           # Index 31: final_119_cm - 14161 → 119 cm
         )
         
@@ -177,46 +177,46 @@ class SQ2(MathTutorialScene):
         # Animate Step 2: Rearrange
         scroll_mgr.prepare_next(self)  # Index 2: step2[0] - "Rearrange to solve for b" label
         scroll_mgr.fade_in_from_target(self, formula_b_squared)  # Index 3: rearr_b2 - b^2 term
-        scroll_mgr.fade_in_from_target(self, formula_equals)     # Index 4: rearr_b2_equals - equals sign
+        scroll_mgr.fade_in_from_target(self, formula_equals)     # Index 4: rearr_equals - equals sign
         scroll_mgr.fade_in_from_target(self, formula_c2)         # Index 5: rearr_c,rearr_c_squared - c^2 term
         scroll_mgr.fade_in_from_target(self, formula_plus)       # Index 6: rearr_minus - minus sign (transforms from +)
         scroll_mgr.fade_in_from_target(self, formula_a_squared)  # Index 7: rearr_a,rearr_a_squared - a^2 term
         
         # Animate Step 3: Substitute values
-        scroll_mgr.prepare_next(self)  # Index 9: step3[0] - "Substitute c = 169 and a = 120" label
-        scroll_mgr.transform_from_copy(self, VGroup(rearr_equals, rearr_b2))    # Index 10: sub_b2_equals - b^2 = part
-        scroll_mgr.transform_from_copy(self, rearr_c)           # Index 11: sub_169 - c → 169
-        scroll_mgr.transform_from_copy(self, rearr_c_squared)    # Index 12: sub_169_squared - ^2 for 169
-        scroll_mgr.transform_from_copy(self, rearr_minus)        # Index 13: sub_minus - minus sign
-        scroll_mgr.transform_from_copy(self, rearr_a)           # Index 14: sub_120 - a → 120
-        scroll_mgr.transform_from_copy(self, rearr_a_squared)    # Index 15: sub_120_squared - ^2 for 120
+        scroll_mgr.prepare_next(self)  # Index 8: step3[0] - "Substitute c = 169 and a = 120" label
+        scroll_mgr.transform_from_copy(self, VGroup(rearr_equals, rearr_b2))    # Index 9: sub_b2_equals - b^2 = part
+        scroll_mgr.transform_from_copy(self, rearr_c)           # Index 10: sub_169 - c → 169
+        scroll_mgr.transform_from_copy(self, rearr_c_squared)    # Index 11: sub_169_squared - ^2 for 169
+        scroll_mgr.transform_from_copy(self, rearr_minus)        # Index 12: sub_minus - minus sign
+        scroll_mgr.transform_from_copy(self, rearr_a)           # Index 13: sub_120 - a → 120
+        scroll_mgr.transform_from_copy(self, rearr_a_squared)    # Index 14: sub_120_squared - ^2 for 120
         
         # Animate Step 4: Calculate squares
-        scroll_mgr.prepare_next(self)  # Index 16: step4[0] - "Calculate the squares" label
-        scroll_mgr.transform_from_copy(self, sub_b2_equals)      # Index 17: calc1_b2_equals - b^2 = part
-        scroll_mgr.transform_from_copy(self, VGroup(sub_169, sub_169_squared)) # Index 18: calc1_28561 - 169^2 → 28561
-        scroll_mgr.transform_from_copy(self, sub_minus)          # Index 19: calc1_minus - minus sign
-        scroll_mgr.transform_from_copy(self, VGroup(sub_120, sub_120_squared)) # Index 20: calc1_14400 - 120^2 → 14400
+        scroll_mgr.prepare_next(self)  # Index 15: step4[0] - "Calculate the squares" label
+        scroll_mgr.transform_from_copy(self, sub_b2_equals)      # Index 16: calc1_b2_equals - b^2 = part
+        scroll_mgr.transform_from_copy(self, VGroup(sub_169, sub_169_squared)) # Index 17: calc1_28561 - 169^2 → 28561
+        scroll_mgr.transform_from_copy(self, sub_minus)          # Index 18: calc1_minus - minus sign
+        scroll_mgr.transform_from_copy(self, VGroup(sub_120, sub_120_squared)) # Index 19: calc1_14400 - 120^2 → 14400
         
         # Continue Step 4: b^2 = 14161
-        scroll_mgr.transform_from_copy(self, calc1_b2_equals)  # Index 21: calc2_b2_equals - b^2 = part
-        scroll_mgr.transform_from_copy(self, VGroup(calc1_28561, calc1_minus, calc1_14400))  # Index 22: calc2_14161 - 28561 - 14400 → 14161
+        scroll_mgr.transform_from_copy(self, calc1_b2_equals)  # Index 20: calc2_b2_equals - b^2 = part
+        scroll_mgr.transform_from_copy(self, VGroup(calc1_28561, calc1_minus, calc1_14400))  # Index 21: calc2_14161 - 28561 - 14400 → 14161
         
         # Scroll if needed
         scroll_mgr.scroll_down(self, steps=3)
         
         # Animate Step 5: Square root
-        scroll_mgr.prepare_next(self)  # Index 23: step5[0] - "Calculate the value of b" label
-        scroll_mgr.prepare_next(self)  # Index 24: calc3_sqrt - first square root symbol
-        scroll_mgr.fade_in_from_target(self, calc2_b2_equals)  # Index 25: calc3_b2 - b^2 under sqrt
-        scroll_mgr.prepare_next(self)  # Index 26: calc3_equals - equals sign
-        scroll_mgr.prepare_next(self)  # Index 27: calc3_sqrt2 - second square root symbol
-        scroll_mgr.fade_in_from_target(self, calc2_14161)     # Index 28: calc3_14161 - 14161 under sqrt
+        scroll_mgr.prepare_next(self)  # Index 22: step5[0] - "Calculate the value of b" label
+        scroll_mgr.prepare_next(self)  # Index 23: calc3_sqrt - first square root symbol
+        scroll_mgr.fade_in_from_target(self, calc2_b2_equals)  # Index 24: calc3_b2 - b^2 under sqrt
+        scroll_mgr.prepare_next(self)  # Index 25: calc3_equals - equals sign
+        scroll_mgr.prepare_next(self)  # Index 26: calc3_sqrt2 - second square root symbol
+        scroll_mgr.fade_in_from_target(self, calc2_14161)     # Index 27: calc3_14161 - 14161 under sqrt
         
         # Animate Step 6: Final answer
-        scroll_mgr.prepare_next(self)  # Index 29: step6[0] - "Final answer" label
-        scroll_mgr.transform_from_copy(self, VGroup(calc3_sqrt, calc3_b2))     # Index 30: final_b - b = part
-        scroll_mgr.fade_in_from_target(self, final_equals)              #Index 31: final_equals - equals sign
-        scroll_mgr.transform_from_copy(self, VGroup(calc3_sqrt2, calc3_14161))  # Index 32: final_119_cm - 14161 → 119 cm
+        scroll_mgr.prepare_next(self)  # Index 28: step6[0] - "Final answer" label
+        scroll_mgr.transform_from_copy(self, VGroup(calc3_sqrt, calc3_b2))     # Index 29: final_b - b term
+        scroll_mgr.fade_in_from_target(self, final_equals)              # Index 30: final_equals - equals sign
+        scroll_mgr.transform_from_copy(self, VGroup(calc3_sqrt2, calc3_14161))  # Index 31: final_119_cm - 14161 → 119 cm
         
         self.wait(2)

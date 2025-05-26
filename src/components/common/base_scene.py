@@ -23,7 +23,7 @@ ANNOTATION_SCALE = 0.65
 
 
 
-
+S_MATH_SCALE = 0.60
 
 
 
