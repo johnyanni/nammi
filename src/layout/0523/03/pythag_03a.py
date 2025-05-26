@@ -177,7 +177,7 @@ class SQ2(MathTutorialScene):
         scroll_mgr.prepare_next(self)  # Index 2: step2[0] - "Rearrange to solve for b" label
         scroll_mgr.fade_in_from_target(self, formula_b_squared)  # Index 3: rearr_b2 - b^2 term
         scroll_mgr.fade_in_from_target(self, formula_equals)     # Index 4: rearr_equals - equals sign
-        scroll_mgr.fade_in_from_target(self, formula_c2)         # Index 5: rearr_c,rearr_c_squared - c^2 term
+        scroll_mgr.transform_from_copy(self, formula_c2)         # Index 5: rearr_c,rearr_c_squared - c^2 term
         scroll_mgr.fade_in_from_target(self, formula_plus)       # Index 6: rearr_minus - minus sign (transforms from +)
         scroll_mgr.fade_in_from_target(self, formula_a_squared)  # Index 7: rearr_a,rearr_a_squared - a^2 term
         
