@@ -15,24 +15,31 @@ class SQ1(MathTutorialScene):
         
         # Create all formulas
         formula = MathTex(r"c^2 = a^2 + b^2").scale(MATH_SCALE)
-        formula[0][:2].set_color(YELLOW)
-        formula[0][3:5].set_color(GREEN)
-        formula[0][6:].set_color(RED)
-        
+
         substitute = MathTex(r"c^2 = 5^2 + 10^2").scale(MATH_SCALE)
-        substitute[0][:2].set_color(YELLOW)
-        substitute[0][3:5].set_color(GREEN)
-        substitute[0][6:].set_color(RED)
-        
+
+
         calculation_step1 = MathTex(r"c^2 = \sqrt{25} + 100").scale(MATH_SCALE)
-        calculation_step1[0][:2].set_color(YELLOW)
-        calculation_step1[0][3:5].set_color(GREEN)
-        calculation_step1[0][5:].set_color(RED)
+
+        calculation_step2 = MathTex(r"c^2 = 125").scale(MATH_SCALE)
         
-        calculation_step2 = MathTex(r"c^2 = 125", color=YELLOW).scale(MATH_SCALE)
+        self.apply_smart_colorize(
+            [test[0], test[1], formula, substitute, calculation_step1],
+            {
+                "a^2": YELLOW,
+                "b^2": GREEN,
+                "c^2": RED,
+                "5^2": GREEN,
+                "10^2": RED,
+            }
+        )
+        
+        
+        
+        
         
         # Position formulas
-        VGroup(test,formula, substitute, calculation_step1, calculation_step2).arrange(
+        VGroup(test, formula, substitute, calculation_step1, calculation_step2).arrange(
             DOWN, aligned_edge=LEFT, buff=0.5
         ).to_edge(LEFT)
         
@@ -55,7 +62,7 @@ class SQ1(MathTutorialScene):
         
         # Calculation step 1 parts - SIMPLIFIED
         calc1_c2_equals = self.find_element("c^2 =", calculation_step1)
-        calc_sqrt = calculation_step1[0][3:5]
+        calc_sqrt = calculation_step1[0][3:5]   
         # calc_sqrt = self.find_element("sqrt", calculation_step1)
         
         calc1_25 = self.find_element("25", calculation_step1)

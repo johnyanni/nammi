@@ -512,21 +512,14 @@ class MathTutorialScene(VoiceoverScene):
 
 
 
-
-
-
-    
-
-
-
-
-    def find_element(self, pattern, exp, nth=0, color=None, opacity=None):
-        """
-        Find element without as_group parameter - no longer needed!
+        
+        
+    def find_element(self, pattern, tex_obj, nth=0, color=None, opacity=None):
+        """Simplified find_element that handles common cases.
         
         Args:
-            pattern: The text pattern to search for (e.g., "x", "1", "-5")
-            exp: The MathTex or Tex object to search within
+            pattern: The text pattern to search for (e.g., "x", "1", "-5", r"\frac{300}{400}")
+            tex_obj: The MathTex or Tex object to search within
             nth: Which occurrence to return (0-based index)
             color: Optional color to set for the element
             opacity: Optional opacity to set for the element
@@ -535,85 +528,39 @@ class MathTutorialScene(VoiceoverScene):
             The matching element(s) - single VMobject or VGroup for multi-element patterns
             None if not found
         """
-        # Special case: looking for fraction bar
-        if pattern == "/" or pattern == "frac_bar":
-            for i, element in enumerate(exp[0]):
-                if element.get_height() < 0.1 and element.get_width() > 0.3:
-                    if color is not None:
-                        element.set_color(color)
-                    if opacity is not None:
-                        element.set_opacity(opacity)
-                    return element  # Just return the element
-            print("Warning: Could not find fraction bar")
-            return None
         
-        # Special case for square root
-        if pattern in ["sqrt", r"\sqrt"]:
-            for i, element in enumerate(exp[0]):
-                aspect_ratio = element.get_height() / element.get_width() if element.get_width() > 0 else 0
-                
-                if (aspect_ratio > 1.2 and element.get_height() > 0.2) or \
-                (element.get_height() > 0.4 and element.get_width() < 0.3):
-                    if color is not None:
-                        element.set_color(color)
-                    if opacity is not None:
-                        element.set_opacity(opacity)
-                    return element  # Just return the element
+        # Handle negative numbers specially
+        if pattern.startswith('-') and len(pattern) > 1 and pattern[1:].isdigit():
+            # Find minus sign and number separately
+            minus_indices = search_shape_in_text(tex_obj, MathTex("-"))
+            num_indices = search_shape_in_text(tex_obj, MathTex(pattern[1:]))
             
-            print(f"Warning: Could not find square root symbol")
+            # Look for adjacent pairs
+            for minus_idx in minus_indices:
+                for num_idx in num_indices:
+                    # Check if they're next to each other
+                    if hasattr(minus_idx, 'stop') and hasattr(num_idx, 'start'):
+                        if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
+                            if nth == 0:  # Found our match
+                                result = VGroup(tex_obj[0][minus_idx], tex_obj[0][num_idx])
+                                if color: result.set_color(color)
+                                if opacity: result.set_opacity(opacity)
+                                return result
+                            nth -= 1
+        
+        # For everything else, use search_shape_in_text
+        indices = search_shape_in_text(tex_obj, MathTex(pattern))
+        
+        if not indices or nth >= len(indices):
+            print(f"Pattern '{pattern}' not found")
             return None
-
-        # First try direct search
-        try:
-            indices = search_shape_in_text(exp, MathTex(pattern))
-            if indices and nth < len(indices):
-                element = exp[0][indices[nth]]
-                
-                if color is not None:
-                    element.set_color(color)
-                
-                if opacity is not None:
-                    element.set_opacity(opacity)
-                
-                return element  # Just return the element
-        except Exception:
-            pass
+            
+        # Return what search_shape_in_text found
+        result = tex_obj[0][indices[nth]]
+        if color: result.set_color(color)
+        if opacity: result.set_opacity(opacity)
         
-        # If pattern looks like a negative number, return VGroup
-        if pattern.startswith('-') and len(pattern) > 1:
-            try:
-                num_part = pattern[1:]
-                minus_indices = search_shape_in_text(exp, MathTex("-"))
-                num_indices = search_shape_in_text(exp, MathTex(num_part))
-                
-                # Find adjacent pairs
-                adjacent_pairs = []
-                for minus_idx in minus_indices:
-                    for num_idx in num_indices:
-                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
-                            if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
-                                adjacent_pairs.append((minus_idx, num_idx))
-                
-                if adjacent_pairs and nth < len(adjacent_pairs):
-                    minus_idx, num_idx = adjacent_pairs[nth]
-                    minus_element = exp[0][minus_idx]
-                    num_element = exp[0][num_idx]
-                    
-                    # Create VGroup for multi-element patterns
-                    result = VGroup(minus_element, num_element)
-                    
-                    if color is not None:
-                        result.set_color(color)
-                    
-                    if opacity is not None:
-                        result.set_opacity(opacity)
-                    
-                    return result  # Return VGroup for negative numbers
-            except Exception as e:
-                print(f"Adjacent search error: {e}")
-        
-        print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-        return None
+        return result
         
         
         
@@ -742,3 +689,93 @@ class MathTutorialScene(VoiceoverScene):
         # Default: object first, then rectangle
         group = VGroup(rect, mobject) if show_rect_first else VGroup(mobject, rect)
         return group
+    
+    
+    
+    
+        
+    def show_vgroup_indices(self, vgroup):
+        """Show indices for all MathTex objects in a VGroup with auto-generated labels.
+        
+        Usage:
+            formulas = VGroup(formula, substitute, calculation_step1, calculation_step2)
+            self.show_vgroup_indices(formulas)
+        """
+        print("\n" + "="*60)
+        print("INDEX MAPPING FOR ALL MATHTEX OBJECTS")
+        print("="*60)
+        
+        for i, tex_obj in enumerate(vgroup):
+            if not isinstance(tex_obj, (MathTex, Tex)):
+                continue
+                
+            # Auto-generate label from tex_string or use index
+            if hasattr(tex_obj, 'tex_string'):
+                # Truncate long formulas for readability
+                label = tex_obj.tex_string[:30] + "..." if len(tex_obj.tex_string) > 30 else tex_obj.tex_string
+            else:
+                label = f"MathTex_{i}"
+                
+            print(f"\n[{i}] {label}")
+            print("-" * 40)
+            
+            if hasattr(tex_obj, 'submobjects') and len(tex_obj.submobjects) > 0:
+                submob = tex_obj[0]
+                for j in range(len(submob)):
+                    try:
+                        element = submob[j]
+                        elem_str = element.__class__.__name__
+                        print(f"  [{j}] = {elem_str}")
+                    except:
+                        print(f"  [{j}] = <error>")
+            
+        print("\n" + "="*60 + "\n")
+
+
+
+    def show_flattened_indices(self, *groups):
+        """Show indices for all MathTex/Tex objects, flattening nested structures.
+        
+        Usage:
+            self.show_flattened_indices(step1, step2, step3)
+            # or
+            self.show_flattened_indices(main)  # The VGroup containing all steps
+        """
+        print("\n" + "="*80)
+        print("FLATTENED INDEX MAPPING (All MathTex/Tex objects)")
+        print("="*80)
+        
+        all_objects = []
+        labels = []
+        
+        def extract_math_objects(obj, prefix=""):
+            """Recursively extract all MathTex/Tex objects."""
+            if isinstance(obj, VGroup):
+                for i, item in enumerate(obj):
+                    new_prefix = f"{prefix}[{i}]" if prefix else f"item[{i}]"
+                    extract_math_objects(item, new_prefix)
+            elif isinstance(obj, (MathTex, Tex)):
+                all_objects.append(obj)
+                labels.append(prefix if prefix else "item")
+        
+        # Extract all objects
+        for group in groups:
+            extract_math_objects(group)
+        
+        # Display them
+        for obj, label in zip(all_objects, labels):
+            tex_str = obj.tex_string if hasattr(obj, 'tex_string') else str(obj)
+            if len(tex_str) > 50:
+                tex_str = tex_str[:47] + "..."
+            
+            print(f"\n{label}: {tex_str}")
+            print("-" * 60)
+            
+            if hasattr(obj, 'submobjects') and len(obj.submobjects) > 0:
+                submob = obj[0]
+                for i in range(len(submob)):
+                    elem = submob[i]
+                    elem_type = elem.__class__.__name__
+                    print(f"  [{i}] = {elem_type}")
+        
+        print("\n" + "="*80 + "\n")

@@ -439,7 +439,8 @@ class Asymptote(MathTutorialScene):
             scroll.prepare_next(self, steps=2)
             
             self.wait_until_bookmark("divisor")
-            scroll.fade_in_from_target(self, example_func_num, run_time=2)
+            scroll.prepare_next(self)
+            # scroll.fade_in_from_target(self, example_func_num, run_time=2)
 
             self.wait_until_bookmark("poly")
             scroll.fade_in_from_target(self, example_func_den, run_time=2)

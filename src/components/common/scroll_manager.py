@@ -351,6 +351,87 @@ class ScrollManager(VGroup):
         
         return self
     
+    
+    
+    
+    
+    
+    
+    ##### Experimental #####
+    def transform_from_copy(self, scene, source, run_time=None, animation_kwargs=None):
+        """Transform a copy of source to the next element in the queue.
+        
+        Args:
+            scene: The manim scene to animate on
+            source: Source mobject to copy and transform from
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+            
+        Returns:
+            self: For method chaining
+        """
+        run_time = {} if run_time is None else {"run_time": run_time}
+        animation_kwargs = {} if animation_kwargs is None else animation_kwargs
+        
+        # Make sure we have elements left
+        if self.current_position >= len(self.equations):
+            print("No more equations to display.")
+            return self
+        
+        # Get the target element
+        target = self.equations[self.current_position]
+        
+        # Perform TransformFromCopy
+        scene.play(
+            TransformFromCopy(source, target, **animation_kwargs),
+            **run_time
+        )
+        
+        # Update position counter
+        self.current_position += 1
+        
+        return self
+    
+    
+
+
+    def transform_match(self, scene, source, path_arc=0, run_time=1, **kwargs):
+        """Transform with matching shapes for smoother animations.
+        
+        Args:
+            scene: The manim scene
+            source: Source mobject to transform from
+            path_arc: Arc of the transformation path (0 = straight line)
+            run_time: Duration (default: 1 second)
+            **kwargs: Other TransformFromCopy parameters
+        """
+        if self.current_position >= len(self.equations):
+            print("No more equations to display.")
+            return self
+        
+        target = self.equations[self.current_position]
+        
+        # Use TransformMatchingShapes for text transformations
+        if isinstance(source, (MathTex, Tex)) and isinstance(target, (MathTex, Tex)):
+            scene.play(
+                TransformMatchingShapes(source.copy(), target, path_arc=path_arc, **kwargs),
+                run_time=run_time
+            )
+        else:
+            scene.play(
+                TransformFromCopy(source, target, path_arc=path_arc, **kwargs),
+                run_time=run_time
+            )
+        
+        self.current_position += 1
+        return self
+
+
+
+
+
+
+
 
     
     def transform_between(self, scene, source_index, target_index=None, 

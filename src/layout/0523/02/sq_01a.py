@@ -70,7 +70,7 @@ class SQ1(MathTutorialScene):
         self.play(ReplacementTransform(formula[0][3].copy(), substitute[0][3]))
         self.play(ReplacementTransform(formula[0][4].copy(), substitute[0][4]))
         self.play(ReplacementTransform(formula[0][5].copy(), substitute[0][5]))
-        self.play(ReplacementTransform(formula[0][6:7].copy(), substitute[0][6:8]))
+        self.play(ReplacementTransform(formula[0][6].copy(), substitute[0][6:8]))
         self.play(ReplacementTransform(formula[0][-1].copy(), substitute[0][-1]))
         
         

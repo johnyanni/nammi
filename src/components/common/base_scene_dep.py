@@ -709,102 +709,172 @@ class MathTutorialScene(VoiceoverScene):
 
 
 
-    def find_element(self, pattern, exp, nth=0, color=None, opacity=None):
-        """
-        Find element without as_group parameter - no longer needed!
+    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None):
+    #     """
+    #     Find element without as_group parameter - no longer needed!
         
-        Args:
-            pattern: The text pattern to search for (e.g., "x", "1", "-5")
-            exp: The MathTex or Tex object to search within
-            nth: Which occurrence to return (0-based index)
-            color: Optional color to set for the element
-            opacity: Optional opacity to set for the element
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
         
-        Returns:
-            The matching element(s) - single VMobject or VGroup for multi-element patterns
-            None if not found
-        """
-        # Special case: looking for fraction bar
-        if pattern == "/" or pattern == "frac_bar":
-            for i, element in enumerate(exp[0]):
-                if element.get_height() < 0.1 and element.get_width() > 0.3:
-                    if color is not None:
-                        element.set_color(color)
-                    if opacity is not None:
-                        element.set_opacity(opacity)
-                    return element  # Just return the element
-            print("Warning: Could not find fraction bar")
-            return None
+    #     Returns:
+    #         The matching element(s) - single VMobject or VGroup for multi-element patterns
+    #         None if not found
+    #     """
+    #     # Special case: looking for fraction bar
+    #     if pattern == "/" or pattern == "frac_bar":
+    #         for i, element in enumerate(exp[0]):
+    #             if element.get_height() < 0.1 and element.get_width() > 0.3:
+    #                 if color is not None:
+    #                     element.set_color(color)
+    #                 if opacity is not None:
+    #                     element.set_opacity(opacity)
+    #                 return element  # Just return the element
+    #         print("Warning: Could not find fraction bar")
+    #         return None
         
-        # Special case for square root
-        if pattern in ["sqrt", r"\sqrt"]:
-            for i, element in enumerate(exp[0]):
-                aspect_ratio = element.get_height() / element.get_width() if element.get_width() > 0 else 0
+    #     # Special case for square root
+    #     if pattern in ["sqrt", r"\sqrt"]:
+    #         for i, element in enumerate(exp[0]):
+    #             aspect_ratio = element.get_height() / element.get_width() if element.get_width() > 0 else 0
                 
-                if (aspect_ratio > 1.2 and element.get_height() > 0.2) or \
-                (element.get_height() > 0.4 and element.get_width() < 0.3):
-                    if color is not None:
-                        element.set_color(color)
-                    if opacity is not None:
-                        element.set_opacity(opacity)
-                    return element  # Just return the element
+    #             if (aspect_ratio > 1.2 and element.get_height() > 0.2) or \
+    #             (element.get_height() > 0.4 and element.get_width() < 0.3):
+    #                 if color is not None:
+    #                     element.set_color(color)
+    #                 if opacity is not None:
+    #                     element.set_opacity(opacity)
+    #                 return element  # Just return the element
             
-            print(f"Warning: Could not find square root symbol")
-            return None
+    #         print(f"Warning: Could not find square root symbol")
+    #         return None
 
-        # First try direct search
-        try:
-            indices = search_shape_in_text(exp, MathTex(pattern))
-            if indices and nth < len(indices):
-                element = exp[0][indices[nth]]
+    #     # First try direct search
+    #     try:
+    #         indices = search_shape_in_text(exp, MathTex(pattern))
+    #         if indices and nth < len(indices):
+    #             element = exp[0][indices[nth]]
                 
-                if color is not None:
-                    element.set_color(color)
+    #             if color is not None:
+    #                 element.set_color(color)
                 
-                if opacity is not None:
-                    element.set_opacity(opacity)
+    #             if opacity is not None:
+    #                 element.set_opacity(opacity)
                 
-                return element  # Just return the element
-        except Exception:
-            pass
+    #             return element  # Just return the element
+    #     except Exception:
+    #         pass
         
-        # If pattern looks like a negative number, return VGroup
-        if pattern.startswith('-') and len(pattern) > 1:
-            try:
-                num_part = pattern[1:]
-                minus_indices = search_shape_in_text(exp, MathTex("-"))
-                num_indices = search_shape_in_text(exp, MathTex(num_part))
+    #     # If pattern looks like a negative number, return VGroup
+    #     if pattern.startswith('-') and len(pattern) > 1:
+    #         try:
+    #             num_part = pattern[1:]
+    #             minus_indices = search_shape_in_text(exp, MathTex("-"))
+    #             num_indices = search_shape_in_text(exp, MathTex(num_part))
                 
-                # Find adjacent pairs
-                adjacent_pairs = []
-                for minus_idx in minus_indices:
-                    for num_idx in num_indices:
-                        if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
-                            if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
-                                adjacent_pairs.append((minus_idx, num_idx))
+    #             # Find adjacent pairs
+    #             adjacent_pairs = []
+    #             for minus_idx in minus_indices:
+    #                 for num_idx in num_indices:
+    #                     if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+    #                         if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
+    #                             adjacent_pairs.append((minus_idx, num_idx))
                 
-                if adjacent_pairs and nth < len(adjacent_pairs):
-                    minus_idx, num_idx = adjacent_pairs[nth]
-                    minus_element = exp[0][minus_idx]
-                    num_element = exp[0][num_idx]
+    #             if adjacent_pairs and nth < len(adjacent_pairs):
+    #                 minus_idx, num_idx = adjacent_pairs[nth]
+    #                 minus_element = exp[0][minus_idx]
+    #                 num_element = exp[0][num_idx]
                     
-                    # Create VGroup for multi-element patterns
-                    result = VGroup(minus_element, num_element)
+    #                 # Create VGroup for multi-element patterns
+    #                 result = VGroup(minus_element, num_element)
                     
-                    if color is not None:
-                        result.set_color(color)
+    #                 if color is not None:
+    #                     result.set_color(color)
                     
-                    if opacity is not None:
-                        result.set_opacity(opacity)
+    #                 if opacity is not None:
+    #                     result.set_opacity(opacity)
                     
-                    return result  # Return VGroup for negative numbers
-            except Exception as e:
-                print(f"Adjacent search error: {e}")
+    #                 return result  # Return VGroup for negative numbers
+    #         except Exception as e:
+    #             print(f"Adjacent search error: {e}")
         
-        print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
-        return None
+    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #     return None
         
+    
+    
+
+    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None):
+    #     """
+    #     Find element without as_group parameter - no longer needed!
         
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+        
+    #     Returns:
+    #         The matching element(s) - single VMobject or VGroup for multi-element patterns
+    #         None if not found
+    #     """
+        
+
+    #     # First try direct search
+    #     try:
+    #         indices = search_shape_in_text(exp, MathTex(pattern))
+    #         if indices and nth < len(indices):
+    #             element = exp[0][indices[nth]]
+                
+    #             if color is not None:
+    #                 element.set_color(color)
+                
+    #             if opacity is not None:
+    #                 element.set_opacity(opacity)
+                
+    #             return element  # Just return the element
+    #     except Exception:
+    #         pass
+        
+    #     # If pattern looks like a negative number, return VGroup
+    #     if pattern.startswith('-') and len(pattern) > 1:
+    #         try:
+    #             num_part = pattern[1:]
+    #             minus_indices = search_shape_in_text(exp, MathTex("-"))
+    #             num_indices = search_shape_in_text(exp, MathTex(num_part))
+                
+    #             # Find adjacent pairs
+    #             adjacent_pairs = []
+    #             for minus_idx in minus_indices:
+    #                 for num_idx in num_indices:
+    #                     if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+    #                         if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
+    #                             adjacent_pairs.append((minus_idx, num_idx))
+                
+    #             if adjacent_pairs and nth < len(adjacent_pairs):
+    #                 minus_idx, num_idx = adjacent_pairs[nth]
+    #                 minus_element = exp[0][minus_idx]
+    #                 num_element = exp[0][num_idx]
+                    
+    #                 # Create VGroup for multi-element patterns
+    #                 result = VGroup(minus_element, num_element)
+                    
+    #                 if color is not None:
+    #                     result.set_color(color)
+                    
+    #                 if opacity is not None:
+    #                     result.set_opacity(opacity)
+                    
+    #                 return result  # Return VGroup for negative numbers
+    #         except Exception as e:
+    #             print(f"Adjacent search error: {e}")
+        
+    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #     return None
         
     def create_labeled_step(
                 self,

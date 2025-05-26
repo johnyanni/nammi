@@ -53,7 +53,7 @@ class SQ1(MathTutorialScene):
             calculation_step2,     # Index 11
         )
         
-
+        
         
         # Create scroll manager
         scroll_mgr = ScrollManager(elements)
@@ -64,7 +64,17 @@ class SQ1(MathTutorialScene):
         scroll_mgr.prepare_next(self)  # Shows formula
         
         scroll_mgr.prepare_next(self)  # Shows c^2=
-        
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
 
         
         self.wait(1)
