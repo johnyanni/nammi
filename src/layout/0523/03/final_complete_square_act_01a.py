@@ -33,7 +33,7 @@ class Square1(MathTutorialScene):
                 annotation_scale=1.0        
             ),
             MathTex("k^2 - 6k = 18").scale(0.6),
-            VGroup(horizontal_arrangement)
+            horizontal_arrangement
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         
