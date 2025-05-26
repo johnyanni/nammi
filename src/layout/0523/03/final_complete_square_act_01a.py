@@ -55,6 +55,7 @@ class Square1(MathTutorialScene):
         main = VGroup(step1, step2).arrange(
             DOWN, aligned_edge=LEFT, buff=0.5
         ).to_edge(UP, buff=0.3).to_edge(LEFT, buff=1)
+
         
         # # Find elements - Step 1
         # formula_k2 = self.find_element("k^2", step1[1])
@@ -95,11 +96,11 @@ class Square1(MathTutorialScene):
         scroll_mgr.prepare_next(self) 
         
         scroll_mgr.prepare_next(self)  
-        scroll_mgr.prepare_next(self) 
         scroll_mgr.prepare_next(self)  
+        scroll_mgr.transform_from_copy(self, step2[1][0])
         scroll_mgr.prepare_next(self) 
         scroll_mgr.prepare_next(self) 
-        scroll_mgr.prepare_next(self)  
+        scroll_mgr.transform_from_copy(self, step2[3][0])  
         
         
         
