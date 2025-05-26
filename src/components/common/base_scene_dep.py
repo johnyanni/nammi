@@ -170,18 +170,18 @@ class MathTutorialScene(VoiceoverScene):
         for element, color_map in coloring_list:
             SmartColorizeStatic(element, color_map)
 
-    # def create_step(self, title, *content, buff=0.3):
-    #     """Create a vertical group of elements with consistent formatting.
+    def create_step(self, title, *content, buff=0.3):
+        """Create a vertical group of elements with consistent formatting.
         
-    #     Args:
-    #         title: Title mobject for the step
-    #         *content: Variable number of content mobjects to include
-    #         buff: Buffer space between elements
+        Args:
+            title: Title mobject for the step
+            *content: Variable number of content mobjects to include
+            buff: Buffer space between elements
             
-    #     Returns:
-    #         VGroup containing the title and content arranged vertically
-    #     """
-    #     return VGroup(title, *content).arrange(DOWN, aligned_edge=LEFT, buff=buff) 
+        Returns:
+            VGroup containing the title and content arranged vertically
+        """
+        return VGroup(title, *content).arrange(DOWN, aligned_edge=LEFT, buff=buff) 
 
     
 
@@ -510,12 +510,201 @@ class MathTutorialScene(VoiceoverScene):
         if header:
             self.remove(header)
 
+   
+    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False, 
+    #                 keep_together=False, context=None):  # Added keep_together parameter
+    #     """
+    #     Enhanced find_element that automatically handles negative numbers, context, and other patterns.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+    #         as_group: If True, returns the element wrapped in a VGroup
+    #         keep_together: If True and as_group=True, adds _keep_together flag
+    #         context: Optional context pattern to disambiguate elements
+        
+    #     Returns:
+    #         The matching element, or a VGroup containing the element if as_group=True
+    #         None if not found
+    #     """
+        
+    #     # First try direct search
+    #     try:
+    #         indices = search_shape_in_text(exp, MathTex(pattern))
+    #         if indices and nth < len(indices):
+    #             element = exp[0][indices[nth]]
+
+    #             if color is not None:
+    #                 element.set_color(color)
+
+    #             if opacity is not None:
+    #                 element.set_opacity(opacity)
+
+    #             # MODIFIED PART - add keep_together logic
+    #             if as_group:
+    #                 result = VGroup(element)
+    #                 if keep_together:
+    #                     result._keep_together = True
+    #                 return result
+    #             return element
+    #     except Exception:
+    #         pass
+
+    #     # If pattern looks like it might be a negative number, try adjacent search
+    #     if pattern.startswith('-') and len(pattern) > 1:
+    #         try:
+    #             # ... existing negative number logic ...
+                
+    #             if adjacent_pairs and nth < len(adjacent_pairs):
+    #                 # ... existing code to create result VGroup ...
+                    
+    #                 if color is not None:
+    #                     result.set_color(color)
+
+    #                 if opacity is not None:
+    #                     result.set_opacity(opacity)
+
+    #                 # ADD THIS for negative numbers
+    #                 if keep_together:
+    #                     result._keep_together = True
+                    
+    #                 return result
+    #         except Exception:
+    #             pass
+
+    #     # If we get here, both context search and standard searches failed
+    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'" + 
+    #         (f" within context '{context}'" if context else ""))
+    #     return None
 
 
 
-
-
+    # def find_element(self, pattern, exp, nth=0, color=None, opacity=None, as_group=False):
+    #     """
+    #     Enhanced find_element that automatically handles negative numbers and other patterns.
+        
+    #     Args:
+    #         pattern: The text pattern to search for (e.g., "x", "1", "-5")
+    #         exp: The MathTex or Tex object to search within
+    #         nth: Which occurrence to return (0-based index)
+    #         color: Optional color to set for the element
+    #         opacity: Optional opacity to set for the element
+    #         as_group: If True, returns the element wrapped in a VGroup
+        
+    #     Returns:
+    #         The matching element, or a VGroup containing the element if as_group=True
+    #         None if not found
+    #     """
+    #      # Special case: looking for fraction bar
+    #     if pattern == "/" or pattern == "frac_bar":
+    #         # Find the horizontal line (fraction bar)
+    #         for i, element in enumerate(exp[0]):
+    #             # Fraction bars are typically thin horizontal lines
+    #             if element.get_height() < 0.1 and element.get_width() > 0.3:
+    #                 if color is not None:
+    #                     element.set_color(color)
+    #                 if opacity is not None:
+    #                     element.set_opacity(opacity)
+    #                 return VGroup(element) if as_group else element
+    #         print("Warning: Could not find fraction bar")
+    #         return None
+        
+    #      # Special case for square root - enhanced detection
+    #     if pattern in ["sqrt", r"\sqrt"]:
+    #         # Method 1: Try to find by shape characteristics
+    #         for i, element in enumerate(exp[0]):
+    #             # Square root symbols are typically tall and curved
+    #             aspect_ratio = element.get_height() / element.get_width() if element.get_width() > 0 else 0
+                
+    #             # More flexible criteria for sqrt detection
+    #             if (aspect_ratio > 1.2 and element.get_height() > 0.2) or \
+    #             (element.get_height() > 0.4 and element.get_width() < 0.3):
+    #                 if color is not None:
+    #                     element.set_color(color)
+    #                 if opacity is not None:
+    #                     element.set_opacity(opacity)
+    #                 return VGroup(element) if as_group else element
+            
+    #         # Method 2: Try to find by position relative to other elements
+    #         # Square roots often appear before numbers/expressions
+    #         print(f"Warning: Could not find square root symbol using shape detection")
+            
+    #         # Method 3: As a fallback, you could use manual indices if you know them
+    #         # This is specific to your use case
+    #         if hasattr(self, '_sqrt_indices') and exp in self._sqrt_indices:
+    #             indices = self._sqrt_indices[exp]
+    #             elements = VGroup(*[exp[0][i] for i in range(indices[0], indices[1])])
+    #             if color is not None:
+    #                 elements.set_color(color)
+    #             if opacity is not None:
+    #                 elements.set_opacity(opacity)
+    #             return elements
+            
+    #         return None
     
+    #     # First try direct search
+    #     try:
+    #         indices = search_shape_in_text(exp, MathTex(pattern))
+    #         if indices and nth < len(indices):
+    #             element = exp[0][indices[nth]]
+                
+    #             if color is not None:
+    #                 element.set_color(color)
+                
+    #             if opacity is not None:
+    #                 element.set_opacity(opacity)
+                
+    #             return VGroup(element) if as_group else element
+    #     except Exception:
+    #         pass  # If direct search fails, try adjacent elements approach
+        
+    #     # If pattern looks like it might be a negative number, try adjacent search
+    #     if pattern.startswith('-') and len(pattern) > 1:
+    #         try:
+    #             num_part = pattern[1:]  # Remove the minus sign
+    #             minus_indices = search_shape_in_text(exp, MathTex("-"))
+    #             num_indices = search_shape_in_text(exp, MathTex(num_part))
+                
+    #             # Debug print
+    #             print(f"Looking for '-' and '{num_part}'")
+    #             print(f"Minus indices: {minus_indices}")
+    #             print(f"Num indices: {num_indices}")
+                
+    #             # Find adjacent pairs
+    #             adjacent_pairs = []
+    #             for minus_idx in minus_indices:
+    #                 for num_idx in num_indices:
+    #                     if isinstance(minus_idx, slice) and isinstance(num_idx, slice):
+    #                         # Check if they're adjacent (with possible space)
+    #                         if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
+    #                             adjacent_pairs.append((minus_idx, num_idx))
+    #                             print(f"Found adjacent pair: minus at {minus_idx}, num at {num_idx}")
+                
+    #             if adjacent_pairs and nth < len(adjacent_pairs):
+    #                 minus_idx, num_idx = adjacent_pairs[nth]
+    #                 minus_element = exp[0][minus_idx]
+    #                 num_element = exp[0][num_idx]
+                    
+    #                 # Create a group with both elements
+    #                 result = VGroup(minus_element, num_element)
+                    
+    #                 if color is not None:
+    #                     result.set_color(color)
+                    
+    #                 if opacity is not None:
+    #                     result.set_opacity(opacity)
+                    
+    #                 # Don't need as_group check here since we're already returning a VGroup
+    #                 return result
+    #         except Exception as e:
+    #             print(f"Adjacent search error: {e}")
+        
+    #     # If we get here, all searches failed
+    #     print(f"Warning: Could not find occurrence {nth} of '{pattern}'")
+    #     return None
 
 
 

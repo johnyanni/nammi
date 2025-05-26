@@ -12,18 +12,27 @@ class StepFunc1(MathTutorialScene):
         random_formula = MathTex(r"\frac{350}{450}").scale(MATH_SCALE)
         random_formula.to_edge(LEFT)
         
-        random_formula = MathTex(r"\frac{350}{450}").scale(MATH_SCALE)
-        random_formula.to_edge(LEFT)
-        
         # Find all parts using your existing find_element
-        numerator = self.find_element("350", random_formula, color=RED, as_group=True)
-        frac_bar = self.find_element("/", random_formula, color=YELLOW, as_group=True)  # Just use "/"
-        denominator = self.find_element("450", random_formula, color=BLUE, as_group=True)
+        numerator = self.find_element("350", random_formula, color=RED)
+        frac_bar = self.find_element("/", random_formula, color=YELLOW)  # Just use "/"
+        denominator = self.find_element("450", random_formula, color=BLUE)
         
         # Animate sequentially
-        self.play(Write(numerator))
-        self.play(Write(frac_bar))
-        self.play(Write(denominator))
+        # self.play(Write(numerator))
+        # self.play(Write(frac_bar))
+        # self.play(Write(denominator))
+        
+        elements = VGroup(
+            numerator,
+            frac_bar,
+            denominator
+        )
+        
+        scroll_mgr = ScrollManager(elements)
+        
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next(self)
         
         # formula_part = self.find_element("350", random_formula, color=RED, as_group=True)
         

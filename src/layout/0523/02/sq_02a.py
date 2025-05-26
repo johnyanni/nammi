@@ -53,6 +53,7 @@ class SQ1(MathTutorialScene):
             calculation_step2,     # Index 11
         )
         
+
         
         # Create scroll manager
         scroll_mgr = ScrollManager(elements)
@@ -62,24 +63,9 @@ class SQ1(MathTutorialScene):
         # Show the original formula
         scroll_mgr.prepare_next(self)  # Shows formula
         
-        # Transform formula parts to substitute equation
-        # c^2 =
-        scroll_mgr.fade_in_from_target(self, formula[0][:3])
+        scroll_mgr.prepare_next(self)  # Shows c^2=
         
-        # a -> 5
-        scroll_mgr.fade_in_from_target(self, formula[0][3])
-        
-        # ^2
-        scroll_mgr.fade_in_from_target(self, formula[0][4])
-        
-        # +
-        scroll_mgr.fade_in_from_target(self, formula[0][5])
-        
-        # b -> 10
-        scroll_mgr.fade_in_from_target(self, formula[0][6:7])
-        
-        # ^2
-        scroll_mgr.fade_in_from_target(self, formula[0][-1])
+
         
         self.wait(1)
         

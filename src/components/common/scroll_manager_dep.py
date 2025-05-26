@@ -17,10 +17,46 @@ class ScrollManager(VGroup):
         )  # Key: scroll index, Value: list of callout managers
         self.scroll_count = 0  # Track number of scrolls
 
+    # def prepare_next(
+    #     self,
+    #     scene=None,
+    #     target_slice=slice(None),
+    #     same_item=False,
+    #     animation_type=Write,
+    #     steps=1,
+    #     run_time=None,
+    #     animation_kwargs=None,
+    # ):
+    #     """Writes the next equation(s) without scrolling.
+
+    #     Args:
+    #         scene: The manim scene to animate on (optional)
+    #         steps: Number of equations to write (default: 1)
+    #         run_time: Animation duration in seconds (optional)
+    #         animation_kwargs: Additional keyword arguments for the animation (optional)
+    #     """
+    #     run_time = {} if run_time is None else {"run_time": run_time}
+    #     animation_kwargs = {} if animation_kwargs is None else animation_kwargs
+        
+    #     if same_item:
+    #         self.current_position -= self.last_steps
+            
+    #     if scene is not None:
+    #         animations = [
+    #             animation_type(
+    #                 self.equations[self.current_position + i][0][target_slice], **animation_kwargs
+    #             )
+    #             for i in range(steps)
+    #         ]
+
+    #         scene.play(*animations, **run_time)
+
+    #     self.last_steps = steps
+    #     self.current_position += steps
     
     def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
                     animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
-        """Simplest version - handles lists inline without helper method."""
+        """Enhanced prepare_next that checks for annotated equations."""
         
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
@@ -31,42 +67,34 @@ class ScrollManager(VGroup):
             print("No more equations to display.")
             return self
         
-        # Handle annotated equations
         current_item = self.equations[self.current_position]
+        
+        # NEW: Check if this is an annotated equation
         if isinstance(current_item, VGroup) and hasattr(current_item, '_has_annotation'):
             if scene is not None:
+                # Animate equation first (first element of VGroup)
                 scene.play(animation_type(current_item[0], **animation_kwargs))
+                # Then fade in annotations (remaining elements)
                 if len(current_item) > 1:
                     scene.play(FadeIn(VGroup(*current_item[1:])))
+            
             self.last_steps = steps
             self.current_position += steps
             return self
         
-        # Handle regular items
+        # ORIGINAL CODE for regular items
         if scene is not None:
-            animations = []
-            
-            for i in range(steps):
-                if self.current_position + i >= len(self.equations):
-                    break
-                    
-                item = self.equations[self.current_position + i]
-                
-                if isinstance(item, (list, tuple)):
-                    to_animate = VGroup(*item[target_slice])
-                elif isinstance(item, VGroup) and len(item) > 0 and not isinstance(item[0], (MathTex, Tex, Text)):
-                    # VGroup of individual elements (like from slicing)
-                    to_animate = item[target_slice]  # Use the whole VGroup, not just first element
-                else:
-                    to_animate = item[0][target_slice]
-                
-                animations.append(animation_type(to_animate, **animation_kwargs))
-            
-            if animations:
-                if run_time is not None:
-                    scene.play(*animations, run_time=run_time)
-                else:
-                    scene.play(*animations)
+            animations = [
+                animation_type(
+                    self.equations[self.current_position + i][0][target_slice], **animation_kwargs
+                )
+                for i in range(steps)
+            ]
+
+            if run_time is not None:
+                scene.play(*animations, run_time=run_time)
+            else:
+                scene.play(*animations)
 
         self.last_steps = steps
         self.current_position += steps

@@ -29,6 +29,8 @@ class SQ1(MathTutorialScene):
         formula[0][3:5].set_color(GREEN)
         formula[0][6:].set_color(RED)
         
+        formula_c2_equals = self.find_element("c^2 =", formula)
+        
         
         substitute = MathTex(r"c^2 = 5^2 + 10^2").scale(MATH_SCALE)
         substitute[0][:2].set_color(YELLOW)
@@ -52,6 +54,7 @@ class SQ1(MathTutorialScene):
         solve_step[0][9:11].set_color(GREEN)
         solve_step[0][11].set_color(RED)
         
+        
 
         
         result_approx = MathTex(r"c \approx 11.18 \ \text{cm}").scale(MATH_SCALE)
@@ -60,6 +63,7 @@ class SQ1(MathTutorialScene):
         
         # self.add(steps)
 
+        self.play(Write(formula_c2_equals))
         self.play(Write(formula))
         
         self.play(ReplacementTransform(formula[0][:3].copy(), substitute[0][:3]))
