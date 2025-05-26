@@ -392,104 +392,104 @@ class ScrollManager(VGroup):
         
         return self
     
+
+
+
+    # def transform_match(self, scene, source, path_arc=0, run_time=1, **kwargs):
+    #     """Transform with matching shapes for smoother animations.
+        
+    #     Args:
+    #         scene: The manim scene
+    #         source: Source mobject to transform from
+    #         path_arc: Arc of the transformation path (0 = straight line)
+    #         run_time: Duration (default: 1 second)
+    #         **kwargs: Other TransformFromCopy parameters
+    #     """
+    #     if self.current_position >= len(self.equations):
+    #         print("No more equations to display.")
+    #         return self
+        
+    #     target = self.equations[self.current_position]
+        
+    #     # Use TransformMatchingShapes for text transformations
+    #     if isinstance(source, (MathTex, Tex)) and isinstance(target, (MathTex, Tex)):
+    #         scene.play(
+    #             TransformMatchingShapes(source.copy(), target, path_arc=path_arc, **kwargs),
+    #             run_time=run_time
+    #         )
+    #     else:
+    #         scene.play(
+    #             TransformFromCopy(source, target, path_arc=path_arc, **kwargs),
+    #             run_time=run_time
+    #         )
+        
+    #     self.current_position += 1
+    #     return self
+
+
+
+
+
+
+
+
     
-
-
-    def transform_match(self, scene, source, path_arc=0, run_time=1, **kwargs):
-        """Transform with matching shapes for smoother animations.
+    # def transform_between(self, scene, source_index, target_index=None, 
+    #                     animation_type=ReplacementTransform, run_time=None, 
+    #                     copy_source=True, auto_advance=True):
+    #     """Transform between any two elements.
         
-        Args:
-            scene: The manim scene
-            source: Source mobject to transform from
-            path_arc: Arc of the transformation path (0 = straight line)
-            run_time: Duration (default: 1 second)
-            **kwargs: Other TransformFromCopy parameters
-        """
-        if self.current_position >= len(self.equations):
-            print("No more equations to display.")
-            return self
-        
-        target = self.equations[self.current_position]
-        
-        # Use TransformMatchingShapes for text transformations
-        if isinstance(source, (MathTex, Tex)) and isinstance(target, (MathTex, Tex)):
-            scene.play(
-                TransformMatchingShapes(source.copy(), target, path_arc=path_arc, **kwargs),
-                run_time=run_time
-            )
-        else:
-            scene.play(
-                TransformFromCopy(source, target, path_arc=path_arc, **kwargs),
-                run_time=run_time
-            )
-        
-        self.current_position += 1
-        return self
-
-
-
-
-
-
-
-
-    
-    def transform_between(self, scene, source_index, target_index=None, 
-                        animation_type=ReplacementTransform, run_time=None, 
-                        copy_source=True, auto_advance=True):
-        """Transform between any two elements.
-        
-        Args:
-            scene: The manim scene
-            source_index: Index of source element
-            target_index: Index of target (if None, uses current_position)
-            animation_type: Type of transformation
-            run_time: Duration
-            copy_source: Whether to copy the source
-            auto_advance: Whether to advance current_position
-        """
-        if target_index is None:
-            target_index = self.current_position
+    #     Args:
+    #         scene: The manim scene
+    #         source_index: Index of source element
+    #         target_index: Index of target (if None, uses current_position)
+    #         animation_type: Type of transformation
+    #         run_time: Duration
+    #         copy_source: Whether to copy the source
+    #         auto_advance: Whether to advance current_position
+    #     """
+    #     if target_index is None:
+    #         target_index = self.current_position
             
-        if source_index >= len(self.equations) or target_index >= len(self.equations):
-            raise IndexError("Index out of range")
+    #     if source_index >= len(self.equations) or target_index >= len(self.equations):
+    #         raise IndexError("Index out of range")
         
-        source = self.equations[source_index]
-        target = self.equations[target_index]
+    #     source = self.equations[source_index]
+    #     target = self.equations[target_index]
         
-        if copy_source:
-            source = source.copy()
+    #     if copy_source:
+    #         source = source.copy()
         
-        kwargs = {"run_time": run_time} if run_time else {}
-        scene.play(animation_type(source, target), **kwargs)
+    #     kwargs = {"run_time": run_time} if run_time else {}
+    #     scene.play(animation_type(source, target), **kwargs)
         
-        if auto_advance:
-            self.current_position = target_index + 1
+    #     if auto_advance:
+    #         self.current_position = target_index + 1
         
-        return self
+    #     return self
     
     
-    def transform_to(self, scene, source, target, run_time=None, add_to_manager=False):
-        """Transform source to target, optionally adding target to scroll manager."""
-        # Perform the transform
-        scene.play(ReplacementTransform(source.copy(), target), 
-                  run_time=run_time if run_time else 1)
+    # def transform_to(self, scene, source, target, run_time=None, add_to_manager=False):
+    #     """Transform source to target, optionally adding target to scroll manager."""
+    #     # Perform the transform
+    #     scene.play(ReplacementTransform(source.copy(), target), 
+    #               run_time=run_time if run_time else 1)
         
-        # Check if target is already managed
-        try:
-            target_index = self.equations.index(target)
-            self.current_position = target_index + 1
-        except ValueError:
-            # Target not in manager
-            if add_to_manager:
-                # Add it at current position
-                self.equations.insert(self.current_position, target)
-                self.add(target)  # Add to VGroup so it moves with us
-                self.current_position += 1
-                print(f"Added target to scroll manager at position {self.current_position - 1}")
-            else:
-                print(f"Note: Target not in scroll manager and won't scroll")
+    #     # Check if target is already managed
+    #     try:
+    #         target_index = self.equations.index(target)
+    #         self.current_position = target_index + 1
+    #     except ValueError:
+    #         # Target not in manager
+    #         if add_to_manager:
+    #             # Add it at current position
+    #             self.equations.insert(self.current_position, target)
+    #             self.add(target)  # Add to VGroup so it moves with us
+    #             self.current_position += 1
+    #             print(f"Added target to scroll manager at position {self.current_position - 1}")
+    #         else:
+    #             print(f"Note: Target not in scroll manager and won't scroll")
                 
                 
-    # Usage:
-    # scroll_mgr.transform_to(self, label_c[0][0], formula[0][0], add_to_manager=True)
+    # # Usage:
+    # # scroll_mgr.transform_to(self, label_c[0][0], formula[0][0], add_to_manager=True)
