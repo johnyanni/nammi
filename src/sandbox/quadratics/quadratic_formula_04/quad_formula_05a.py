@@ -160,19 +160,21 @@ class QuadraticFormula(MathTutorialScene):
 
         # solution = VGroup(step1, step2, step3, step4).arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
             
-        solution = self.create_ordered_steps(step1_list, step2_list, step3_list, step4_list)
-        solution.next_to(question_title_group, DOWN, buff=0.8).align_to(question_title_group, LEFT)
+        solution = self.create_ordered_steps(step1_list, step2_list, step3_list, step4_list,
+            # scale the second element in the first step by 1.5 factor
+            scale_maps = {0: {1: 1.5}})
 
+        solution.next_to(question_title_group, DOWN, buff=0.8).align_to(question_title_group, LEFT)
         step1, step2, step3, step4 = solution
         # solution.arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
-        print(len(step2))
-        step2_annotation = step2[2]
-        step4_annotation = step4[2]
+        step2_annotation = step2.annotations[0]
+        step4_annotation = step4.annotations[0]
+
         # step2_annotation = step2_expr1[2]  # The annotation part is the third element in the group
         # Step 4 annotations (subtraction of 12)
         # Extract the annotation terms from step4_expr1
         # step4_annotation = step4_expr1[2]  # The annotation part is the third element in the group
-        self.add(step2[3])
+        # self.add(step2[3])
         # self.add(step2_annotation)
         # self.add(step4_annotation)
         # Create individual step elements for ScrollManager including annotations
@@ -190,11 +192,10 @@ class QuadraticFormula(MathTutorialScene):
             *step3,
             *step4,
         )
-        
         pre_scroll_mgr = ScrollManager(pre_ordered_steps)
         
         
-         ###############################################################################
+        ###############################################################################
         # IDENTIFY COEFFICIENTS
         ###############################################################################
         
@@ -371,15 +372,16 @@ class QuadraticFormula(MathTutorialScene):
         )
         
         self.play(Write(question_title_group))
-        
+
         pre_scroll_mgr.prepare_next(self)  # Shows step1_label
         pre_scroll_mgr.prepare_next(self)  # Shows step1_expr
 
         pre_scroll_mgr.prepare_next(self)  # Shows step2_label
         pre_scroll_mgr.prepare_next(self)  # Shows main expression (step2_expr1[0])
         
-        self.play(FadeIn(step2_annotation))
-        pre_scroll_mgr.current_position += 1  # Manually update position
+        # self.play(FadeIn(step2_annotation))
+        # pre_scroll_mgr.current_position += 1  # Manually update position
+        pre_scroll_mgr.prepare_next(self, animation_type=FadeIn)  # Shows step2_annotation
         
         pre_scroll_mgr.prepare_next(self)  # Shows step2_expr2
         
@@ -392,11 +394,15 @@ class QuadraticFormula(MathTutorialScene):
 
         pre_scroll_mgr.prepare_next(self)  # Shows step4_label
         pre_scroll_mgr.prepare_next(self)  # Shows step4_expr1
-        self.play(FadeIn(step4_annotation))
-        pre_scroll_mgr.current_position += 1  # Manually update position
+
+        pre_scroll_mgr.prepare_next(self, animation_type=FadeIn)  # Shows step4_annotation
+        # self.play(FadeIn(step4_annotation))
+        # pre_scroll_mgr.current_position += 1  # Manually update position
         pre_scroll_mgr.prepare_next(self)  # Shows step4_expr2
         
-        self.play(FadeOut(solution))
+        # self.play(FadeOut(solution))
+        pre_scroll_mgr.fade_out_all_in_view(self)
+
         
         # scroll_mgr.prepare_next(self)
 
