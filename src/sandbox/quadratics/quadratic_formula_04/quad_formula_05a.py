@@ -157,6 +157,10 @@ class QuadraticFormula(MathTutorialScene):
             MathTex("x^2 + 10x + 13 = 0")
         ]
 
+        self.add(step2_list[1], step2_list[2])
+        
+        
+        
 
         # solution = VGroup(step1, step2, step3, step4).arrange(DOWN, aligned_edge=LEFT, buff=STEP_BUFF)
             
