@@ -693,6 +693,11 @@ class MathTutorialScene(VoiceoverScene):
     
     
     
+    
+    
+    
+    
+    
         
     def show_vgroup_indices(self, vgroup):
         """Show indices for all MathTex objects in a VGroup with auto-generated labels.
