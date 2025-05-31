@@ -28,7 +28,7 @@ class Square1(MathTutorialScene):
                 "k^2 - 4k = 2k + 18",
                 "-2k",
                 "4k",
-                "18",
+                "2k",
                 scale=1.5,
                 annotation_scale=1.0        
             ),
