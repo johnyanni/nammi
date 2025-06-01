@@ -16,7 +16,7 @@ def get_normal(line_start_pt, line_end_pt, proportion=0.5, length=1.0, angle=90*
 
     return vector
 
-def curved_arrow_to_angle(mob, angle_mob, angle=90*DEGREES, proportion=0.5, length=None, buff=0.5, start_direction='bottom', **kwargs):
+def curved_arrow_to_angle(mob, angle_mob, angle=90*DEGREES, proportion=0.5, length=None, buff=0.1, start_direction='bottom', **kwargs):
     line_start_pt = angle_mob.get_start()
     line_end_pt = angle_mob.get_end()
     
@@ -37,8 +37,13 @@ def curved_arrow_to_angle(mob, angle_mob, angle=90*DEGREES, proportion=0.5, leng
     else:
         # If direction is a vector, use get_point_from_direction
         start_point = mob.get_center() + np.array(start_direction)
+
+
+    direction_vector = start_point - mob.get_center()
+    if np.linalg.norm(direction_vector) > 0:
+        direction_unit = direction_vector / np.linalg.norm(direction_vector)
+        start_point = start_point + buff * direction_unit
         
-    l = Line(line_start_pt, line_end_pt)
     normal = get_normal(line_start_pt, line_end_pt, proportion, length, angle)
     arrow = CurvedArrow(start_point, normal.get_end(), angle=angle, tip_length=0.20, **kwargs)
     return arrow

@@ -1,4 +1,6 @@
+# %%
 from manim import *
+from src.components.common.scroll_manager import ScrollManager
 from src.components.common.base_scene import *
 from src.components.common.quick_tip import *
 from src.components.common.smart_tex import *
@@ -7,43 +9,9 @@ from utils import color_indices, add_underline, dms_terms, extract_number, get_e
 
 config.media_width = "80%"
 
-# Colors
-TRIANGLE_COLOR = WHITE
-ANGLE_COLOR = BLUE
-HYP_COLOR = GREEN
-OPP_COLOR = RED
-ADJ_COLOR = TEAL
-COMMENTS_COLOR = YELLOW
-SUBTITLE_COLOR = GREY
-
-TOP_EDGE_BUFF = 1
-STEPS_BUFF = 0.4
-
-TITLE_SCALE = 0.80
-LABEL_SCALE = 0.70
-EXPRESSION_SCALE = 0.70
-FOOTNOTE_SCALE = 0.55
-
-# Triangle 
-a = None
-b = "78.4"
-c = "y"
-h = None 
-alpha = r"32^\circ"
-beta = None
-unknown = "c"
-right_angle_position = "bottom_left" # bottom_right, bottom_left, top_right, top_left
-solution_prec = 2                 # In case of angle, 2 = nearest minute
-indicate_alpha_with_arrow = True  # Has no effect when unknown is "alpha" or "beta"
-indicate_beta_with_arrow = True  # Has no effect when unknown is "alpha" or "beta"
-# angle_shift = 0.5
-label_shift = 0.30
-label_scale = 0.80
-triangle_scale = 0.80
-triangle_edge_buff = 1.5
-
+# %%
 def get_side_name(side, angle):
-    if side == "c":
+    if side == "c" or h is not None:
         return "hyp"
     
     if angle == "alpha":
@@ -69,6 +37,58 @@ def get_trig_eqn(s):
 def get_known_angle(alpha, beta):
     return alpha if alpha else beta
 
+# %%
+# Colors
+TRIANGLE_COLOR = WHITE
+ANGLE_COLOR = BLUE
+HYP_COLOR = GREEN
+OPP_COLOR = RED
+ADJ_COLOR = TEAL
+COMMENTS_COLOR = YELLOW
+SUBTITLE_COLOR = GREY
+
+TOP_EDGE_BUFF = 1.4
+STEPS_BUFF = 0.45
+
+# %%
+# Triangle with h
+a = "a"
+b = "19"
+c = None
+h = "17.6"
+alpha = r"68^\circ"
+beta = r"13^\circ"
+unknown = "a"
+right_angle_position = "perpendicular_foot"
+solution_prec = 2 
+indicate_alpha_with_arrow = True  
+indicate_beta_with_arrow = False  
+
+
+
+# Triangle 
+"""
+a = None
+b = r"37.8 \text{ cm}"
+c = "h"
+h = None 
+alpha = None
+beta = r"47^\circ 12'"
+unknown = "c"
+right_angle_position = "top_left" # bottom_right, bottom_left, top_right, top_left
+solution_prec = 2                 # In case of angle, 2 = nearest minute
+indicate_alpha_with_arrow = True  # Has no effect when unknown is "alpha" or "beta"
+indicate_beta_with_arrow = True  # Has no effect when unknown is "alpha" or "beta"
+"""
+
+angle_shift = 0.6
+label_shift = 0.70
+label_scale = 0.70
+triangle_scale = 0.70
+triangle_edge_buff = 1.5
+
+# %%
+%%manim -v ERROR --disable_caching -qh Trig
 class Trig(MathTutorialScene):
     def solve_for_angle(self, steps):
         steps[-3][0][-7:].scale(MATH_SCALE).shift(LEFT * 0.2)
@@ -138,6 +158,7 @@ class Trig(MathTutorialScene):
         step_5_degree_symbol_idx = search_shape_in_text(steps[4], MathTex(r"\circ"))[-1]
         step_5_angle_w_eql = steps[4][0][:2]
         step_5_right_side = steps[4][0][2:step_5_degree_symbol_idx.stop]
+        step_5_wo_dms = steps[4][0][:step_5_degree_symbol_idx.stop]
         step_5_dms = steps[4][0][step_5_degree_symbol_idx.stop:]        
 
         step_6_degree_symbol_idx = search_shape_in_text(steps[5], MathTex(r"\circ"))[-1]
@@ -151,16 +172,31 @@ class Trig(MathTutorialScene):
         step_7_angle_remain = steps[6][0][step_7_degree_symbol_idx.stop:]
 
         # Animations
-        self.play(Write(steps[0]))
-        self.wait()
+        scroll_steps = VGroup(
+            *steps[:4],
+            VGroup(step_5_wo_dms),
+            VGroup(step_5_dms),
+            steps[5],
+            VGroup(seconds_underline),
+            steps[-1]
+        )
+        
+        scroll = ScrollManager(scroll_steps)
 
+        # Ratio used
+        scroll.prepare_next(self)
+        self.wait()
+        
+        # Plugging in the values
         self.play(
             ReplacementTransform(step_1_trig.copy(), step_2_trig),
             ReplacementTransform(step_1_eql.copy(), step_2_eql),
         )
         self.play(Write(step_2_right_side))
+        scroll.prepare_next()
         self.wait()
 
+        # Separate the angle
         self.play(
             ReplacementTransform(step_2_angle.copy(), step_3_angle),
             ReplacementTransform(step_2_eql.copy(), step_3_eql),
@@ -170,53 +206,67 @@ class Trig(MathTutorialScene):
             ReplacementTransform(step_2_right_side.copy(), step_3_ratio),
         )
         self.play(Write(step_3_inverse))
+        scroll.prepare_next()
         self.wait()
 
-        self.play(FadeIn(steps[3]))
+        # Calculate the trig value
+        scroll.prepare_next(self, animation_type=FadeIn)
         self.wait()
+        
+        # Plugging in the trig value
+        scroll.scroll_down(self, steps=2)
 
         self.play(
             ReplacementTransform(step_3_angle_w_eql.copy(), step_5_angle_w_eql),
         )
         self.play(Write(step_5_right_side))
-        self.wait()
-        self.play(FadeIn(step_5_dms))
+        scroll.prepare_next()
         self.wait()
 
+        # Convert to dms
+        scroll.prepare_next(self, animation_type=FadeIn)
+        self.wait()
+
+        # Converted angle
         self.play(
             ReplacementTransform(step_5_angle_w_eql.copy(), step_6_angle_w_eql),
         )
         self.play(Write(step_6_right_side))
         self.wait()
-
+        
         self.play(
             ReplacementTransform(step_6_angle_w_eql.copy(), step_7_angle_w_eql)
         )
         self.wait()
-        # Add comment
-        self.play(Write(seconds_underline))
-        self.wait()
+        scroll.prepare_next()
 
+        # Comment
+        scroll.prepare_next(self, animation_type=FadeIn)
+        self.wait()
+        
+        # Round
         self.play(
             ReplacementTransform(step_6_angle_degree.copy(), step_7_angle_degree),
             Write(step_7_angle_remain)
         )
+        scroll.prepare_next()
+        
         self.play(Create(self.create_surrounding_rectangle(steps[-1], buff=0.15)))
         
     def solve_for_side(self, triangle_obj, steps):
         unknown_label = triangle_obj.components["unknown_label"]
         unknown_label_str= unknown_label.tex_string
         unknown_color = triangle_obj.components["unknown_color"]
-        unknown_label_position = triangle_obj.components["unknown_label_position"]
-        unknown_label_angle = triangle_obj.components["unknown_label_angle"]
-        unknown_label_edge = triangle_obj.components["unknown_label_edge"]
-
+                                
         # Arrange steps
         steps.arrange(DOWN, aligned_edge=LEFT, buff=STEPS_BUFF).to_edge(LEFT, buff=1.5)
         steps.to_edge(UP, buff=TOP_EDGE_BUFF)
         
         # Color calclator comments
-        degrees, minutes, seconds = dms_terms(alpha if alpha else beta)
+        if h:
+            degrees, minutes, seconds = dms_terms(beta)
+        else:
+            degrees, minutes, seconds = dms_terms(alpha if alpha else beta)
         if degrees and minutes:
             color_indices(steps[-4], [0, 1, 5, 6])
             color_indices(steps[-4], [7 + len(degrees), 8 + len(degrees), 12 + len(degrees), 13 + len(degrees)])
@@ -237,11 +287,20 @@ class Trig(MathTutorialScene):
         if decimal_point_idx:
             num_to_check_idx = decimal_point_idx + solution_prec + 1
             comment = r"\ge 5" if int(mid_sol_str[num_to_check_idx]) >= 5 else "< 5"
-            underlines = add_underline(steps[-2][0][num_to_check_idx], comment=comment, comment_right_buff=3, color=COMMENTS_COLOR, comment_color=COMMENTS_COLOR)
+            underlines = add_underline(
+                steps[-2][0][num_to_check_idx],
+                comment=comment,
+                comment_right_buff=3,
+                color=COMMENTS_COLOR,
+                comment_color=COMMENTS_COLOR
+            )
         else: underlines = None
         
-        # Color  steps
-        if known_side := extract_number(a):
+        # Color steps
+        if h:
+            known_side = extract_number(h)
+            known_side_color = OPP_COLOR
+        elif known_side := extract_number(a):
             known_side_color = OPP_COLOR if alpha else ADJ_COLOR
         elif known_side := extract_number(b):
             known_side_color = ADJ_COLOR if alpha else OPP_COLOR
@@ -272,6 +331,8 @@ class Trig(MathTutorialScene):
                 f"{known_side}": known_side_color,
             }
         )
+
+        steps[-2][0][2:].set_color(WHITE)
         
         # Data for animations
         trig_eqn = get_trig_eqn(steps[0])
@@ -323,12 +384,24 @@ class Trig(MathTutorialScene):
         step_7_unknown_w_eql = steps[6][0][:2]
         step_7_right_term = steps[6][0][2:]
 
-        self.play(Write(steps[0]))
+        scroll_steps = VGroup(
+            *steps[:-1],
+        )
+        if comment:
+            scroll_steps.add(VGroup(comment))
+        scroll_steps.add(steps[-1])
+        
+        scroll = ScrollManager(scroll_steps)
+
+        # Ratio used
+        scroll.prepare_next(self)
         self.wait()
         
-        self.play(Write(steps[1]))
+        # Plugging in the values
+        scroll.prepare_next(self)
         self.wait()
-        
+
+        # Separate the unknown
         self.play(
             ReplacementTransform(step_2_unkown.copy(), step_3_unknown),
             ReplacementTransform(step_2_eql.copy(), step_3_eql),
@@ -337,14 +410,20 @@ class Trig(MathTutorialScene):
             ReplacementTransform(step_2_trig_term.copy(), step_3_trig_term),
             run_time=2
         )
+        scroll.prepare_next()
         self.wait()
-        
+
+        # Calculate the trig value
         self.play(Succession(
             *[
                 FadeIn(obj) for obj in steps[3][:]
             ]
         ))
+        scroll.prepare_next()
         self.wait()
+        
+        # Plugging in the trig value
+        scroll.scroll_down(self, steps=2)
 
         self.play(
             ReplacementTransform(step_3_unknown_w_eql.copy(), step_5_unknown_w_eql),
@@ -353,24 +432,30 @@ class Trig(MathTutorialScene):
             run_time=1
         )
         self.play(Write(step_5_trig_evaluation))
+        scroll.prepare_next()
         self.wait()
 
+        # Multiply
         self.play(
             ReplacementTransform(step_5_unknown_w_eql.copy(), step_6_unknown_w_eql),
         )
         self.play(Write(step_6_right_term))
+        scroll.prepare_next()
         self.wait()
 
-        # Add comment if needed
+        # Comment
         if comment:
-            self.play(Write(comment))
-        self.wait()
+            scroll.prepare_next(self)
+            self.wait()
         
+        # Round
         self.play(
             ReplacementTransform(step_6_unknown_w_eql.copy(), step_7_unknown_w_eql),
         )
         self.play(Write(step_7_right_term))
-            
+        scroll.prepare_next()        
+
+        
     def find_numerator_steps(self, triangle_obj, steps, comment=None):
         unknown_label = triangle_obj.components["unknown_label"]
         unknown_label_str= unknown_label.tex_string
@@ -379,13 +464,14 @@ class Trig(MathTutorialScene):
         step_2_eql_idx = search_shape_in_text(steps[1], MathTex("="))[0]
         
         step_2_wo_times = steps[1][0][step_2_times_idx[0].stop:step_2_times_idx[-1].start]
-        step_2_left_multiply = steps[1][0][:step_2_times_idx[0].stop]
-        step_2_right_multiply = steps[1][0][step_2_times_idx[-1].start:]
+        step_2_left_multiply = VGroup(steps[1][0][:step_2_times_idx[0].stop])
+        step_2_right_multiply = VGroup(steps[1][0][step_2_times_idx[-1].start:])
         step_2_unkown = steps[1][0][search_shape_in_text(steps[1], MathTex(f"{unknown_label_str}"))[0]]
         step_2_trig_term = steps[1][0][step_2_times_idx[0].stop:step_2_eql_idx.start]
         step_2_eql = steps[1][0][step_2_eql_idx]
         step_2_left_term = steps[1][0][:step_2_eql_idx.start]
-
+        step_2_wo_multiply = VGroup(steps[1][0][step_2_times_idx[0].stop:step_2_times_idx[-1].start])
+        
         step_3_times_idx = search_shape_in_text(steps[2], MathTex(r"\times"))[0]
         step_3_unknown = steps[2][0][0]
         step_3_eql = steps[2][0][1]
@@ -403,53 +489,88 @@ class Trig(MathTutorialScene):
         step_7_unknown_w_eql = steps[6][0][:2]
         step_7_right_term = steps[6][0][2:]
 
-        self.play(Write(steps[0]))
+        scroll_steps = VGroup(
+            steps[0],
+            step_2_wo_multiply,
+            step_2_right_multiply,
+            step_2_left_multiply,
+            *steps[2:-1],
+        )
+        if comment:
+            scroll_steps.add(VGroup(comment))
+        scroll_steps.add(steps[-1])
+        
+        scroll = ScrollManager(scroll_steps)
+
+        # Ratio used
+        scroll.prepare_next(self)
         self.wait()
+        
+        # Plugging in the values
         self.play(Write(step_2_wo_times))
+        scroll.prepare_next()
         self.wait()
+
+        # Multiply by the denominator
         self.play(Succession(
             FadeIn(step_2_right_multiply),
             FadeIn(step_2_left_multiply),
         ))
+        scroll.prepare_next(steps=2)
         self.wait()
+
+        # Simplify
         self.play(
             ReplacementTransform(step_2_unkown.copy(), step_3_unknown),
             ReplacementTransform(step_2_eql.copy(), step_3_eql),
             ReplacementTransform(step_2_left_term.copy(), step_3_right_term),
             run_time=2
         )
+        scroll.prepare_next()
         self.wait()
+
+        # Calculate the trig value
         self.play(Succession(
             *[
                 FadeIn(obj) for obj in steps[3][:]
             ]
         ))
+        scroll.prepare_next()
         self.wait()
+        
+        # Plugging in the trig value
+        scroll.scroll_down(self, steps=4)
+
         self.play(
             ReplacementTransform(step_3_unknown.copy(), step_5_unknown_w_eql[0]),
             ReplacementTransform(step_3_eql.copy(), step_5_unknown_w_eql[1]),
             ReplacementTransform(step_3_multiply_factor.copy(), step_5_multiply_factor),
         )
         self.play(Write(step_5_trig_evaluation))
+        scroll.prepare_next()
         self.wait()
 
+        # Multiply
         self.play(
             ReplacementTransform(step_5_unknown_w_eql.copy(), step_6_unknown_w_eql),
         )
         self.play(Write(step_6_right_term))
         self.wait()
-
-        # Add comment if needed
-        if comment:
-            self.play(Write(comment))
+        scroll.prepare_next()
         self.wait()
+
+        # Comment
+        if comment:
+            scroll.prepare_next(self, animation_type=FadeIn, run_time=1)
+            self.wait()
         
+        # Round
         self.play(
             ReplacementTransform(step_6_unknown_w_eql.copy(), step_7_unknown_w_eql),
         )
         self.play(Write(step_7_right_term))
-
-
+        scroll.prepare_next()        
+        
     def construct(self):        
         # Create the triangle
         triangle_obj = Triangle(
@@ -466,6 +587,7 @@ class Trig(MathTutorialScene):
             solution_prec=solution_prec,
             label_scale=label_scale,
             label_shift=label_shift,
+            angle_shift=angle_shift,
             color=TRIANGLE_COLOR,
             color_map = {
                 "hyp": HYP_COLOR,
@@ -490,6 +612,8 @@ class Trig(MathTutorialScene):
         title = Tex(f"Find ${unknown_label_str}$").scale(TITLE_SCALE).to_corner(UL)
         title[0][-1].set_color(unknown_color)
 
+        
+        
         if unknown in ["beta", "alpha"]:
             subtitle_text = f"nearest {prec_map[solution_prec]}"
         else:
@@ -507,13 +631,12 @@ class Trig(MathTutorialScene):
         steps[-4].scale(0.8)
 
         # Animations
-        triangle_component = "triangle_w_h" if "triangle_w_h" in triangle_obj.components else "triangle"
         for component in [
-                triangle_component, "right_angle", "angle_value",
+                "triangle", "right_angle", "alpha_value", "beta_value",
                 "label_a", "label_b", "label_c", "label_h",
         ]:
             if component in triangle_obj.components:
-                self.play(Write(triangle_obj.components[component]), run_time=1)
+                self.play(Write(triangle_obj.components[component]), run_time=1.2)
         self.wait()
         
         self.play(FadeIn(title, subtitle))
@@ -541,7 +664,7 @@ class Trig(MathTutorialScene):
             self.wait()
 
         for component in ["label_a_name","label_b_name", "label_c_name", "label_h_name"]:
-            if component in triangle_obj.components:
+            if component in triangle_obj.components and triangle_obj.components[component] is not None:
                 self.play(Write(triangle_obj.components[component]), run_time=1)
         self.wait()
 
@@ -557,10 +680,15 @@ class Trig(MathTutorialScene):
         
         self.play(triangle.animate.to_edge(RIGHT, buff=triangle_edge_buff))
         self.wait()
-        
+
         if unknown in ["alpha", "beta"]:
             self.solve_for_angle(steps)           
         else:
             self.solve_for_side(triangle_obj, steps)
 
         self.wait(4)
+
+# %%
+
+
+

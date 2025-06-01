@@ -1,6 +1,7 @@
 from manim import *
 from math import radians
 from trig_variants import *
+from triangle_config import *
 from utils import *
 
 class Triangle:
@@ -49,9 +50,9 @@ class Triangle:
                 "adj": YELLOW,
                 "angle": BLUE,
             }
-        
-        self._triangle = self._build()
+
         self._steps = self._get_solution_steps()
+        self._triangle = self._build()
     def get_foot_of_perpendicular(self, A, B, C):
         BC = C - B
         t = np.dot(A - B, BC) / np.dot(BC, BC)
@@ -78,269 +79,220 @@ class Triangle:
 
     def _build(self):
         A = ORIGIN
-        B = 4 * RIGHT
-        C = 3 * UP
-        # B = 3 * RIGHT
-        # C = 4 * UP
+
+        if self.h:
+            B = 4 * RIGHT
+            C = 5 * UP
+        else:
+            B = 5 * RIGHT
+            C = 4 * UP
+        
         
         full_triangle = VGroup()
         self.components = {}
-        labels_map = {}
-        label_positions_map = {}
-        label_angles_map = {}
-        label_aligned_edge_map = {}
-        
-        rotation_map = {
-            "top_right": PI,
-            "top_left": -PI / 2,
-            "bottom_right": PI / 2,
-            "bottom_left": 0,
-            "perpendicular_foot": PI - Line(C, B).get_angle(),
-        }
 
-        angle_config = {
-            "top_right": {
-                "alpha": {"angle": 235 * DEGREES, "arrow_start": "right", "arrow_radius": -PI / 3},
-                "beta": {"angle": -155 * DEGREES, "arrow_start": "right", "arrow_radius": PI / 3},
-            },
-            "top_left": {
-                "alpha": {"angle": 5 * DEGREES, "arrow_start": "left", "arrow_radius": -PI / 3},
-                "beta": {"angle": -85 * DEGREES, "arrow_start": "left", "arrow_radius": PI / 3},
-            },
-            "bottom_right": {
-                "alpha": {"angle": -25 * DEGREES, "arrow_start": "right", "arrow_radius": -PI / 3},
-                "beta": {"angle": -155 * DEGREES, "arrow_start": "down", "arrow_radius": PI / 3},
-            },
-            "bottom_left": {
-                "alpha": {"angle": 200 * DEGREES, "arrow_start": "up", "arrow_radius": PI / 3},
-                "beta": {"angle": -155 * DEGREES, "arrow_start": "left", "arrow_radius": PI / 3},
-            },
-            "perpendicular_foot": {
-                "alpha": {"angle": -65 * DEGREES, "arrow_start": "right", "arrow_radius": PI / 3},
-                "beta": {"angle": -45 * DEGREES, "arrow_start": "down", "arrow_radius": -PI / 3},
-            }
-        }
+        # Configuration dictionaries
+        rotation_config = ROTATION_CONFIG
+        angle_config = ANGLE_CONFIG
+        side_names_config = SIDE_NAMES_CONFIG
+        side_edge_config = SIDE_EDGE_CONFIG
 
-        side_names_map = {
-            "alpha": {"a": "opp", "b": "adj", "c": "hyp"},
-            "beta":  {"a": "adj", "b": "opp", "c": "hyp"},
-        }
-
-        side_edge_map = {
-            "top_right": {"a": LEFT, "b": DOWN},
-            "top_left": {"a": DOWN, "b": RIGHT},
-            "bottom_right": {"a": UP, "b": LEFT},
-            "bottom_left": {"a": RIGHT, "b": UP},
-            "perpendicular_foot": {"a": ORIGIN, "b": ORIGIN, "h": RIGHT},
-        }
-
-        triangle = Polygon(A, B, C, color=self.color).set_z_index(2).rotate(rotation_map[self.right_angle_position])
+        # Create triangle
+        triangle = self._create_triangle(A, B, C, rotation_config)
         full_triangle.add(triangle)
 
+        # Get rotated vertices
         A, B, C = triangle.get_vertices()
-        D = self.get_foot_of_perpendicular(A, B, C)
-
-        if not self.h:
-            right_angle = Angle.from_three_points(B, A, C, elbow=True, radius=0.3)
-        else:
-            altitude = Line(A, D)
-            right_angle = Angle.from_three_points(B, D, A, elbow=True, radius=0.3)
-
-            label_h_position = get_normal(D, A, length=self.label_shift)
-            label_h = MathTex(self.h).scale(self.label_scale).move_to(
-                label_h_position.get_end(),
-                aligned_edge=side_edge_map[self.right_angle_position]["h"]
-            )
-            label_h_position.set_opacity(0)
-            full_triangle.add(altitude, label_h, label_h_position)
-            self.components["label_h"] = label_h
-            label_positions_map["h"] = label_h_position
-            label_angles_map["h"] = 0
-            label_aligned_edge_map["h"] = side_edge_map[self.right_angle_position]["h"]
-
+        D = self.get_foot_of_perpendicular(A, B, C) if self.h else None
+        
+        # Add altitude if needed
+        if self.h:
+            altitude, h_label = self._create_altitude(A, D, side_edge_config)
+            full_triangle.add(altitude, h_label)
+            
+        # Create right angle indicator
+        right_angle = self._create_right_angle(A, B, C, D)
         full_triangle.add(right_angle)
 
-        def rotation_angle(p1, p2):
-            angle = Line(p1, p2).get_angle()
-            if abs(round(angle, 3)) in [round(x, 3) for x in [PI / 2, PI]]:
-                return 0
-            return angle
+        # Add side labels
+        self._add_side_labels(full_triangle, A, B, C, side_names_config, side_edge_config)            
 
+        # Add angle labels
+        self._add_angle_labels(full_triangle, A, B, C, angle_config)
+
+        # Set colors
+        self._apply_colors()
+
+        # Store unknown info
+        self._store_unknown_info(side_names_config)
+
+        # Store triangle info
+        self.components["triangle"] = triangle if not self.h else VGroup(triangle, altitude)
+        self.components["right_angle"] = right_angle
+        
+        # Center the triangle
+        full_triangle.move_to(ORIGIN)    
+        
+        return full_triangle
+
+
+    def _create_triangle(self, A, B, C, rotation_config):
+        triangle = Polygon(A, B, C, color=self.color).set_z_index(2)
+        rotation = rotation_config.get(self.right_angle_position, 0)
+
+        if self.h:
+            rotation = -Angle.from_three_points(A, B, C).get_value() + PI
+
+        return triangle.rotate(rotation)
+
+    def _create_right_angle(self, A, B, C, D):
+        if self.h:
+            right_angle = Angle.from_three_points(B, D, A, elbow=True, radius=0.3)
+        else:
+            right_angle = Angle.from_three_points(B, A, C, elbow=True, radius=0.3)
+            
+        return right_angle
+
+    def _create_altitude(self, A, D, edge_config):
+        altitude = Line(A, D)
+        
+        label_position = get_normal(A, D, length=self.label_shift)
+        value_label = MathTex(self.h).scale(self.label_scale)
+        name_label = Tex("opp").scale(self.label_scale)
+
+        label_group = VGroup(name_label, value_label).arrange(DOWN)
+        label_group.move_to(label_position.get_end())
+        label_group.set_color(self.color_map["opp"])
+
+        # Store components
+        self.components[f"label_h"] = value_label
+        self.components[f"label_h_name"] = name_label    
+    
+        return altitude, label_group
+
+    def _add_side_labels(self, container, A, B, C, side_names_config, side_edge_config):
+        vertices = {"a": (A, C), "b": (B, A), "c": (C, B)}
         known_angle = "alpha" if self.alpha else "beta"
-        if self.a:
-            label_a_position = get_normal(A, C, length=self.label_shift)
-            label_a_angle = rotation_angle(A, C)
-            label_a = MathTex(self.a).scale(self.label_scale).rotate(label_a_angle)
-            labels_map["a"] = label_a
-            label_positions_map["a"] = label_a_position
-            label_angles_map["a"] = label_a_angle
-            label_aligned_edge_map["a"] = side_edge_map[self.right_angle_position]["a"]
 
-            # a -> opp of alpha, a -> adj of beta
-            side_name = side_names_map[known_angle]["a"]
-            label_a_name = Tex(side_name).scale(self.label_scale).rotate(label_a_angle)
+        for side, value in [("a", self.a), ("b", self.b), ("c", self.c)]:
+            if not value: continue
 
-            label_a_group = VGroup(label_a_name, label_a).arrange(DOWN)
-            label_a_group.set_color(self.color_map[side_name])
-            label_a_group.move_to(
-                label_a_position.get_end(),
-                aligned_edge=side_edge_map[self.right_angle_position]["a"]
+            v1, v2 = vertices[side]
+            label_group = self._create_side_label(
+                v1, v2, value, side, known_angle, side_names_config, side_edge_config
             )
-            label_a_position.set_opacity(0)
-            full_triangle.add(label_a, label_a_position)
-            full_triangle.add(label_a_name)
-            self.components["label_a"] = label_a
-            self.components["label_a_name"] = label_a_name
-                
-                
-                
-        if self.b:
-            label_b_position = get_normal(B, A, length=self.label_shift)
-            label_b_angle = rotation_angle(B, A)
-            label_b = MathTex(self.b).scale(self.label_scale).rotate(label_b_angle)
-            labels_map["b"] = label_b
-            label_positions_map["b"] = label_b_position
-            label_angles_map["b"] = label_b_angle
-            label_aligned_edge_map["b"] = side_edge_map[self.right_angle_position]["b"]
+            container.add(label_group)
 
-            # b -> adj of alpha, b -> opp of beta
-            side_name = side_names_map[known_angle]["b"]
-            label_b_name = Tex(side_name).scale(self.label_scale).rotate(label_b_angle)
-            
-            label_b_group = VGroup(label_b_name, label_b).arrange(DOWN)
-            label_b_group.set_color(self.color_map[side_name])
-            label_b_group.move_to(
-                label_b_position.get_end(),
-                aligned_edge=side_edge_map[self.right_angle_position]["b"]
-            )
-            label_b_position.set_opacity(0)
-            full_triangle.add(label_b, label_b_position)
-            full_triangle.add(label_b_name)
-            self.components["label_b"] = label_b
-            self.components["label_b_name"] = label_b_name
-            
+    def _create_side_label(self, v1, v2, value, side, known_angle, side_names_config, side_edge_config):
+        label_position = get_normal(v1, v2, length=self.label_shift)
+        angle = self._calculate_rotation_angle(v1, v2)
 
-        if self.c:
-            # if self.right_angle_position in ["top_right", "top_left"]:
-            #     label_c_angle = 0
-            #     label_shift_offset = 0.2
-            # else:
-            #     label_c_angle = rotation_angle(C, B)
-            #     label_shift_offset = 0
-            label_c_angle = rotation_angle(C, B)
-            label_shift_offset = 0.5
-            if self.right_angle_position in ["top_right", "top_left"]:
-                label_c_angle = PI + label_c_angle
+        # Adjust for specific side
+        if side == "c":
+            angle = self._adjust_hypotenuse_angle(angle)
+            # label_position = get_normal(v1, v2, length=self.label_shift + 0.5)
             
-            label_c_position = get_normal(C, B, length=self.label_shift + label_shift_offset)
-            label_c = MathTex(self.c).scale(self.label_scale).rotate(label_c_angle).move_to(label_c_position.get_end())
-            labels_map["c"] = label_c
-            label_positions_map["c"] = label_c_position
-            label_angles_map["c"] = label_c_angle
-            
-            side_name = side_names_map[known_angle]["c"]
-            label_c_name_position = get_normal(C, B, length=self.label_shift + label_shift_offset - 0.5)
-            label_c_name = Tex(side_name).scale(self.label_scale).rotate(label_c_angle).move_to(label_c_name_position.get_end())
+        # Create value label
+        value_label = MathTex(value).scale(self.label_scale)
+    
+        # Create name label
+        side_name = side_names_config[known_angle][side] if not self.h else "hyp"
 
-            VGroup(label_c, label_c_name).set_color(self.color_map[side_name])
-            label_c_position.set_opacity(0)
-            full_triangle.add(label_c, label_c_position)
-            full_triangle.add(label_c_name)
-            self.components["label_c"] = label_c
-            self.components["label_c_name"] = label_c_name
-            
-            
-        # Angles
+        if self.h and self.unknown != side:
+            name_label = None
+        else:
+            name_label = Tex(side_name).scale(self.label_scale)
+    
+        # Group and position
+        label_group = VGroup()
+        if name_label: label_group.add(name_label)
+        label_group.add(value_label)
+        label_group.arrange(DOWN).rotate(angle)
+        label_group.set_color(self.color_map[side_name])
+    
+        edge_alignment = side_edge_config[self.right_angle_position].get(side, ORIGIN)
+        label_group.move_to(label_position.get_end())#, aligned_edge=edge_alignment)
+        
+        # Store components
+        self.components[f"label_{side}"] = value_label
+        self.components[f"label_{side}_name"] = name_label
+    
+        return label_group
+
+    def _calculate_rotation_angle(self, p1, p2):
+        angle = Line(p1, p2).get_angle()
+        if abs(round(angle, 3)) in [round(x, 3) for x in [PI / 2, PI]]:
+            return 0
+        return angle
+
+    def _adjust_hypotenuse_angle(self, angle):
+        if self.right_angle_position in ["top_right", "top_left"]:
+            return PI + angle
+        return angle
+
+    def _add_angle_labels(self, container, A, B, C, angle_config):
         if self.alpha:
-            alpha_obj = Angle.from_three_points(C, B, A, radius=self.angle_radius)
-            alpha_label = MathTex(rf"{self.alpha}").scale(self.label_scale)
-            if not self.indicate_alpha_with_arrow:
-                alpha_position = get_normal(alpha_obj.get_end(), alpha_obj.get_start(), length=self.angle_shift)
-                alpha_label.move_to(alpha_position.get_end())
-                alpha_position.set_opacity(0)
-                full_triangle.add(alpha_obj, alpha_label, alpha_position)
-                labels_map["alpha"] = alpha_label
-                self.components["label_alpha"] = alpha_label
-            else:
-                alpha_position = get_normal(
-                    alpha_obj.get_end(), alpha_obj.get_start(),
-                    proportion=0.6, length=1.2,
-                    angle=angle_config[self.right_angle_position]["alpha"]["angle"]
-                )
-                alpha_label.move_to(alpha_position.get_end())
-                alpha_arrow = curved_arrow_to_angle(
-                    alpha_label, alpha_obj,
-                    start_direction=angle_config[self.right_angle_position]["alpha"]["arrow_start"],
-                    radius=angle_config[self.right_angle_position]["alpha"]["arrow_radius"]
-                ).set_z_index(3)
-                full_triangle.add(alpha_obj, alpha_label, alpha_arrow)
-                labels_map["alpha"] = alpha_label
-                self.components["label_alpha"] = alpha_label
+            angle_group = self._create_angle_label(
+                C, B, A, self.alpha, "alpha", angle_config, self.indicate_alpha_with_arrow
+            )
+            container.add(angle_group)
 
         if self.beta:
-            beta_obj = Angle.from_three_points(A, C, B, radius=self.angle_radius)
-            beta_label = MathTex(rf"{self.beta}").scale(self.label_scale)
-            if not self.indicate_beta_with_arrow:
-                beta_position = get_normal(beta_obj.get_end(), beta_obj.get_start(), length=self.angle_shift)
-                beta_label.move_to(beta_position.get_end())
-                beta_position.set_opacity(0)
-                full_triangle.add(beta_obj, beta_label, beta_position)
-                labels_map["beta"] = beta_label
-                self.components["label_beta"] = beta_label
-            else:
-                beta_position = get_normal(
-                    beta_obj.get_end(), beta_obj.get_start(),
-                    proportion=0.6, length=1.2,
-                    angle=angle_config[self.right_angle_position]["beta"]["angle"]
-                )
-                beta_label.move_to(beta_position.get_end())
-                beta_arrow = curved_arrow_to_angle(
-                    beta_label, beta_obj,
-                    start_direction=angle_config[self.right_angle_position]["beta"]["arrow_start"],
-                    radius=angle_config[self.right_angle_position]["beta"]["arrow_radius"]
-                ).set_z_index(3)
-                full_triangle.add(beta_obj, beta_label, beta_arrow)
-                labels_map["beta"] = beta_label
-                self.components["label_beta"] = beta_label
+            angle_group = self._create_angle_label(
+                A, C, B, self.beta, "beta", angle_config, self.indicate_beta_with_arrow
+            )
+            container.add(angle_group)
 
-        if self.h: self.components["triangle_w_h"] = VGroup(triangle, altitude)
-        
-        full_triangle.move_to(ORIGIN)
-        
+    def _create_angle_label(self, p1, p2, p3, value, angle_name, angle_config, use_arrow):
+        angle_obj = Angle.from_three_points(p1, p2, p3, radius=self.angle_radius)
+        label = MathTex(rf"{value}").scale(self.label_scale)
+
+        if not use_arrow:
+            position = get_normal(angle_obj.get_end(), angle_obj.get_start(), length=self.angle_shift)
+            label.move_to(position.get_end())
+            group = VGroup(angle_obj, label)
+        else:
+            config = angle_config[self.right_angle_position][angle_name]
+            position = get_normal(
+                angle_obj.get_end(), angle_obj.get_start(),
+                proportion=0.6, length=1.2, angle=config["angle"]
+            )
+            label.move_to(position.get_end())
+
+            arrow = curved_arrow_to_angle(
+                label, angle_obj,
+                start_direction=config["arrow_start"],
+                radius=config["arrow_radius"]
+            ).set_z_index(3)
+
+            group = VGroup(angle_obj, label, arrow)
+
+        # Store components
+        self.components[f"label_{angle_name}"] = label
+        if hasattr(self, 'alpha') and angle_name == "alpha" and self.alpha:
+            self.components["alpha_value"] = group
+        elif hasattr(self, 'beta') and angle_name == "beta" and self.beta:
+            self.components["beta_value"] = group
+
+        return group
+
+    def _apply_colors(self):
+        for angle_name in ["alpha", "beta"]:
+            label_key = f"label_{angle_name}"
+            if label_key in self.components:
+                self.components[label_key].set_color(self.color_map["angle"])
+    
+    def _store_unknown_info(self, side_names_config):
+        known_angle = "alpha" if self.alpha else "beta"
+    
         if self.unknown not in ["alpha", "beta"]:
-            side_name = side_names_map[known_angle][self.unknown]
+            side_name = "hyp" if self.h else side_names_config[known_angle][self.unknown]
             self.components["unknown_color"] = self.color_map.get(side_name)
         else:
             self.components["unknown_color"] = self.color_map.get("angle")
-        self.components["unknown_label"] = labels_map.get(self.unknown, None)
-        self.components["unknown_label_position"] = label_positions_map.get(self.unknown, None)
-        self.components["unknown_label_angle"] = label_angles_map.get(self.unknown, None)
-        self.components["unknown_label_edge"] = label_aligned_edge_map.get(self.unknown, ORIGIN)
-
-        self.components["triangle"] = triangle
-        self.components["right_angle"] = right_angle
-        
-        if self.alpha:
-            self.components["angle_value"] = VGroup(alpha_obj, alpha_label)
-            if self.indicate_alpha_with_arrow: self.components["angle_value"].add(alpha_arrow)
-        elif self.beta:
-            self.components["angle_value"] = VGroup(beta_obj, beta_label)
-            if self.indicate_beta_with_arrow: self.components["angle_value"].add(beta_arrow)
-            
-        # Colors
-        try:
-            alpha_label.set_color(self.color_map["angle"])
-        except:
-            pass
-
-        try:
-            beta_label.set_color(self.color_map["angle"])
-        except:
-            pass
     
-        
-        return full_triangle
-    
+        self.components["unknown_label"] = self.components.get(f"label_{self.unknown}")
+                
     def _get_solution_steps(self):
         if self.unknown not in {"a", "b", "c", "h", "alpha", "beta"}:
             return []
@@ -379,14 +331,14 @@ class Triangle:
         
         trig_expressions = {
             "a": {
-                ("h", "beta"): lambda: generate_cos_variants(self.a, h_val, "adj", self.beta, beta_val, unit=unit, prec=self.solution_prec),
+                ("h", "beta"): lambda: generate_sin_variants(h_val, self.a, "adj", self.beta, beta_val, unit=unit, prec=self.solution_prec),
                 ("b", "alpha"): lambda: generate_tan_variants(self.a, b_val, "opp", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
                 ("c", "alpha"): lambda: generate_sin_variants(self.a, c_val, "opp", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
                 ("b", "beta"): lambda: generate_tan_variants(self.a, b_val, "adj", self.beta, beta_val, unit=unit, prec=self.solution_prec),
                 ("c", "beta"): lambda: generate_cos_variants(self.a, c_val, "adj", self.beta, beta_val, unit=unit, prec=self.solution_prec),
             },
             "b": {
-                ("h", "alpha"): lambda: generate_sin_variants(self.b, h_val, "adj", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
+                ("h", "alpha"): lambda: generate_sin_variants(h_val, self.b, "adj", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
                 ("a", "alpha"): lambda: generate_tan_variants(self.b, a_val, "adj", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
                 ("c", "alpha"): lambda: generate_cos_variants(self.b, c_val, "adj", self.alpha, alpha_val, unit=unit, prec=self.solution_prec),
                 ("a", "beta"): lambda: generate_tan_variants(self.b, a_val, "opp", self.beta, beta_val, unit=unit, prec=self.solution_prec),
