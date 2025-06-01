@@ -562,6 +562,109 @@ class MathTutorialScene(VoiceoverScene):
         
         return result
         
+    SHARED_MATH_ELEMENTS = [
+        ('equals', '='),
+        ('plus', '+', 0),      # First plus sign
+        ('minus', '-', 0),     # First minus sign
+    ]
+
+    SHARED_COMPARISON_ELEMENTS = [
+        ('equals', '='),
+        ('less_than', '<'),
+        ('greater_than', '>'),
+        ('leq', r'\leq'),
+        ('geq', r'\geq'),
+    ]
+
+    SHARED_ARITHMETIC_OPS = [
+        ('plus', '+', 0),
+        ('minus', '-', 0),
+        ('times', r'\times', 0),
+        ('divide', r'\div', 0),
+    ]
+
+    # For equations with equals and all basic operations
+    SHARED_EQUATION_ELEMENTS = [
+        ('equals', '='),
+        ('plus', '+', 0),
+        ('minus', '-', 0),
+        ('times', r'\times', 0),
+        ('divide', r'\div', 0),
+    ]
+        
+        
+    def parse_elements(self, equation, *patterns):
+        """Parse multiple elements from an equation in one call.
+        
+        Args:
+            equation: The MathTex object to parse
+            *patterns: Variable number of tuples defining what to find:
+                - (name, pattern): Basic pattern search
+                - (name, pattern, nth): Pattern with nth occurrence (0-indexed)
+                - (name, pattern, nth, color): Pattern with nth occurrence and color
+                - (name, pattern, nth, color, opacity): Full options
+            
+        Returns:
+            Dict of extracted elements with given names as keys
+            
+        Example:
+            # Basic usage
+            parts = self.parse_elements(equation,
+                ('x', 'x'),
+                ('equals', '='),
+                ('zero', '0')
+            )
+            # Access as: parts['x'], parts['equals'], etc.
+            
+            # With shared elements
+            parts = self.parse_elements(equation,
+                ('x', 'x'),
+                ('y', 'y'),
+                *SHARED_MATH_ELEMENTS  # Adds equals, plus, minus
+            )
+            
+            # With nth occurrence
+            parts = self.parse_elements(equation,
+                ('first_x', 'x', 0),   # First x
+                ('second_x', 'x', 1),  # Second x
+                ('squared', '^2', 1),  # Second ^2
+            )
+            
+            # With color
+            parts = self.parse_elements(equation,
+                ('result', '42', 0, YELLOW),
+                ('x', 'x', 0, BLUE, 0.5),  # With opacity
+            )
+        """
+        results = {}
+        
+        for pattern_info in patterns:
+            # Skip None patterns (allows conditional patterns)
+            if pattern_info is None:
+                continue
+                
+            name = pattern_info[0]
+            pattern = pattern_info[1]
+            
+            # Build kwargs based on tuple length
+            kwargs = {}
+            if len(pattern_info) > 2:
+                kwargs['nth'] = pattern_info[2]
+            if len(pattern_info) > 3:
+                kwargs['color'] = pattern_info[3]
+            if len(pattern_info) > 4:
+                kwargs['opacity'] = pattern_info[4]
+                
+            # Find the element
+            element = self.find_element(pattern, equation, **kwargs)
+            if element is not None:
+                results[name] = element
+            else:
+                # Only warn for non-optional patterns
+                if len(pattern_info) <= 2 or pattern_info[2] == 0:
+                    print(f"Warning: Could not find pattern '{pattern}' for '{name}' in equation")
+                
+        return results
         
         
     def create_labeled_step(

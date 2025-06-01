@@ -4,15 +4,13 @@ from src.components.common.scroll_manager import ScrollManager
 
 config.verbosity = "ERROR"
 
-class SQ1(MathTutorialScene):
+class Pythagoras01a(MathTutorialScene):
     def construct(self):
-        
         
         step1 = VGroup(
             Tex("Pythagoras' Theorem").scale(TEXT_SCALE),
             MathTex("c^2 = a^2 + b^2").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
         
         step2 = VGroup(
             Tex("Substitute the values of a and b").scale(TEXT_SCALE),
@@ -95,78 +93,81 @@ class SQ1(MathTutorialScene):
         # Create elements for ScrollManager
         elements = VGroup(
             step1[0],
-            step1[1],# Index 0 - full formula
+            step1[1],
             
             step2[0],
-            sub_c2_equals,     # Index 1
-            sub_5,             # Index 2
-            sub_5_squared,     # Index 3
-            sub_plus,          # Index 4
-            sub_10,            # Index 5
-            sub_10_squared,    # Index 6
+            sub_c2_equals,
+            sub_5,
+            sub_5_squared,
+            sub_plus,
+            sub_10,
+            sub_10_squared,
             
             step3[0],
-            calc1_c2_equals,   # Index 7
-            calc1_25,          # Index 8
-            calc1_plus,        # Index 9
-            calc1_100,         # Index 10
+            calc1_c2_equals,
+            calc1_25,
+            calc1_plus,
+            calc1_100,
             
-            calc2_c2_equals,   # Index 11
-            calc2_125,         # Index 12
+            calc2_c2_equals,
+            calc2_125,
             
             step4[0],
-            calc3_sqrt,        # Index 13
-            calc3_c2,          # Index 14
-            calc3_equals,      # Index 15
-            calc3_sqrt2,       # Index 16
-            calc3_125,         # Index 17
+            calc3_sqrt,
+            calc3_c2,
+            calc3_equals,
+            calc3_sqrt2,
+            calc3_125,
             
             step5[0],
-            calc4_c_equals,    # Index 18
-            calc4_11_18        # Index 19
+            calc4_c_equals,
+            calc4_11_18
         )
         
-        # Create scroll manager
-        scroll_mgr = ScrollManager(elements)
+        # Create scroll manager with scene reference
+        scroll_mgr = ScrollManager(elements, scene=self)
         
         # Step 1: Pythagoras' Theorem
-        scroll_mgr.prepare_next(self)  # step1[0] - "Pythagoras' Theorem" label
-        scroll_mgr.prepare_next(self)  # step1[1] - full formula
+        scroll_mgr.prepare_next()  # step1[0] - "Pythagoras' Theorem" label
+        scroll_mgr.prepare_next()  # step1[1] - full formula
         
-        # Step 2: Substitute values
-        scroll_mgr.prepare_next(self)  # step2[0] - "Substitute the values" label
-        scroll_mgr.transform_from_copy(self, formula_c2_equals)  # sub_c2_equals
-        scroll_mgr.transform_from_copy(self, formula_a)  # sub_5
-        scroll_mgr.transform_from_copy(self, formula_a_squared)  # sub_5_squared
-        scroll_mgr.transform_from_copy(self, formula_plus)  # sub_plus
-        scroll_mgr.transform_from_copy(self, formula_b)  # sub_10
-        scroll_mgr.transform_from_copy(self, formula_b_squared)  # sub_10_squared
+        # Step 2: Substitute values - CLEAN SYNTAX
+        scroll_mgr.prepare_next()  # step2[0] - "Substitute the values" label
+        scroll_mgr.transform_from_copy(formula_c2_equals, sub_c2_equals)
+        scroll_mgr.transform_from_copy(formula_a, sub_5)
+        scroll_mgr.transform_from_copy(formula_a_squared, sub_5_squared)
+        scroll_mgr.transform_from_copy(formula_plus, sub_plus)
+        scroll_mgr.transform_from_copy(formula_b, sub_10)
+        scroll_mgr.transform_from_copy(formula_b_squared, sub_10_squared)
         
-        # Step 3: Simplify
-        scroll_mgr.prepare_next(self)  # step3[0] - "Simplify" label
-        scroll_mgr.transform_from_copy(self, sub_c2_equals)  # calc1_c2_equals
-        scroll_mgr.transform_from_copy(self, VGroup(sub_5, sub_5_squared))  # calc1_25
-        scroll_mgr.transform_from_copy(self, sub_plus)  # calc1_plus
-        scroll_mgr.transform_from_copy(self, VGroup(sub_10, sub_10_squared))  # calc1_100
+        # Step 3: Simplify - CLEAN SYNTAX
+        scroll_mgr.prepare_next()  # step3[0] - "Simplify" label
+        scroll_mgr.transform_from_copy(sub_c2_equals, calc1_c2_equals)
+        scroll_mgr.transform_from_copy(VGroup(sub_5, sub_5_squared), calc1_25)
+        scroll_mgr.transform_from_copy(sub_plus, calc1_plus)
+        scroll_mgr.transform_from_copy(VGroup(sub_10, sub_10_squared), calc1_100)
         
         # Step 3 continued: c^2 = 125
-        scroll_mgr.transform_from_copy(self, calc1_c2_equals)  # calc2_c2_equals
-        scroll_mgr.transform_from_copy(self, VGroup(calc1_25, calc1_plus, calc1_100))  # calc2_125
+        scroll_mgr.transform_from_copy(calc1_c2_equals, calc2_c2_equals)
+        scroll_mgr.transform_from_copy(VGroup(calc1_25, calc1_plus, calc1_100), calc2_125)
         
-        scroll_mgr.scroll_down(self, steps=2)
+        scroll_mgr.scroll_down(steps=2)
         
         # Step 4: Calculate c
-        scroll_mgr.prepare_next(self)  # step4[0] - "Calculate the value of c" label
-        scroll_mgr.prepare_next(self)  # calc3_sqrt
-        scroll_mgr.transform_from_copy(self, calc2_c2_equals)  # calc3_c2
-        scroll_mgr.prepare_next(self)  # calc3_equals
-        scroll_mgr.prepare_next(self)  # calc3_sqrt2
-        scroll_mgr.transform_from_copy(self, calc2_125)  # calc3_125
+        scroll_mgr.prepare_next()  # step4[0] - "Calculate the value of c" label
+        scroll_mgr.prepare_next()  # calc3_sqrt
+        scroll_mgr.transform_from_copy(calc2_c2_equals, calc3_c2)
+        scroll_mgr.prepare_next()  # calc3_equals
+        scroll_mgr.prepare_next()  # calc3_sqrt2
+        scroll_mgr.transform_from_copy(calc2_125, calc3_125)
         
-        scroll_mgr.scroll_down(self, steps=7)
+        scroll_mgr.scroll_down(steps=7)
         
         # Step 5: Final result
-        scroll_mgr.prepare_next(self)  # step5[0] - "Round to 2 decimal places" label
-        scroll_mgr.transform_from_copy(self, calc3_c2)  # calc4_c_equals
-        scroll_mgr.transform_from_copy(self, calc3_125)  # calc4_11_18
+        scroll_mgr.prepare_next()  # step5[0] - "Round to 2 decimal places" label
+        scroll_mgr.transform_from_copy(calc3_c2, calc4_c_equals)
+        scroll_mgr.transform_from_copy(calc3_125, calc4_11_18)
+        
+        
+        
         

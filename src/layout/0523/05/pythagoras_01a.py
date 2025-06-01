@@ -4,15 +4,13 @@ from src.components.common.scroll_manager import ScrollManager
 
 config.verbosity = "ERROR"
 
-class SQ1(MathTutorialScene):
+class Pythagoras01a(MathTutorialScene):
     def construct(self):
-        
         
         step1 = VGroup(
             Tex("Pythagoras' Theorem").scale(TEXT_SCALE),
             MathTex("c^2 = a^2 + b^2").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
         
         step2 = VGroup(
             Tex("Substitute the values of a and b").scale(TEXT_SCALE),

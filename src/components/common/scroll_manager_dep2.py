@@ -3,34 +3,25 @@
 from manim import *
 
 class ScrollManager(VGroup):
-    def __init__(self, equations, scene=None, *args, **kwargs):
+    def __init__(self, equations, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.equations = equations
-        self.scene = scene  # Store scene reference
         self.start_position = self.equations[0].copy()
         self.current_position = 0
         self.last_in_view = 0
         self.last_steps = 0
-        self.replacements = {}
+        self.replacements = {}  # Add this line
         # Store callouts with their target scroll index
-        self.callouts_by_scroll_index = {}  # Key: scroll index, Value: list of callout managers
+        self.callouts_by_scroll_index = (
+            {}
+        )  # Key: scroll index, Value: list of callout managers
         self.scroll_count = 0  # Track number of scrolls
 
-    def set_scene(self, scene):
-        """Set the scene reference if not provided during initialization."""
-        self.scene = scene
-        return self
-
     
-    # Update prepare_next to also use stored scene
     def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
                     animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
-        """Prepare next elements with optional scene override."""
+        """Simplest version - handles lists inline without helper method."""
         
-        # Use provided scene or stored scene
-        if scene is None:
-            scene = self.scene
-            
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
         if same_item:
@@ -64,7 +55,8 @@ class ScrollManager(VGroup):
                 if isinstance(item, (list, tuple)):
                     to_animate = VGroup(*item[target_slice])
                 elif isinstance(item, VGroup) and len(item) > 0 and not isinstance(item[0], (MathTex, Tex, Text)):
-                    to_animate = item[target_slice]
+                    # VGroup of individual elements (like from slicing)
+                    to_animate = item[target_slice]  # Use the whole VGroup, not just first element
                 else:
                     to_animate = item[0][target_slice]
                 
@@ -80,17 +72,16 @@ class ScrollManager(VGroup):
         self.current_position += steps
         return self
 
-    
-    def scroll_down(self, scene=None, steps=1, run_time=None):
-        """Scrolls equations up and reveals new equations"""
+    def attach_callout_at_scroll(self, scroll_index, callout_manager):
+        """Attach a callout manager to fade out at a specific scroll index."""
+        if scroll_index not in self.callouts_by_scroll_index:
+            self.callouts_by_scroll_index[scroll_index] = []
+        self.callouts_by_scroll_index[scroll_index].append(callout_manager)
+        return self
         
-        # Use provided scene or stored scene
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available.")
-            
+    
+    def scroll_down(self, scene, steps=1, run_time=None):
+        """Scrolls equations up and reveals new equations"""
         run_time = {} if run_time is None else {"run_time": run_time}
         hidden_equations = self.equations[self.last_in_view : self.last_in_view + steps]
         viewed_equations = self.equations[
@@ -115,6 +106,9 @@ class ScrollManager(VGroup):
                             FadeOut(callout_manager.get_callout(), shift=UP * 2)
                         )
                         callout_manager.is_visible = False
+                        print(
+                            f"Reached scroll index {self.scroll_count}, fading out callout."
+                        )
 
         VGroup(
             viewed_equations.copy(), self.equations[self.current_position :]
@@ -128,17 +122,6 @@ class ScrollManager(VGroup):
         )
         self.remove(hidden_equations)
         self.last_in_view += steps
-        
-        
-    def attach_callout_at_scroll(self, scroll_index, callout_manager):
-        """Attach a callout manager to fade out at a specific scroll index.
-        No scene parameter needed as this just stores data."""
-        if scroll_index not in self.callouts_by_scroll_index:
-            self.callouts_by_scroll_index[scroll_index] = []
-        self.callouts_by_scroll_index[scroll_index].append(callout_manager)
-        return self
-    
-    
 
     def _is_target_in_container(self, target, container):
         """Recursively check if target is inside a container"""
@@ -175,26 +158,18 @@ class ScrollManager(VGroup):
         return None  # If not found
 
         
-    def replace_in_place(self, index, new_content, scene=None, animation_type=ReplacementTransform, 
-                        run_time=None, animation_kwargs=None, move_new_content=True):
+    def replace_in_place(self, scene, index, new_content, animation_type=ReplacementTransform, run_time=None, animation_kwargs=None, move_new_content=True):
         """Replaces an equation at its current position
         
         Args:
+            scene: The manim scene to animate on
             index: Index of the equation to replace
             new_content: New equation/content to replace with
-            scene: The manim scene to animate on (if None, uses stored scene)
-            animation_type: Animation to use for replacement (default: ReplacementTransform)
+            animation_type: Animation to use for replacement (default: Transform)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
-            move_new_content: Whether to move the new content to the position of the old one (optional)
+            move_new_content: Whether to move the new content the position of the old one (optional)
         """
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
-        
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
@@ -217,27 +192,21 @@ class ScrollManager(VGroup):
         # Update the equations list
         self.equations[index] = new_content
         self.remove(original)
-
-    def highlight_and_replace(self, index, new_content, scene=None, highlight_color=YELLOW, 
-                            highlight_time=0.5, replace_time=1, final_color=WHITE):
+        #self.add(new_content)
+    
+    def highlight_and_replace(self, scene, index, new_content, highlight_color=YELLOW, 
+                              highlight_time=0.5, replace_time=1, final_color=WHITE):
         """Highlights an equation before replacing it
         
         Args:
+            scene: The manim scene to animate on
             index: Index of the equation to replace
             new_content: New equation/content to replace with
-            scene: The manim scene to animate on (if None, uses stored scene)
             highlight_color: Color to use for highlighting (default: YELLOW)
             highlight_time: Duration of highlight animation in seconds (default: 0.5)
             replace_time: Duration of replacement animation in seconds (default: 1)
             final_color: Final color of the new content (default: WHITE)
         """
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
-        
         if index < self.last_in_view or index >= self.current_position:
             raise IndexError(f"Index {index} is out of the currently visible range ({self.last_in_view}-{self.current_position-1})")
         
@@ -263,24 +232,18 @@ class ScrollManager(VGroup):
         # Update the equations list
         self.equations[index] = new_content
         self.remove(original)
-
-    def restore_original(self, index, scene=None, animation_type=Transform, run_time=None, animation_kwargs=None):
+        # self.add(new_content)
+    
+    def restore_original(self, scene, index, animation_type=Transform, run_time=None, animation_kwargs=None):
         """Restores an equation to its original state before replacement
         
         Args:
+            scene: The manim scene to animate on
             index: Index of the equation to restore
-            scene: The manim scene to animate on (if None, uses stored scene)
             animation_type: Animation to use for restoration (default: Transform)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
         """
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
-        
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
@@ -307,25 +270,18 @@ class ScrollManager(VGroup):
         
         # Remove from replacements dictionary
         del self.replacements[index]
-
-    def cascade_update(self, start_index, new_contents, scene=None, cascade_delay=0.2, run_time=1, animation_type=ReplacementTransform):
+    
+    def cascade_update(self, scene, start_index, new_contents, cascade_delay=0.2, run_time=1, animation_type=ReplacementTransform):
         """Updates multiple equations in a cascading sequence
         
         Args:
+            scene: The manim scene to animate on
             start_index: Index of the first equation to replace
             new_contents: List of new equations/content to replace with
-            scene: The manim scene to animate on (if None, uses stored scene)
             cascade_delay: Delay between successive animations in seconds (default: 0.2)
             run_time: Duration of each replacement animation in seconds (default: 1)
-            animation_type: Animation to use for replacement (default: ReplacementTransform)
+            animation_type: Animation to use for replacement (default: Transform)
         """
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
-        
         if start_index < self.last_in_view or start_index + len(new_contents) > self.current_position:
             raise IndexError(f"Replacement range {start_index}-{start_index + len(new_contents) - 1} is outside visible range")
         
@@ -351,13 +307,14 @@ class ScrollManager(VGroup):
             # Add delay between animations if not the last one
             if i < len(new_contents) - 1:
                 scene.wait(cascade_delay)
-
-    def fade_in_from_target(self, target, scene=None, steps=1, run_time=None, animation_kwargs=None):
+                
+                
+    def fade_in_from_target(self, scene, target, steps=1, run_time=None, animation_kwargs=None):
         """Fades in the next equation(s) from a target position
         
         Args:
+            scene: The manim scene to animate on
             target: Target position or mobject to fade from
-            scene: The manim scene to animate on (if None, uses stored scene)
             steps: Number of equations to fade in (default: 1)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
@@ -365,13 +322,6 @@ class ScrollManager(VGroup):
         Returns:
             self: For method chaining
         """
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
-        
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
@@ -400,20 +350,20 @@ class ScrollManager(VGroup):
         self.current_position += steps
         
         return self
-
-
     
     
     
     
     
-    def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
-        """Transform a copy of source to a target element.
+    
+    
+    ##### Experimental #####
+    def transform_from_copy(self, scene, source, run_time=None, animation_kwargs=None):
+        """Transform a copy of source to the next element in the queue.
         
         Args:
+            scene: The manim scene to animate on
             source: Source mobject to copy and transform from
-            target: Target mobject to transform to (if None, uses next element in queue)
-            scene: The manim scene to animate on (if None, uses stored scene)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
             
@@ -423,32 +373,13 @@ class ScrollManager(VGroup):
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
-        # Use stored scene if not provided
-        if scene is None:
-            scene = self.scene
-            
-        if scene is None:
-            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
+        # Make sure we have elements left
+        if self.current_position >= len(self.equations):
+            print("No more equations to display.")
+            return self
         
-        # If no target specified, use the next element in queue
-        if target is None:
-            if self.current_position >= len(self.equations):
-                print("No more equations to display.")
-                return self
-            target = self.equations[self.current_position]
-            self.current_position += 1
-        else:
-            # If target is specified, check if it's in our equations
-            # VGroup doesn't have index(), so we need to search manually
-            target_index = None
-            for i, eq in enumerate(self.equations):
-                if eq is target:  # Use 'is' for object identity
-                    target_index = i
-                    break
-            
-            # Only update position if target is ahead of current position
-            if target_index is not None and target_index >= self.current_position:
-                self.current_position = target_index + 1
+        # Get the target element
+        target = self.equations[self.current_position]
         
         # Perform TransformFromCopy
         scene.play(
@@ -456,4 +387,109 @@ class ScrollManager(VGroup):
             **run_time
         )
         
+        # Update position counter
+        self.current_position += 1
+        
         return self
+    
+
+
+
+    # def transform_match(self, scene, source, path_arc=0, run_time=1, **kwargs):
+    #     """Transform with matching shapes for smoother animations.
+        
+    #     Args:
+    #         scene: The manim scene
+    #         source: Source mobject to transform from
+    #         path_arc: Arc of the transformation path (0 = straight line)
+    #         run_time: Duration (default: 1 second)
+    #         **kwargs: Other TransformFromCopy parameters
+    #     """
+    #     if self.current_position >= len(self.equations):
+    #         print("No more equations to display.")
+    #         return self
+        
+    #     target = self.equations[self.current_position]
+        
+    #     # Use TransformMatchingShapes for text transformations
+    #     if isinstance(source, (MathTex, Tex)) and isinstance(target, (MathTex, Tex)):
+    #         scene.play(
+    #             TransformMatchingShapes(source.copy(), target, path_arc=path_arc, **kwargs),
+    #             run_time=run_time
+    #         )
+    #     else:
+    #         scene.play(
+    #             TransformFromCopy(source, target, path_arc=path_arc, **kwargs),
+    #             run_time=run_time
+    #         )
+        
+    #     self.current_position += 1
+    #     return self
+
+
+
+
+
+
+
+
+    
+    # def transform_between(self, scene, source_index, target_index=None, 
+    #                     animation_type=ReplacementTransform, run_time=None, 
+    #                     copy_source=True, auto_advance=True):
+    #     """Transform between any two elements.
+        
+    #     Args:
+    #         scene: The manim scene
+    #         source_index: Index of source element
+    #         target_index: Index of target (if None, uses current_position)
+    #         animation_type: Type of transformation
+    #         run_time: Duration
+    #         copy_source: Whether to copy the source
+    #         auto_advance: Whether to advance current_position
+    #     """
+    #     if target_index is None:
+    #         target_index = self.current_position
+            
+    #     if source_index >= len(self.equations) or target_index >= len(self.equations):
+    #         raise IndexError("Index out of range")
+        
+    #     source = self.equations[source_index]
+    #     target = self.equations[target_index]
+        
+    #     if copy_source:
+    #         source = source.copy()
+        
+    #     kwargs = {"run_time": run_time} if run_time else {}
+    #     scene.play(animation_type(source, target), **kwargs)
+        
+    #     if auto_advance:
+    #         self.current_position = target_index + 1
+        
+    #     return self
+    
+    
+    # def transform_to(self, scene, source, target, run_time=None, add_to_manager=False):
+    #     """Transform source to target, optionally adding target to scroll manager."""
+    #     # Perform the transform
+    #     scene.play(ReplacementTransform(source.copy(), target), 
+    #               run_time=run_time if run_time else 1)
+        
+    #     # Check if target is already managed
+    #     try:
+    #         target_index = self.equations.index(target)
+    #         self.current_position = target_index + 1
+    #     except ValueError:
+    #         # Target not in manager
+    #         if add_to_manager:
+    #             # Add it at current position
+    #             self.equations.insert(self.current_position, target)
+    #             self.add(target)  # Add to VGroup so it moves with us
+    #             self.current_position += 1
+    #             print(f"Added target to scroll manager at position {self.current_position - 1}")
+    #         else:
+    #             print(f"Note: Target not in scroll manager and won't scroll")
+                
+                
+    # # Usage:
+    # # scroll_mgr.transform_to(self, label_c[0][0], formula[0][0], add_to_manager=True)
