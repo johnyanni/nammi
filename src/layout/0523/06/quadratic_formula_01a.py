@@ -142,22 +142,25 @@ class QuadraticFormula01a(MathTutorialScene):
             MathTex(r"x = \frac{3 \pm \sqrt{45}}{-2}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        sol3_step4_sqrt = self.parse_elements(sol3_step4[1],
-            ('sqrt_45', r'\sqrt{45}')
-        )
+        sol3_step4_exp = sol3_step4[1]
         
-        print(f"sol3_step4[1] tex_string: {sol3_step4[1].tex_string}")
-        self.show_indices(sol3_step4[1])
+        # sol3_step4_sqrt = self.parse_elements(sol3_step4[1],
+        #     ('sqrt_45', r'\sqrt{45}')
+        # )
+        sol3_step4_sqrt = sol3_step4_exp[0][search_shape_in_text(sol3_step4_exp, MathTex(r"\pm \sqrt{45}"))[0]]
+        
+        
+        # print(f"sol3_step4[1] tex_string: {sol3_step4[1].tex_string}")
+        # self.show_indices(sol3_step4[1])
         
         
         sol3_step5 = VGroup(
             Tex("Simplify the square root:").scale(LABEL_SCALE),
-            MathTex(r"\sqrt{45} = \sqrt{9 \times 5} = 3\sqrt{5}").scale(S_MATH_SCALE),
+            MathTex(r"\sqrt{45} = \sqrt{9 \times 5} = 3\sqrt{5}").scale(MATH_SCALE),
             MathTex(r"x = \frac{3 \pm 3\sqrt{5}}{-2}").scale(MATH_SCALE)    
-        )
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         sol3_step5_parts = self.parse_elements(sol3_step5[1],
-            ('sqrt_45', r'\sqrt{45}'),
             ('rest', r'= \sqrt{9 \times 5} = 3\sqrt{5}')
         )
         
@@ -192,7 +195,10 @@ class QuadraticFormula01a(MathTutorialScene):
             sol2_step1,
             sol2_step2,
             sol3_step1,
-            sol3_step2
+            sol3_step2,
+            sol3_step3,
+            sol3_step4,
+            sol3_step5
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
         sol_steps.next_to(question_group, DOWN, buff=0.4).align_to(question_group, LEFT)
         
@@ -208,7 +214,6 @@ class QuadraticFormula01a(MathTutorialScene):
             *sol3_step3,
             *sol3_step4,
             sol3_step5[0],
-            sol3_step5_parts['sqrt_45'],
             sol3_step5_parts['rest'],
             sol3_step5[2]
         )
@@ -267,14 +272,19 @@ class QuadraticFormula01a(MathTutorialScene):
         sol_steps_scroll.fade_in_from_target(coefficient_values['a_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values['c_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values['a_value'])
+        
+        sol_steps_scroll.scroll_down(steps=8)
 
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.transform_from_copy(sol3_step2[1], sol3_step3[1])
         
+        sol_steps_scroll.scroll_down(steps=2)
+        
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.transform_from_copy(sol3_step3[1], sol3_step4[1])
         
+        sol_steps_scroll.scroll_down(steps=7)
+        
         sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt['sqrt_45'], sol3_step5_parts['sqrt_45'])
-        sol_steps_scroll.prepare_next()
+        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_parts['rest'])
         sol_steps_scroll.prepare_next()
