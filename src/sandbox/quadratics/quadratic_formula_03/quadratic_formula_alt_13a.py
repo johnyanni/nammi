@@ -266,8 +266,8 @@ class QuadraticFormula(MathTutorialScene):
         c_in_4ac = self.find_element("13", step_1_exp, nth=0, opacity=0, color=C_COLOR)
         a_in_denom = self.find_element("1", step_1_exp, nth=1, opacity=0, color=A_COLOR)
         
-        print(f"b_in_frac opacity: {b_in_frac.get_fill_opacity()}")
-        print(f"b_in_frac stroke opacity: {b_in_frac.get_stroke_opacity()}")
+        print(f"Working example - fill: {b_in_frac.get_fill_opacity()}, stroke: {b_in_frac.get_stroke_opacity()}")
+        print(f"Stroke width: {b_in_frac.get_stroke_width()}")
 
         # Create visible copies with the same initial positions
         visible_b_frac = b_in_frac.copy().set_opacity(1)
@@ -332,48 +332,48 @@ class QuadraticFormula(MathTutorialScene):
         )
         
         
-        # Step 1 animations
-        self.play(Write(step1_label))
-        self.play(Write(step1_expr))
-        self.wait(1)
+        # # Step 1 animations
+        # self.play(Write(step1_label))
+        # self.play(Write(step1_expr))
+        # self.wait(1)
         
-        # Step 2 animations
-        self.play(Write(step2_label))
-        self.play(Write(step2_expr1))
-        self.wait(0.5)
+        # # Step 2 animations
+        # self.play(Write(step2_label))
+        # self.play(Write(step2_expr1))
+        # self.wait(0.5)
         
-        # Animate division annotation 
-        self.play(FadeIn(div_4))
-        self.wait(0.5)
+        # # Animate division annotation 
+        # self.play(FadeIn(div_4))
+        # self.wait(0.5)
         
-        # Show the result of division
-        self.play(Write(step2_expr2))
-        self.wait(1)
+        # # Show the result of division
+        # self.play(Write(step2_expr2))
+        # self.wait(1)
         
-        # Step 3 animations
-        self.play(Write(step3_label))
+        # # Step 3 animations
+        # self.play(Write(step3_label))
         
-        # Link to previous step
-        self.play(ReplacementTransform(step2_expr2.copy(), step3_expr1))
-        self.wait(0.5)
+        # # Link to previous step
+        # self.play(ReplacementTransform(step2_expr2.copy(), step3_expr1))
+        # self.wait(0.5)
         
-        # Show expanded expression
-        self.play(Write(step3_expr2))
-        self.wait(1)
+        # # Show expanded expression
+        # self.play(Write(step3_expr2))
+        # self.wait(1)
         
-        # Step 4 animations
-        self.play(Write(step4_label))
+        # # Step 4 animations
+        # self.play(Write(step4_label))
         
-        # Link to previous step
-        self.play(ReplacementTransform(step3_expr2.copy(), step4_expr1))
-        self.wait(0.5)
+        # # Link to previous step
+        # self.play(ReplacementTransform(step3_expr2.copy(), step4_expr1))
+        # self.wait(0.5)
         
-        # Animate subtraction annotation
-        self.play(FadeIn(subtract_12))
-        self.wait(0.5)
+        # # Animate subtraction annotation
+        # self.play(FadeIn(subtract_12))
+        # self.wait(0.5)
         
-        # Show the final result
-        self.play(Write(step4_expr2))
+        # # Show the final result
+        # self.play(Write(step4_expr2))
 
         scroll_mgr.prepare_next(self)
 
