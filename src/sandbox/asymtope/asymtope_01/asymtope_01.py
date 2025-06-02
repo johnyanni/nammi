@@ -229,7 +229,7 @@ class Asymptote(MathTutorialScene):
         step_1_label = step_1[0]
 
         
-        simplified_y = MathTex(r"y = \sqrt{2} \sqrt{x - 8} + 4").scale(TEX_SCALE)
+        simplified_y = MathTex(r"x = \frac{3 \pm \sqrt{45}}{-2}").scale(TEX_SCALE)
         SmartColorizeStatic(
             simplified_y,
             {
@@ -238,11 +238,11 @@ class Asymptote(MathTutorialScene):
                 "4": K_COLOR
             }
         )
-        simplified_y_term_1 = simplified_y[0][search_shape_in_text(simplified_y, MathTex("y ="))[0]]
-        simplified_y_term_2 = simplified_y[0][search_shape_in_text(simplified_y, MathTex(r"\sqrt{2} \sqrt{x - 8}"))[0]]
+        simplified_y_term_1 = simplified_y[0][search_shape_in_text(simplified_y, MathTex("x ="))[0]]
+        simplified_y_term_2 = simplified_y[0][search_shape_in_text(simplified_y, MathTex(r"\frac{3 \pm \sqrt{45}}{-2}"))[0]]
         simplified_y_term_3 =VGroup(
-            simplified_y[0][search_shape_in_text(simplified_y, MathTex("+"))[0]],
-            simplified_y[0][search_shape_in_text(simplified_y, MathTex("4"))[0]]
+            simplified_y[0][search_shape_in_text(simplified_y, MathTex("-"))[0]],
+            simplified_y[0][search_shape_in_text(simplified_y, MathTex("2"))[0]]
         )
         
 
