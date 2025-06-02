@@ -27,7 +27,7 @@ class ScrollManager(VGroup):
         """Prepare next elements with optional scene override."""
         
         # Debug flag - set to True to enable debug output
-        DEBUG = False
+        DEBUG = True
         
         # Use provided scene or stored scene
         if scene is None:

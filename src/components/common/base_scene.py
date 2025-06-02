@@ -905,3 +905,13 @@ class MathTutorialScene(VoiceoverScene):
         print("\n" + "="*80 + "\n")
         
         
+    def create_strikethrough_line(self, target_mobject, color=RED, stroke_width=3):
+        """Create a line that strikes through a mobject"""
+        line = Line(
+            start=target_mobject.get_left() + LEFT * 0.1,
+            end=target_mobject.get_right() + RIGHT * 0.1,
+            color=color,
+            stroke_width=stroke_width
+        )
+        line.move_to(target_mobject.get_center())
+        return line
