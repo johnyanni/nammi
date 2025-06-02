@@ -142,16 +142,7 @@ class QuadraticFormula01a(MathTutorialScene):
             MathTex(r"x = \frac{3 \pm \sqrt{45}}{-2}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        sol3_step4_exp = sol3_step4[1]
-        
-        # sol3_step4_sqrt = self.parse_elements(sol3_step4[1],
-        #     ('sqrt_45', r'\sqrt{45}')
-        # )
-        sol3_step4_sqrt = sol3_step4_exp[0][search_shape_in_text(sol3_step4_exp, MathTex(r"\pm \sqrt{45}"))[0]]
-        
-        
-        # print(f"sol3_step4[1] tex_string: {sol3_step4[1].tex_string}")
-        # self.show_indices(sol3_step4[1])
+        sol3_step4_sqrt = sol3_step4[1][0][4:8].set_color(YELLOW)
         
         
         sol3_step5 = VGroup(
@@ -160,10 +151,13 @@ class QuadraticFormula01a(MathTutorialScene):
             MathTex(r"x = \frac{3 \pm 3\sqrt{5}}{-2}").scale(MATH_SCALE)    
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        sol3_step5_parts = self.parse_elements(sol3_step5[1],
-            ('rest', r'= \sqrt{9 \times 5} = 3\sqrt{5}')
-        )
+        sol3_step5_1_sqrt = sol3_step5[1][0][:4]
+        sol3_step5_1_sqrt_solve = sol3_step5[1][0][4:]
+        sol3_step5_1_sqrt_ans = sol3_step5[1][0][-4:].set_color(YELLOW)
+        sol3_step5_2_sqrt = sol3_step5[2][0][4:8].set_color(YELLOW)
         
+        
+
         
         
         
@@ -214,7 +208,8 @@ class QuadraticFormula01a(MathTutorialScene):
             *sol3_step3,
             *sol3_step4,
             sol3_step5[0],
-            sol3_step5_parts['rest'],
+            sol3_step5_sqrt,
+            sol3_step5_sqrt_solve,
             sol3_step5[2]
         )
         sol_steps_scroll = ScrollManager(sol_steps_elements, scene=self)
@@ -285,6 +280,12 @@ class QuadraticFormula01a(MathTutorialScene):
         
         sol_steps_scroll.scroll_down(steps=7)
         
+        
+        
         sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_parts['rest'])
+        
+        self.play(self.indicate(sol3_step4_sqrt))
+        
+        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_sqrt)
+        sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
