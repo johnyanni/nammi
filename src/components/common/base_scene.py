@@ -546,7 +546,9 @@ class MathTutorialScene(VoiceoverScene):
                             if nth == 0:  # Found our match
                                 result = VGroup(tex_obj[0][minus_idx], tex_obj[0][num_idx])
                                 if color: result.set_color(color)
-                                if opacity: result.set_opacity(opacity)
+                                if opacity is not None:  # Change from 'if opacity:'
+                                    result.set_fill_opacity(opacity)
+                                    result.set_stroke_opacity(opacity)
                                 return result
                             nth -= 1
         
@@ -560,7 +562,11 @@ class MathTutorialScene(VoiceoverScene):
         # Return what search_shape_in_text found
         result = tex_obj[0][indices[nth]]
         if color: result.set_color(color)
-        if opacity: result.set_opacity(opacity)
+        if opacity is not None:
+            print(f"Before: fill={result.get_fill_opacity()}, stroke={result.get_stroke_opacity()}")
+            result.set_fill_opacity(opacity)
+            result.set_stroke_opacity(opacity)
+            print(f"After: fill={result.get_fill_opacity()}, stroke={result.get_stroke_opacity()}")
         
         return result
         
