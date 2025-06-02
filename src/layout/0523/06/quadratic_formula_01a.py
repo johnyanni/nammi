@@ -208,8 +208,8 @@ class QuadraticFormula01a(MathTutorialScene):
             *sol3_step3,
             *sol3_step4,
             sol3_step5[0],
-            sol3_step5_sqrt,
-            sol3_step5_sqrt_solve,
+            sol3_step5_1_sqrt,
+            sol3_step5_1_sqrt_solve,
             sol3_step5[2]
         )
         sol_steps_scroll = ScrollManager(sol_steps_elements, scene=self)
@@ -286,6 +286,6 @@ class QuadraticFormula01a(MathTutorialScene):
         
         self.play(self.indicate(sol3_step4_sqrt))
         
-        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_sqrt)
+        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_1_sqrt)
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()

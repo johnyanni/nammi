@@ -22,10 +22,12 @@ class ScrollManager(VGroup):
         return self
 
     
-    # Update prepare_next to also use stored scene
     def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
                     animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
         """Prepare next elements with optional scene override."""
+        
+        # Debug flag - set to True to enable debug output
+        DEBUG = True
         
         # Use provided scene or stored scene
         if scene is None:
@@ -43,6 +45,11 @@ class ScrollManager(VGroup):
         # Handle annotated equations
         current_item = self.equations[self.current_position]
         if isinstance(current_item, VGroup) and hasattr(current_item, '_has_annotation'):
+            if DEBUG:
+                print(f"\n[DEBUG] Item {self.current_position}: ANNOTATED EQUATION")
+                print(f"  Type: {type(current_item).__name__}")
+                print(f"  Has annotation: {hasattr(current_item, '_has_annotation')}")
+                
             if scene is not None:
                 scene.play(animation_type(current_item[0], **animation_kwargs))
                 if len(current_item) > 1:
@@ -61,12 +68,45 @@ class ScrollManager(VGroup):
                     
                 item = self.equations[self.current_position + i]
                 
+                if DEBUG:
+                    print(f"\n[DEBUG] Item {self.current_position + i}:")
+                    print(f"  Type: {type(item).__name__}")
+                    if hasattr(item, 'tex_string'):
+                        tex_str = item.tex_string[:50] + "..." if len(item.tex_string) > 50 else item.tex_string
+                        print(f"  TeX: {tex_str}")
+                    if isinstance(item, VGroup):
+                        print(f"  VGroup length: {len(item)}")
+                        if len(item) > 0:
+                            print(f"  First element type: {type(item[0]).__name__}")
+                
+                # Determine which method is used
                 if isinstance(item, (list, tuple)):
                     to_animate = VGroup(*item[target_slice])
+                    method = "LIST/TUPLE"
+                    details = f"Slicing list/tuple with {target_slice}"
+                    
                 elif isinstance(item, VGroup) and len(item) > 0 and not isinstance(item[0], (MathTex, Tex, Text)):
                     to_animate = item[target_slice]
+                    method = "VGROUP (non-text)"
+                    details = f"Slicing VGroup with {target_slice}"
+                    
                 else:
                     to_animate = item[0][target_slice]
+                    method = "MATHTEX/TEX/OTHER"
+                    details = f"Using item[0][{target_slice}]"
+                    
+                    # Additional debug for this case
+                    if DEBUG:
+                        print(f"  Submobjects: {len(item.submobjects) if hasattr(item, 'submobjects') else 'N/A'}")
+                        if hasattr(item, 'submobjects') and len(item.submobjects) > 0:
+                            print(f"  item[0] length: {len(item[0]) if hasattr(item[0], '__len__') else 'N/A'}")
+                
+                if DEBUG:
+                    print(f"  METHOD: {method}")
+                    print(f"  Details: {details}")
+                    print(f"  Result type: {type(to_animate).__name__}")
+                    if hasattr(to_animate, '__len__'):
+                        print(f"  Result length: {len(to_animate)}")
                 
                 animations.append(animation_type(to_animate, **animation_kwargs))
             
