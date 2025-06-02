@@ -532,7 +532,7 @@ class MathTutorialScene(VoiceoverScene):
         """
         
         # Handle negative numbers specially
-        if pattern.startswith('-') and len(pattern) > 1 and pattern[1:].isdigit():
+        if pattern.startswith('-') and len(pattern) > 1:
             # Find minus sign and number separately
             minus_indices = search_shape_in_text(tex_obj, MathTex("-"))
             num_indices = search_shape_in_text(tex_obj, MathTex(pattern[1:]))
@@ -544,11 +544,22 @@ class MathTutorialScene(VoiceoverScene):
                     if hasattr(minus_idx, 'stop') and hasattr(num_idx, 'start'):
                         if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
                             if nth == 0:  # Found our match
-                                result = VGroup(tex_obj[0][minus_idx], tex_obj[0][num_idx])
-                                if color: result.set_color(color)
-                                if opacity is not None:  # Change from 'if opacity:'
-                                    result.set_fill_opacity(opacity)
-                                    result.set_stroke_opacity(opacity)
+                                minus_element = tex_obj[0][minus_idx]
+                                num_element = tex_obj[0][num_idx]
+                                
+                                # Set opacity on individual elements FIRST
+                                if opacity is not None:
+                                    minus_element.set_opacity(opacity)
+                                    num_element.set_opacity(opacity)
+                                
+                                # Set color on individual elements
+                                if color:
+                                    minus_element.set_color(color)
+                                    num_element.set_color(color)
+                                
+                                # THEN create the group
+                                result = VGroup(minus_element, num_element)
+                                
                                 return result
                             nth -= 1
         
@@ -563,10 +574,7 @@ class MathTutorialScene(VoiceoverScene):
         result = tex_obj[0][indices[nth]]
         if color: result.set_color(color)
         if opacity is not None:
-            print(f"Before: fill={result.get_fill_opacity()}, stroke={result.get_stroke_opacity()}")
-            result.set_fill_opacity(opacity)
-            result.set_stroke_opacity(opacity)
-            print(f"After: fill={result.get_fill_opacity()}, stroke={result.get_stroke_opacity()}")
+            result.set_opacity(opacity)
         
         return result
         
