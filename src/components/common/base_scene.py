@@ -15,15 +15,17 @@ from functools import partial, partialmethod
 # NEW SCALE VALUES
 
 MATH_SCALE = 0.80
+S_MATH_SCALE = 0.60
 
-LABEL_SCALE = 0.65
+
+LABEL_SCALE = 0.60
 TEXT_SCALE = 0.70
 
 ANNOTATION_SCALE = 0.65
 
 
 
-S_MATH_SCALE = 0.60
+
 
 
 
@@ -281,9 +283,9 @@ class MathTutorialScene(VoiceoverScene):
     ):
         return SurroundingRectangle(mobject, color=color, corner_radius=corner_radius, buff=buff)
 
-    def indicate(self, mobject, color="#9A48D0", run_time=2.0):
+    def indicate(self, mobject, color=YELLOW, run_time=2.0, scale_factor=1.6):
         """Indicate a mobject with a color."""
-        return Indicate(mobject, color=color, run_time=run_time)
+        return Indicate(mobject, color=color, run_time=run_time, scale_factor=scale_factor)
 
 
     def create_callout(

@@ -130,6 +130,59 @@ class ScrollManager(VGroup):
         self.last_in_view += steps
         
         
+        
+    def fade_out_in_view(
+        self, steps=1, scene=None, animation_type=FadeOut, run_time=None, animation_kwargs=None
+    ):
+        """
+        Fades out number of `steps` from the elements currently in view
+        
+        Args:
+            steps: Number of elements to fade out (default: 1)
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Type of fade animation (default: FadeOut)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+        """
+        # Use stored scene if not provided
+        if scene is None:
+            scene = self.scene
+            
+        if scene is None:
+            raise ValueError("No scene available. Either pass scene to constructor, use set_scene(), or provide scene parameter.")
+        
+        run_time = {} if run_time is None else {"run_time": run_time}
+        animation_kwargs = {} if animation_kwargs is None else animation_kwargs
+        
+        steps = min(steps, self.current_position - self.last_in_view)
+        animations = [
+            animation_type(self.equations[self.last_in_view + i], **animation_kwargs)
+            for i in range(steps)
+        ]
+        scene.play(*animations, **run_time)
+        self.last_in_view += steps
+
+    def fade_out_all_in_view(
+        self, scene=None, animation_type=FadeOut, run_time=None, animation_kwargs=None
+    ):
+        """
+        Fades out all elements currently in view
+        
+        Args:
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Type of fade animation (default: FadeOut)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+        """
+        # Note: We pass scene through to fade_out_in_view, which will handle the stored scene logic
+        self.fade_out_in_view(
+            steps=self.current_position - self.last_in_view,
+            scene=scene,
+            animation_type=animation_type,
+            run_time=run_time,
+            animation_kwargs=animation_kwargs,
+        )
+        
     def attach_callout_at_scroll(self, scroll_index, callout_manager):
         """Attach a callout manager to fade out at a specific scroll index.
         No scene parameter needed as this just stores data."""

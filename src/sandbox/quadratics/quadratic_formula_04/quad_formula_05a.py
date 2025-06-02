@@ -1,7 +1,6 @@
 from manim import *
 from src.components.common.base_scene import *
 from src.components.common.scroll_manager import ScrollManager
-from src.components.common.annotation import Annotation
 
 config.verbosity = "ERROR"
 

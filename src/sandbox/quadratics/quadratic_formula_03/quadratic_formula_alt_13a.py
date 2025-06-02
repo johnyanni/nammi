@@ -178,9 +178,9 @@ class QuadraticFormula(MathTutorialScene):
         b_value = self.find_element("10", b)
         c_value = self.find_element("13", c)
 
-        a_label = self.find_element("a =", a, as_group=True)
-        b_label = self.find_element("b =", b, as_group=True)
-        c_label = self.find_element("c =", c, as_group=True)
+        a_label = self.find_element("a =", a)
+        b_label = self.find_element("b =", b)
+        c_label = self.find_element("c =", c)
 
         # Arrange coefficients horizontally
         coefficients = VGroup(a, b, c).arrange(RIGHT, buff=0.6)
@@ -265,6 +265,9 @@ class QuadraticFormula(MathTutorialScene):
         a_in_4ac = self.find_element("1", step_1_exp, nth=0, opacity=0, color=A_COLOR)
         c_in_4ac = self.find_element("13", step_1_exp, nth=0, opacity=0, color=C_COLOR)
         a_in_denom = self.find_element("1", step_1_exp, nth=1, opacity=0, color=A_COLOR)
+        
+        print(f"b_in_frac opacity: {b_in_frac.get_fill_opacity()}")
+        print(f"b_in_frac stroke opacity: {b_in_frac.get_stroke_opacity()}")   
 
         # Create visible copies with the same initial positions
         visible_b_frac = b_in_frac.copy().set_opacity(1)
@@ -312,7 +315,7 @@ class QuadraticFormula(MathTutorialScene):
             step_5_label, step_5_exp
         )
 
-        scroll_mgr = ScrollManager(ordered_steps)
+        scroll_mgr = ScrollManager(ordered_steps, scene=self)
         scroll_mgr.start_position = ordered_steps[1].copy()
         
         ###############################################################################
@@ -373,71 +376,71 @@ class QuadraticFormula(MathTutorialScene):
         self.play(Write(step4_expr2))
 
 
-        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next()
 
         # Transition to coefficient identification
         self.play(FadeOut(solution))
 
         # Replace with labeled equation
-        scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
+        #scroll_mgr.replace_in_place(self, 0, mid_sol_step_0_exp, move_new_content=False)      
 
         # Show label for coefficient step
-        scroll_mgr.prepare_next(self)
+        scroll_mgr.prepare_next()
         
         # Show a, b, c labels
-        scroll_mgr.prepare_next(self, steps=3)
+        scroll_mgr.prepare_next(steps=3)
 
         # Animate each coefficient identification with highlighting
         self.play(self.indicate(quad_form_a))
-        scroll_mgr.fade_in_from_target(self, a_in_q_equation)  # Fades in a_value from quad_form_a
+        scroll_mgr.fade_in_from_target(a_in_q_equation)  # Fades in a_value from quad_form_a
 
         self.play(self.indicate(quad_form_b))
-        scroll_mgr.fade_in_from_target(self, b_in_q_equation)  # Fades in b_value from quad_form_b
+        scroll_mgr.fade_in_from_target(b_in_q_equation)  # Fades in b_value from quad_form_b
 
         self.play(self.indicate(quad_form_c))
-        scroll_mgr.fade_in_from_target(self, c_in_q_equation)  # Fades in c_value from quad_form_c
+        scroll_mgr.fade_in_from_target(c_in_q_equation)  # Fades in c_value from quad_form_c
 
         # Show quadratic formula step
-        scroll_mgr.prepare_next(self)  # Shows step_0_label
-        scroll_mgr.prepare_next(self)  # Shows step_0_exp
+        scroll_mgr.prepare_next()  # Shows step_0_label
+        scroll_mgr.prepare_next()  # Shows step_0_exp
 
         # Show substitution step
-        scroll_mgr.prepare_next(self)  # Shows step_1_label
-        scroll_mgr.prepare_next(self)  # Shows step_1_exp
+        scroll_mgr.prepare_next()  # Shows step_1_label
+        scroll_mgr.prepare_next()  # Shows step_1_exp
 
         # Animate coefficient substitutions
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_frac from b_value
-        scroll_mgr.fade_in_from_target(self, b_value)  # Fades in visible_b_sqrt from b_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_4ac from a_value
-        scroll_mgr.fade_in_from_target(self, a_value)  # Fades in visible_a_denom from a_value
-        scroll_mgr.fade_in_from_target(self, c_value)  # Fades in visible_c_4ac from c_value
+        scroll_mgr.fade_in_from_target(b_value)  # Fades in visible_b_frac from b_value
+        scroll_mgr.fade_in_from_target(b_value)  # Fades in visible_b_sqrt from b_value
+        scroll_mgr.fade_in_from_target(a_value)  # Fades in visible_a_4ac from a_value
+        scroll_mgr.fade_in_from_target(a_value)  # Fades in visible_a_denom from a_value
+        scroll_mgr.fade_in_from_target(c_value)  # Fades in visible_c_4ac from c_value
         
         # Scroll to keep in view
         scroll_mgr.scroll_down(self, steps=2)
 
         # Show initial simplification
-        scroll_mgr.prepare_next(self)  # Shows step_2_label
-        scroll_mgr.prepare_next(self)  # Shows step_2_exp
+        scroll_mgr.prepare_next()  # Shows step_2_label
+        scroll_mgr.prepare_next()  # Shows step_2_exp
         
         # Scroll as needed
         scroll_mgr.scroll_down(self, steps=8)
                 
         # Continue simplification
-        scroll_mgr.prepare_next(self)  # Shows step_3_label
-        scroll_mgr.prepare_next(self)  # Shows step_3_exp
+        scroll_mgr.prepare_next()  # Shows step_3_label
+        scroll_mgr.prepare_next()  # Shows step_3_exp
         
         # Scroll to keep in view
         scroll_mgr.scroll_down(self, steps=7)
         
         # Show square root simplification
-        scroll_mgr.prepare_next(self)  # Shows step_4_label
-        scroll_mgr.prepare_next(self)  # Shows step_4_exp
+        scroll_mgr.prepare_next()  # Shows step_4_label
+        scroll_mgr.prepare_next()  # Shows step_4_exp
         
         scroll_mgr.scroll_down(self, steps=2)
         
         # Show final simplification
-        scroll_mgr.prepare_next(self)  # Shows step_5_label
-        scroll_mgr.prepare_next(self)  # Shows step_5_exp
+        scroll_mgr.prepare_next()  # Shows step_5_label
+        scroll_mgr.prepare_next()  # Shows step_5_exp
         
         self.wait(2)
         
