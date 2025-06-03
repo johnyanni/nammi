@@ -15,6 +15,7 @@ from functools import partial, partialmethod
 # NEW SCALE VALUES
 
 MATH_SCALE = 0.80
+M_MATH_SCALE = 0.70
 S_MATH_SCALE = 0.60
 
 

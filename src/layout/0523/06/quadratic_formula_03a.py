@@ -4,7 +4,7 @@ from src.components.common.scroll_manager import ScrollManager
 
 config.verbosity = "ERROR"
 
-class QuadraticFormula02(MathTutorialScene):
+class QuadraticFormula03(MathTutorialScene):
     def construct(self):
 
         A_COLOR = "#47e66c"
@@ -66,61 +66,28 @@ class QuadraticFormula02(MathTutorialScene):
         
         
         question_text = Tex("Solve using the quadratic formula:").scale(LABEL_SCALE)
-        question_equation = MathTex(r"4(x+5)^2 = 48").scale(S_MATH_SCALE)
+        question_equation = MathTex(r"8x^2 - 8x - 3 = 0").scale(S_MATH_SCALE)
         question_group = VGroup(
             question_text, 
             question_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2).to_edge(UP, buff=0.4).to_edge(LEFT, buff=0.4).set_color(LIGHT_GRAY)
         
     
-        # Step 1: Divide both sides by 4
-        sol1_step1 = VGroup(
-            Tex("First, get the equation in standard form:").scale(LABEL_SCALE),
-            Tex("Divide both sides by 4").scale(LABEL_SCALE),
-            self.create_annotated_equation(
-                r"4(x+5)^2 = 48",
-                r"\div 4",
-                "4",
-                "48"
-            ),
-            MathTex(r"(x+5)^2 = 12").scale(MATH_SCALE)
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
-        # Step 2: Expand the squared term
-        sol1_step2 = VGroup(
-            Tex("Expand the squared term:").scale(LABEL_SCALE),
-            MathTex(r"(x+5)^2 = (x+5)(x+5)").scale(MATH_SCALE),
-            MathTex(r"x^2 + 10x + 25 = 12").scale(MATH_SCALE)
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
-        # Step 3: Get in standard form
-        sol1_step3 = VGroup(
-            Tex("Subtract 12 from both sides").scale(LABEL_SCALE),
-            self.create_annotated_equation(
-                r"x^2 + 10x + 25 = 12",
-                "-12",
-                "25",
-                "12"
-            ),
-            MathTex(r"x^2 + 10x + 13 = 0").scale(MATH_SCALE)
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
-
         
         sol2_step1 = VGroup(
-            Tex("Now, identify the coefficients:").scale(LABEL_SCALE),
-            MathTex(r"x^2 + 10x + 13 = 0").scale(MATH_SCALE)
+            Tex("Identify the coefficients:").scale(LABEL_SCALE),
+            MathTex(r"8x^2 - 8x - 3 = 0").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         coefficient_values_in_equation = self.parse_elements(sol2_step1[1],
-            ('a_value', 'x', 0, A_COLOR),  # Coefficient of x^2 is 1 (implicit)
-            ('b_value', '10', 0, B_COLOR),
-            ('c_value', '13', 0, C_COLOR)
+            ('a_value', '8', 0, A_COLOR),
+            ('b_value', '-8', 0, B_COLOR),
+            ('c_value', '-3', 0, C_COLOR)
         )
            
         
         sol2_step2 = VGroup(
-            MathTex(r"a = 1 \quad b = 10 \quad c = 13").scale(MATH_SCALE)
+            MathTex(r"a = 8 \quad b = -8 \quad c = -3").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
 
         coefficient_labels = self.parse_elements(sol2_step2[0],
@@ -130,9 +97,9 @@ class QuadraticFormula02(MathTutorialScene):
         )
         
         coefficient_values = self.parse_elements(sol2_step2[0],
-            ('a_value', '1', 0, A_COLOR),
-            ('b_value', '10', 0, B_COLOR),
-            ('c_value', '13', 0, C_COLOR)
+            ('a_value', '8', 0, A_COLOR),
+            ('b_value', '-8', 0, B_COLOR),
+            ('c_value', '-3', 0, C_COLOR)
         )
         
         coefficient_labels_group = VGroup(*coefficient_labels.values())
@@ -146,71 +113,57 @@ class QuadraticFormula02(MathTutorialScene):
         
         sol3_step2 = VGroup(
             Tex("Substitute the coefficients into the formula:").scale(LABEL_SCALE),
-            MathTex(r"x = \frac{-(10) \pm \sqrt{(10)^2 - 4(1)(13)}}{2(1)}").scale(MATH_SCALE)
+            MathTex(r"x = \frac{-(-8) \pm \sqrt{(-8)^2 - 4(8)(-3)}}{2(8)}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         sol3_step3 = VGroup(
             Tex("Simplify the expression:").scale(LABEL_SCALE),
-            MathTex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}").scale(MATH_SCALE)
+            MathTex(r"x = \frac{8 \pm \sqrt{64 + 96}}{16}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         sol3_step4 = VGroup(
             Tex("Continue simplifying:").scale(LABEL_SCALE),
-            MathTex(r"x = \frac{-10 \pm \sqrt{48}}{2}").scale(MATH_SCALE)
+            MathTex(r"x = \frac{8 \pm \sqrt{160}}{16}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        sol3_step4_sqrt = sol3_step4[1][0][6:10]
+        sol3_step4_sqrt = sol3_step4[1][0][4:9].set_color(YELLOW)
         
         
         sol3_step5 = VGroup(
             Tex("Simplify the square root:").scale(LABEL_SCALE),
-            MathTex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}").scale(M_MATH_SCALE).set_color(LIGHT_GRAY),
-            MathTex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}").scale(MATH_SCALE)    
+            MathTex(r"\sqrt{160} = \sqrt{16 \times 10} = 4\sqrt{10}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{8 \pm 4\sqrt{10}}{16}").scale(MATH_SCALE)    
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        sol3_step5_solving = self.parse_elements(sol3_step5[1],
-            ('sqrt_48', r'\sqrt{48}'),
-            ('sqrt_48_solve', r'= \sqrt{16 \times 3} ='),
-            ('sqrt_48_solved', r'4\sqrt{3}', 0, YELLOW),
-        )
-        sol3_step5_2_sqrt = sol3_step5[2][0][6:10].set_color(YELLOW)
-        
+        sol3_step5_1_sqrt = sol3_step5[1][0][:5]
+        sol3_step5_1_sqrt_solve = sol3_step5[1][0][5:]
+        sol3_step5_1_sqrt_ans = sol3_step5[1][0][-5:].set_color(YELLOW)
+        sol3_step5_2_sqrt = sol3_step5[2][0][4:9].set_color(YELLOW)
         
         # Step 6: Final simplification
         sol3_step6 = VGroup(
-            Tex("We can divide throughout by 2").scale(LABEL_SCALE),
-            MathTex(r"x = \frac{-10 \pm 4\sqrt{3}}{2} = \frac{-10}{2} \pm \frac{4\sqrt{3}}{2}").scale(MATH_SCALE),
-            MathTex(r"x = -5 \pm 2\sqrt{3}").scale(MATH_SCALE)
+            Tex("We can divide throughout by 4").scale(LABEL_SCALE),
+            MathTex(r"x = \frac{8 \pm 4\sqrt{10}}{16} = \frac{8}{16} \pm \frac{4\sqrt{10}}{16}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{1}{2} \pm \frac{\sqrt{10}}{4}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{2 \pm \sqrt{10}}{4}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
-        sol3_step6_solving = self.parse_elements(sol3_step6[1],
-            ('first_frac', r'\frac{-10}{2}', 0, "#cf75ff"),
-            ('second_frac', r'\frac{4\sqrt{3}}{2}', 0, "#fc4dff"),
-        )
-        
-        sol3_step6_solved = self.parse_elements(sol3_step6[2],
-            ('x=', 'x ='),
-            ('first_frac_solved', '-5', 0, "#cf75ff"),
-            ('plus_minus', r'\pm'),
-            ('second_frac_solved', r'2\sqrt{3}', 0, "#fc4dff"),
-        )
         
 
         
         answer1_group = VGroup(
             Tex("Solve for $x$:").scale(LABEL_SCALE),
-            MathTex(r"x = -5 - 2\sqrt{3}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{2 - \sqrt{10}}{4}").scale(MATH_SCALE),
             self.create_rect_group(
-                MathTex(r"x = -8.464").scale(MATH_SCALE),
+                MathTex(r"x = -0.291").scale(MATH_SCALE),
                 buff=0.15
             )
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
         
         answer2_group = VGroup(
             Tex("Solve for $x$:").scale(LABEL_SCALE),
-            MathTex(r"x = -5 + 2\sqrt{3}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{2 + \sqrt{10}}{4}").scale(MATH_SCALE),
             self.create_rect_group(
-                MathTex(r"x = -1.536").scale(MATH_SCALE),
+                MathTex(r"x = 1.291").scale(MATH_SCALE),
                 buff=0.15
             )
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
@@ -227,11 +180,11 @@ class QuadraticFormula02(MathTutorialScene):
         
         
         coefficient_values_in_formula = self.parse_elements(sol3_step2[1],
-            ('b_in_frac', '10', 0, B_COLOR, 0),
-            ('b_in_sqrt', '10', 1, B_COLOR, 0),
-            ('a_in_4ac', '1', 2, A_COLOR, 0),
-            ('c_in_4ac', '13', 0, C_COLOR, 0),
-            ('a_in_denom', '1', -1, A_COLOR, 0)
+            ('b_in_frac', '-8', 0, B_COLOR, 0),
+            ('b_in_sqrt', '-8', 1, B_COLOR, 0),
+            ('a_in_4ac', '8', 2, A_COLOR, 0),
+            ('c_in_4ac', '-3', 0, C_COLOR, 0),
+            ('a_in_denom', '8', -1, A_COLOR, 0)
         )
         
         visible_copies = VGroup()
@@ -259,9 +212,6 @@ class QuadraticFormula02(MathTutorialScene):
         
         
         sol_steps = VGroup(
-            sol1_step1,
-            sol1_step2,
-            sol1_step3,
             sol2_step1,
             sol2_step2,
             sol3_step1,
@@ -275,9 +225,6 @@ class QuadraticFormula02(MathTutorialScene):
         
         
         sol_steps_elements = VGroup(
-            *sol1_step1,
-            *sol1_step2,
-            *sol1_step3,
             *sol2_step1,
             *coefficient_labels_group,
             *coefficient_values_group,
@@ -287,16 +234,10 @@ class QuadraticFormula02(MathTutorialScene):
             *sol3_step3,
             *sol3_step4,
             sol3_step5[0],
-            sol3_step5_solving['sqrt_48'],
-            sol3_step5_solving['sqrt_48_solve'],
-            sol3_step5_solving['sqrt_48_solved'],
+            sol3_step5_1_sqrt,
+            sol3_step5_1_sqrt_solve,
             sol3_step5[2],
-            sol3_step6[0],
-            sol3_step6[1],
-            sol3_step6_solved['x='],
-            sol3_step6_solved['first_frac_solved'],
-            sol3_step6_solved['plus_minus'],
-            sol3_step6_solved['second_frac_solved']
+            *sol3_step6
         )
         sol_steps_scroll = ScrollManager(sol_steps_elements, scene=self)
         
@@ -321,32 +262,12 @@ class QuadraticFormula02(MathTutorialScene):
         
 
     
-        # Step 1: Simplify by dividing by 4
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        # Step 2: Expand the squared term
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        sol_steps_scroll.scroll_down(steps=3)
-        
-        # Step 3: Get in standard form
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        total_in_view = sol_steps_scroll.current_position - sol_steps_scroll.last_in_view
-        sol_steps_scroll.scroll_down(self, steps=total_in_view - 1)
-        
+        # Step 1: Already in standard form
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
         
         sol_steps_scroll.prepare_next(steps=3)
-
+        
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['a_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['b_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['c_value'])
@@ -384,21 +305,18 @@ class QuadraticFormula02(MathTutorialScene):
         
         self.play(self.indicate(sol3_step4_sqrt))
         
-        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_solving['sqrt_48'])
-        sol_steps_scroll.prepare_next()
+        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_1_sqrt)
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
         
         sol_steps_scroll.scroll_down(steps=4)
         
+        # Additional step for final simplification
+        sol_steps_scroll.prepare_next()
+        sol_steps_scroll.prepare_next()
+        sol_steps_scroll.prepare_next()
         
         sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step6_solving['first_frac'], sol3_step6_solved['first_frac_solved'])
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step6_solving['second_frac'], sol3_step6_solved['second_frac_solved'])
         
         
         self.play(
@@ -407,8 +325,8 @@ class QuadraticFormula02(MathTutorialScene):
         )
         
         self.play(
-            TransformFromCopy(sol3_step6[2], answer1_group[1]),
-            TransformFromCopy(sol3_step6[2], answer2_group[1])
+            TransformFromCopy(sol3_step6[3], answer1_group[1]),
+            TransformFromCopy(sol3_step6[3], answer2_group[1])
         )
         
         self.play(Write(answer1_group[2]))
