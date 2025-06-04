@@ -11,7 +11,7 @@ class QuadraticFormula02(MathTutorialScene):
         B_COLOR = "#ff79c6"
         C_COLOR = "#00bfff"
        
-        
+
         quadratic_form_title = Tex("Standard Form").scale(LABEL_SCALE)
         quadratic_form = MathTex(r"ax^2 + bx + c = 0").scale(MATH_SCALE)
         
@@ -223,9 +223,7 @@ class QuadraticFormula02(MathTutorialScene):
         
         answer_group.next_to(quadratic_group, DOWN, buff=1)
         
-        
-        
-        
+
         coefficient_values_in_formula = self.parse_elements(sol3_step2[1],
             ('b_in_frac', '10', 0, B_COLOR, 0),
             ('b_in_sqrt', '10', 1, B_COLOR, 0),
@@ -234,17 +232,15 @@ class QuadraticFormula02(MathTutorialScene):
             ('a_in_denom', '1', -1, A_COLOR, 0)
         )
         
-        visible_copies = VGroup()
+        # visible_copies = VGroup()
 
-        for name, element in coefficient_values_in_formula.items():
-            visible_copy = element.copy().set_opacity(1)
-            setattr(visible_copies, name, visible_copy)
-            visible_copies.add(visible_copy)
+        # for name, element in coefficient_values_in_formula.items():
+        #     visible_copy = element.copy().set_opacity(1)
+        #     setattr(visible_copies, name, visible_copy)
+        #     visible_copies.add(visible_copy)
 
-        sol3_step2[1].add(visible_copies)
-        
-        
-        
+        # sol3_step2[1].add(visible_copies)
+
         self.apply_smart_colorize(
             [quadratic_formula, sol3_step1[1]],
             {
@@ -253,9 +249,6 @@ class QuadraticFormula02(MathTutorialScene):
                 "c": C_COLOR,
             }
         )
-        
-        
-        
         
         
         sol_steps = VGroup(
@@ -283,12 +276,13 @@ class QuadraticFormula02(MathTutorialScene):
             *coefficient_values_group,
             *sol3_step1,
             *sol3_step2,
-            *visible_copies,
+            # *visible_copies,
+            *VGroup(*coefficient_values_in_formula.values()),
             *sol3_step3,
             *sol3_step4,
             sol3_step5[0],
             sol3_step5_solving['sqrt_48'],
-            sol3_step5_solving['sqrt_48_solve'],
+            sol3_step5_solving['sqrt_48_solve'],   # does not seem to work
             sol3_step5_solving['sqrt_48_solved'],
             sol3_step5[2],
             sol3_step6[0],
@@ -316,11 +310,7 @@ class QuadraticFormula02(MathTutorialScene):
             ),
             Write(quadratic_group, run_time=3)
         )
-        
-        
-        
 
-    
         # Step 1: Simplify by dividing by 4
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
@@ -338,28 +328,33 @@ class QuadraticFormula02(MathTutorialScene):
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
-        
+
         total_in_view = sol_steps_scroll.current_position - sol_steps_scroll.last_in_view
         sol_steps_scroll.scroll_down(self, steps=total_in_view - 1)
-        
+
+        # sol2 step 1
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
         
+        # coefficients labels
         sol_steps_scroll.prepare_next(steps=3)
 
+        # coefficients values
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['a_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['b_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['c_value'])
 
-        
+        # sol3 step1
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
         
         sol_steps_scroll.scroll_down(steps=1)
         
+        # sol3 step 2
         sol_steps_scroll.prepare_next()
         sol_steps_scroll.prepare_next()
-        
+
+
         sol_steps_scroll.fade_in_from_target(coefficient_values['b_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values['b_value'])
         sol_steps_scroll.fade_in_from_target(coefficient_values['a_value'])
