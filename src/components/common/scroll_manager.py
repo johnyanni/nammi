@@ -483,7 +483,7 @@ class ScrollManager(VGroup):
         
         # Fade in each equation from the target position
         animations = [
-            FadeIn(eq, target_position=target_position, **animation_kwargs)
+            FadeIn(eq.set_opacity(1), target_position=target_position, **animation_kwargs)
             for eq in equations_to_fade
         ]
         
@@ -495,11 +495,6 @@ class ScrollManager(VGroup):
         return self
 
 
-    
-    
-    
-    
-    
     def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
         """Transform a copy of source to a target element.
         
