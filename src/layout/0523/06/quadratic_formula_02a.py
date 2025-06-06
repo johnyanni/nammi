@@ -90,7 +90,7 @@ class QuadraticFormula02(MathTutorialScene):
         sol1_step2 = VGroup(
             Tex("Expand the squared term:").scale(LABEL_SCALE),
             MathTex(r"(x+5)^2 = (x+5)(x+5)").scale(MATH_SCALE),
-            MathTex(r"x^2 + 10x + 25 = 12").scale(MATH_SCALE)
+            MathTex(r"x^2 + 10x + 25 = 12").scale(M_MATH_SCALE).set_color(LIGHT_GRAY)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         # Step 3: Get in standard form
@@ -135,9 +135,6 @@ class QuadraticFormula02(MathTutorialScene):
             ('c_value', '13', 0, C_COLOR)
         )
         
-        coefficient_labels_group = VGroup(*coefficient_labels.values())
-        coefficient_values_group = VGroup(*coefficient_values.values())
-        
         
         sol3_step1 = VGroup(
             Tex("Use the quadratic formula to solve for $x$:").scale(LABEL_SCALE),
@@ -161,7 +158,6 @@ class QuadraticFormula02(MathTutorialScene):
         
         sol3_step4_sqrt = sol3_step4[1][0][6:10]
         
-        
         sol3_step5 = VGroup(
             Tex("Simplify the square root:").scale(LABEL_SCALE),
             MathTex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}").scale(M_MATH_SCALE).set_color(LIGHT_GRAY),
@@ -176,23 +172,25 @@ class QuadraticFormula02(MathTutorialScene):
         sol3_step5_2_sqrt = sol3_step5[2][0][6:10].set_color(YELLOW)
         
         
+        
+        
         # Step 6: Final simplification
         sol3_step6 = VGroup(
-            Tex("We can divide throughout by 2").scale(LABEL_SCALE),
+            Tex(r"\raggedright We can further simplify \\ by dividing throughout by 2").scale(LABEL_SCALE),
             MathTex(r"x = \frac{-10 \pm 4\sqrt{3}}{2} = \frac{-10}{2} \pm \frac{4\sqrt{3}}{2}").scale(MATH_SCALE),
             MathTex(r"x = -5 \pm 2\sqrt{3}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         sol3_step6_solving = self.parse_elements(sol3_step6[1],
-            ('first_frac', r'\frac{-10}{2}', 0, "#cf75ff"),
-            ('second_frac', r'\frac{4\sqrt{3}}{2}', 0, "#fc4dff"),
+            ('first_frac', r'\frac{-10}{2}', 0, LIGHT_GRAY),  
+            ('second_frac', r'\frac{4\sqrt{3}}{2}', 0, LIGHT_GRAY), 
         )
         
         sol3_step6_solved = self.parse_elements(sol3_step6[2],
             ('x=', 'x ='),
-            ('first_frac_solved', '-5', 0, "#cf75ff"),
+            ('first_frac_solved', '-5'), 
             ('plus_minus', r'\pm'),
-            ('second_frac_solved', r'2\sqrt{3}', 0, "#fc4dff"),
+            ('second_frac_solved', r'2\sqrt{3}'),  
         )
         
 
@@ -204,7 +202,7 @@ class QuadraticFormula02(MathTutorialScene):
                 MathTex(r"x = -8.464").scale(MATH_SCALE),
                 buff=0.15
             )
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         answer2_group = VGroup(
             Tex("Solve for $x$:").scale(LABEL_SCALE),
@@ -213,7 +211,7 @@ class QuadraticFormula02(MathTutorialScene):
                 MathTex(r"x = -1.536").scale(MATH_SCALE),
                 buff=0.15
             )
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         
         answer_group = VGroup(
@@ -270,7 +268,7 @@ class QuadraticFormula02(MathTutorialScene):
             sol3_step4,
             sol3_step5,
             sol3_step6
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
         sol_steps.next_to(question_group, DOWN, buff=0.4).align_to(question_group, LEFT)
         
         
@@ -279,8 +277,8 @@ class QuadraticFormula02(MathTutorialScene):
             *sol1_step2,
             *sol1_step3,
             *sol2_step1,
-            *coefficient_labels_group,
-            *coefficient_values_group,
+            *coefficient_labels.values(),
+            *coefficient_values.values(),
             *sol3_step1,
             *sol3_step2,
             *visible_copies,
@@ -298,13 +296,14 @@ class QuadraticFormula02(MathTutorialScene):
             sol3_step6_solved['plus_minus'],
             sol3_step6_solved['second_frac_solved']
         )
-        sol_steps_scroll = ScrollManager(sol_steps_elements, scene=self)
+        scroll = ScrollManager(sol_steps_elements, scene=self)
         
         
         
         
+        # Initial setup animations
         self.play(
-            Write(question_group, run_time=3),
+            Write(question_group, run_time=3),  # Write question and equation
         )
         
         self.wait(1)
@@ -314,103 +313,143 @@ class QuadraticFormula02(MathTutorialScene):
                 quadratic_form_bg,
                 quadratic_formula_bg
             ),
-            Write(quadratic_group, run_time=3)
+            Write(quadratic_group, run_time=3)  # Show formula and standard form
         )
         
+        # Step 1: Initial simplification (indices 0-3)
+        # Animate: "First, get the equation in standard form:"
+        scroll.prepare_next()
+        self.play(self.indicate(quadratic_form_group))
+        # Animate: "Divide both sides by 4"
+        scroll.prepare_next()
+        # Animate: Division annotation and equation
+        scroll.prepare_next()
+        # Animate: Result of division
+        scroll.prepare_next()
         
+        # Step 2: Expand squared term (indices 4-6)
+        # Animate: "Expand the squared term:"
+        scroll.prepare_next()
+        # Animate: Expansion steps
+        scroll.prepare_next()
+        # Animate: Final expanded form
+        scroll.prepare_next()
         
+        # Scroll to keep content in view
+        scroll.scroll_down(steps=3)
+        
+        # Step 3: Standard form conversion (indices 7-9)
+        # Animate: "Subtract 12 from both sides"
+        scroll.prepare_next()
+        # Animate: Subtraction annotation
+        scroll.prepare_next()
+        # Animate: Final standard form
+        scroll.prepare_next()
+        
+        # Calculate and perform necessary scrolling
+        total_in_view = scroll.current_position - scroll.last_in_view
+        scroll.scroll_down(self, steps=total_in_view - 1)
+        
+        # Step 4: Coefficient identification (indices 10-11)
+        # Animate: "Now, identify the coefficients:"
+        scroll.prepare_next()
+        # Animate: Equation with coefficients
+        scroll.prepare_next()
+        
+        # Step 5: Show coefficient values (indices 12-17)
+        # Animate: Coefficient labels and values
+        scroll.prepare_next(steps=3)
 
-    
-        # Step 1: Simplify by dividing by 4
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        # Step 2: Expand the squared term
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        sol_steps_scroll.scroll_down(steps=3)
-        
-        # Step 3: Get in standard form
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        total_in_view = sol_steps_scroll.current_position - sol_steps_scroll.last_in_view
-        sol_steps_scroll.scroll_down(self, steps=total_in_view - 1)
-        
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        sol_steps_scroll.prepare_next(steps=3)
+        # Animate coefficient highlighting and values
+        # Fade in coefficient values with their corresponding equation elements
+        scroll.fade_in_from_target(coefficient_values_in_equation['a_value'], coefficient_values['a_value'])
+        scroll.fade_in_from_target(coefficient_values_in_equation['b_value'], coefficient_values['b_value'])
+        scroll.fade_in_from_target(coefficient_values_in_equation['c_value'], coefficient_values['c_value'])
 
-        sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['a_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['b_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values_in_equation['c_value'])
+        # Step 6: Quadratic formula introduction (indices 18-19)
+        # Animate: "Use the quadratic formula to solve for x:"
+        scroll.prepare_next()
+        # Animate: Quadratic formula
+        scroll.prepare_next()
+        
+        # Scroll to keep formula in view
+        scroll.scroll_down(steps=1)
+        
+        # Step 7: Coefficient substitution (indices 20-21)
+        # Animate: "Substitute the coefficients into the formula:"
+        scroll.prepare_next()
+        # Animate: Substituted formula
+        scroll.prepare_next()
+        
+        # Animate coefficient substitutions with highlighting
+        # Fade in each coefficient in its new position
+        scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_frac)
+        scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_sqrt)
+        scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_4ac)
+        scroll.fade_in_from_target(coefficient_values['c_value'], visible_copies.c_in_4ac)
+        scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_denom)
+        
+        # Scroll to keep substitutions in view
+        scroll.scroll_down(steps=8)
 
+        # Step 8: Initial simplification (indices 22-23)
+        # Animate: "Simplify the expression:"
+        scroll.prepare_next()
+        # Transform to simplified form
+        scroll.transform_from_copy(sol3_step2[1], sol3_step3[1])
         
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
+        # Scroll to keep simplification in view
+        scroll.scroll_down(steps=2)
         
-        sol_steps_scroll.scroll_down(steps=1)
+        # Step 9: Further simplification (indices 24-25)
+        # Animate: "Continue simplifying:"
+        scroll.prepare_next()
+        # Transform to next simplified form
+        scroll.transform_from_copy(sol3_step3[1], sol3_step4[1])
         
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
+        # Scroll to keep simplification in view
+        scroll.scroll_down(steps=7)
         
-        sol_steps_scroll.fade_in_from_target(coefficient_values['b_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values['b_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values['a_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values['c_value'])
-        sol_steps_scroll.fade_in_from_target(coefficient_values['a_value'])
+        # Step 10: Square root simplification (indices 26-29)
+        # Animate: "Simplify the square root:"
+        scroll.prepare_next()
         
-        sol_steps_scroll.scroll_down(steps=8)
-
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step2[1], sol3_step3[1])
-        
-        sol_steps_scroll.scroll_down(steps=2)
-        
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step3[1], sol3_step4[1])
-        
-        sol_steps_scroll.scroll_down(steps=7)
-        
-        
-        
-        sol_steps_scroll.prepare_next()
-        
+        # Highlight square root term
         self.play(self.indicate(sol3_step4_sqrt))
         
-        sol_steps_scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_solving['sqrt_48'])
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
+        # Transform square root simplification
+        scroll.transform_from_copy(sol3_step4_sqrt, sol3_step5_solving['sqrt_48'])
+        scroll.prepare_next()
+        scroll.prepare_next()
+        scroll.prepare_next()
         
-        sol_steps_scroll.scroll_down(steps=4)
+        # Scroll to keep square root simplification in view
+        scroll.scroll_down(steps=4)
         
+        # Step 11: Final simplification (indices 30-34)
+        # Animate: "We can further simplify by dividing throughout by 2"
+        scroll.prepare_next()
+        # Animate: Division steps
+        scroll.prepare_next()
+        # Transform to final simplified form
+        scroll.transform_from_copy(sol3_step6_solving['first_frac'], sol3_step6_solved['first_frac_solved'])
+        scroll.prepare_next()
+        scroll.transform_from_copy(sol3_step6_solving['second_frac'], sol3_step6_solved['second_frac_solved'])
         
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.prepare_next()
-        
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step6_solving['first_frac'], sol3_step6_solved['first_frac_solved'])
-        sol_steps_scroll.prepare_next()
-        sol_steps_scroll.transform_from_copy(sol3_step6_solving['second_frac'], sol3_step6_solved['second_frac_solved'])
-        
-        
+        # Final answers
+        # Animate: "Solve for x:" labels
         self.play(
             Write(answer1_group[0]),
             Write(answer2_group[0])
         )
         
+        # Transform to final answers
         self.play(
             TransformFromCopy(sol3_step6[2], answer1_group[1]),
             TransformFromCopy(sol3_step6[2], answer2_group[1])
         )
         
+        # Show decimal approximations
         self.play(Write(answer1_group[2]))
         self.play(Write(answer2_group[2]))
         

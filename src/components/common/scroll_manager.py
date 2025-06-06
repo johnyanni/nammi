@@ -445,13 +445,17 @@ class ScrollManager(VGroup):
             if i < len(new_contents) - 1:
                 scene.wait(cascade_delay)
 
-    def fade_in_from_target(self, target, scene=None, steps=1, run_time=None, animation_kwargs=None):
-        """Fades in the next equation(s) from a target position
+    def fade_in_from_target(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
+        """Fades in from a source position.
+        
+        Can be called two ways:
+        1. fade_in_from_target(source_position) - fades in next element from source
+        2. fade_in_from_target(source_position, target_element) - fades in specific target from source
         
         Args:
-            target: Target position or mobject to fade from
+            source: Source mobject to get the position from
+            target: Target mobject to fade in (if None, uses next element in queue)
             scene: The manim scene to animate on (if None, uses stored scene)
-            steps: Number of equations to fade in (default: 1)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
             
@@ -468,29 +472,37 @@ class ScrollManager(VGroup):
         run_time = {} if run_time is None else {"run_time": run_time}
         animation_kwargs = {} if animation_kwargs is None else animation_kwargs
         
-        # Make sure we have enough equations left
-        if self.current_position + steps > len(self.equations):
-            steps = len(self.equations) - self.current_position
-            if steps <= 0:
+        # Check if we're using the old single-argument style
+        if target is None and hasattr(source, 'get_center'):
+            # Old style: source is position, target is next in queue
+            source_position = source.get_center()
+            if self.current_position >= len(self.equations):
                 print("No more equations to display.")
                 return self
+            target = self.equations[self.current_position]
+            self.current_position += 1
+        else:
+            # New style: source is position, target is specified
+            source_position = source.get_center()
+            if target is None:
+                raise ValueError("Target must be specified when using new API style")
+                
+            # Update position tracking if target is in our equations list
+            target_index = None
+            for i, eq in enumerate(self.equations):
+                if eq is target:  # Use 'is' for object identity
+                    target_index = i
+                    break
+            
+            # Only update position if target is ahead of current position
+            if target_index is not None and target_index >= self.current_position:
+                self.current_position = target_index + 1
         
-        # Get the equations to fade in
-        equations_to_fade = [self.equations[self.current_position + i] for i in range(steps)]
-        
-        # Get target position
-        target_position = target.get_center() 
-        
-        # Fade in each equation from the target position
-        animations = [
-            FadeIn(eq, target_position=target_position, **animation_kwargs)
-            for eq in equations_to_fade
-        ]
-        
-        scene.play(*animations, **run_time)
-        
-        # Update position counter
-        self.current_position += steps
+        # Perform the animation
+        scene.play(
+            FadeIn(target, target_position=source_position, **animation_kwargs),
+            **run_time
+        )
         
         return self
 
