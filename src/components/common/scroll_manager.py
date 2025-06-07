@@ -196,7 +196,16 @@ class ScrollManager(VGroup):
     def fade_out_in_view(
         self, steps=1, scene=None, animation_type=FadeOut, run_time=None, animation_kwargs=None
     ):
-        """Fades out number of `steps` from the elements currently in view."""
+        """
+        Fades out number of `steps` from the elements currently in view
+        
+        Args:
+            steps: Number of elements to fade out (default: 1)
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Type of fade animation (default: FadeOut)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+        """
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
@@ -211,7 +220,15 @@ class ScrollManager(VGroup):
     def fade_out_all_in_view(
         self, scene=None, animation_type=FadeOut, run_time=None, animation_kwargs=None
     ):
-        """Fades out all elements currently in view."""
+        """
+        Fades out all elements currently in view
+        
+        Args:
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Type of fade animation (default: FadeOut)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+        """
         self.fade_out_in_view(
             steps=self.current_position - self.last_in_view,
             scene=scene,
@@ -221,7 +238,10 @@ class ScrollManager(VGroup):
         )
         
     def attach_callout_at_scroll(self, scroll_index, callout_manager):
-        """Attach a callout manager to fade out at a specific scroll index."""
+        """
+        Attach a callout manager to fade out at a specific scroll index.
+        No scene parameter needed as this just stores data.
+        """
         if scroll_index not in self.callouts_by_scroll_index:
             self.callouts_by_scroll_index[scroll_index] = []
         self.callouts_by_scroll_index[scroll_index].append(callout_manager)
@@ -262,7 +282,18 @@ class ScrollManager(VGroup):
         
     def replace_in_place(self, index, new_content, scene=None, animation_type=ReplacementTransform, 
                         run_time=None, animation_kwargs=None, move_new_content=True):
-        """Replaces an equation at its current position."""
+        """
+        Replaces an equation at its current position
+        
+        Args:
+            index: Index of the equation to replace
+            new_content: New equation/content to replace with
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Animation to use for replacement (default: ReplacementTransform)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)Add commentMore actions
+            move_new_content: Whether to move the new content to the position of the old one (optional)
+        """
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
@@ -283,7 +314,18 @@ class ScrollManager(VGroup):
 
     def highlight_and_replace(self, index, new_content, scene=None, highlight_color=YELLOW, 
                             highlight_time=0.5, replace_time=1, final_color=WHITE):
-        """Highlights an equation before replacing it."""
+        """
+        Highlights an equation before replacing it
+        
+        Args:
+            index: Index of the equation to replace
+            new_content: New equation/content to replace with
+            scene: The manim scene to animate on (if None, uses stored scene)
+            highlight_color: Color to use for highlighting (default: YELLOW)
+            highlight_time: Duration of highlight animation in seconds (default: 0.5)Add commentMore actions
+            replace_time: Duration of replacement animation in seconds (default: 1)
+            final_color: Final color of the new content (default: WHITE)
+        """
         scene = self._get_scene(scene)
         self._validate_index(index, "highlight_and_replace")
             
@@ -308,7 +350,16 @@ class ScrollManager(VGroup):
         self.remove(original)
 
     def restore_original(self, index, scene=None, animation_type=Transform, run_time=None, animation_kwargs=None):
-        """Restores an equation to its original state before replacement."""
+        """
+        Restores an equation to its original state before replacement
+        
+        Args:
+            index: Index of the equation to restore
+            scene: The manim scene to animate on (if None, uses stored scene)
+            animation_type: Animation to use for restoration (default: Transform)Add commentMore actions
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+        """
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
@@ -334,7 +385,17 @@ class ScrollManager(VGroup):
         del self.replacements[index]
 
     def cascade_update(self, start_index, new_contents, scene=None, cascade_delay=0.2, run_time=1, animation_type=ReplacementTransform):
-        """Updates multiple equations in a cascading sequence."""
+        """
+        Updates multiple equations in a cascading sequence
+        
+        Args:
+            start_index: Index of the first equation to replace
+            new_contents: List of new equations/content to replace with
+            scene: The manim scene to animate on (if None, uses stored scene)
+            cascade_delay: Delay between successive animations in seconds (default: 0.2)
+            run_time: Duration of each replacement animation in seconds (default: 1)
+            animation_type: Animation to use for replacement (default: ReplacementTransform)
+        """
         scene = self._get_scene(scene)
         
         if start_index < self.last_in_view or start_index + len(new_contents) > self.current_position:
@@ -364,7 +425,23 @@ class ScrollManager(VGroup):
                 scene.wait(cascade_delay)
 
     def fade_in_from_target(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
-        """Fades in from a source position."""
+        """
+        Fades in from a source position.
+        
+        Can be called two ways:
+        1. fade_in_from_target(source_position) - fades in next element from source
+        2. fade_in_from_target(source_position, target_element) - fades in specific target from source
+        
+        Args:
+            source: Source mobject to get the position from
+            target: Target mobject to fade in (if None, uses next element in queue)
+            scene: The manim scene to animate on (if None, uses stored scene)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+            
+        Returns:
+            self: For method chaining
+        """
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
@@ -403,7 +480,19 @@ class ScrollManager(VGroup):
         return self
 
     def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
-        """Transform a copy of source to a target element."""
+        """
+        Transform a copy of source to a target element.
+        
+        Args:
+            source: Source mobject to copy and transform from
+            target: Target mobject to transform to (if None, uses next element in queue)
+            scene: The manim scene to animate on (if None, uses stored scene)
+            run_time: Animation duration in seconds (optional)
+            animation_kwargs: Additional keyword arguments for animation (optional)
+            
+        Returns:
+            self: For method chaining
+        """
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
