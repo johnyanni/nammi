@@ -89,8 +89,8 @@ class QuadraticFormula02(MathTutorialScene):
         # Step 2: Expand the squared term
         sol1_step2 = VGroup(
             Tex("Expand the squared term:").scale(LABEL_SCALE),
-            MathTex(r"(x+5)^2 = (x+5)(x+5)").scale(MATH_SCALE),
-            MathTex(r"x^2 + 10x + 25 = 12").scale(M_MATH_SCALE).set_color(LIGHT_GRAY)
+            MathTex(r"(x+5)^2 = (x+5)(x+5)").scale(M_MATH_SCALE).set_color(LIGHT_GRAY),
+            MathTex(r"x^2 + 10x + 25 = 12").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         # Step 3: Get in standard form
@@ -319,7 +319,7 @@ class QuadraticFormula02(MathTutorialScene):
         # Step 1: Initial simplification (indices 0-3)
         # Animate: "First, get the equation in standard form:"
         scroll.prepare_next()
-        self.play(self.indicate(quadratic_form_group))
+        self.play(self.indicate(quadratic_form_group, scale_factor=1.2))
         # Animate: "Divide both sides by 4"
         scroll.prepare_next()
         # Animate: Division annotation and equation
@@ -362,9 +362,16 @@ class QuadraticFormula02(MathTutorialScene):
 
         # Animate coefficient highlighting and values
         # Fade in coefficient values with their corresponding equation elements
+        self.play(self.indicate(quadratic_form_coefficients['a']))
         scroll.fade_in_from_target(coefficient_values_in_equation['a_value'], coefficient_values['a_value'])
+        
+        self.play(self.indicate(quadratic_form_coefficients['b']))
         scroll.fade_in_from_target(coefficient_values_in_equation['b_value'], coefficient_values['b_value'])
+        
+        self.play(self.indicate(quadratic_form_coefficients['c']))
         scroll.fade_in_from_target(coefficient_values_in_equation['c_value'], coefficient_values['c_value'])
+        
+        scroll.scroll_down(steps=1)
 
         # Step 6: Quadratic formula introduction (indices 18-19)
         # Animate: "Use the quadratic formula to solve for x:"
@@ -383,10 +390,17 @@ class QuadraticFormula02(MathTutorialScene):
         
         # Animate coefficient substitutions with highlighting
         # Fade in each coefficient in its new position
+        self.play(self.indicate(coefficient_values['b_value'], color=None))
         scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_frac)
         scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_sqrt)
+        
+        self.play(self.indicate(coefficient_values['a_value'], color=None))
         scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_4ac)
+        
+        self.play(self.indicate(coefficient_values['c_value'], color=None))
         scroll.fade_in_from_target(coefficient_values['c_value'], visible_copies.c_in_4ac)
+        
+        self.play(self.indicate(coefficient_values['a_value'], color=None))
         scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_denom)
         
         # Scroll to keep substitutions in view
