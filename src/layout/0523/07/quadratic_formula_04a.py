@@ -209,8 +209,10 @@ class QuadraticFormula04a(MathTutorialScene):
             simplify2_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
-        # Identify square root part for highlighting
-        simplify2_sqrt = simplify2_equation[0][4:8]
+        simplify2_sqrt = self.parse_elements(simplify2_equation,
+            ('sqrt_45', r"\sqrt{45}")
+        )
+        
         
         # ============================================
         # SECTION 9: SIMPLIFY SQUARE ROOT
@@ -231,7 +233,8 @@ class QuadraticFormula04a(MathTutorialScene):
             ('sqrt_45_solve', r'= \sqrt{9 \times 5} ='),
             ('sqrt_45_solved', r'3\sqrt{5}', 0, YELLOW),
         )
-        sqrt_result_highlight = sqrt_result[0][4:8].set_color(YELLOW)
+        
+        SmartColorizeStatic(sqrt_result, {r"3\sqrt{5}": YELLOW})
         
         # ============================================
         # SECTION 10: FINAL ANSWERS
@@ -534,13 +537,14 @@ class QuadraticFormula04a(MathTutorialScene):
             text="""Now we need to simplify the square root of forty-five."""
         ) as tracker:
             scroll.prepare_next(run_time=2)  # Show label
-            self.play(self.indicate(simplify2_sqrt, run_time=2))
+            self.play(self.indicate(simplify2_sqrt['sqrt_45'], run_time=2))
+            self.play(simplify2_sqrt['sqrt_45'].animate.set_color(YELLOW))
             
         with self.voiceover(
             text="""We can factor forty-five as nine times five."""
         ) as tracker:
             
-            scroll.transform_from_copy(simplify2_sqrt, sqrt_parsing['sqrt_45'], run_time=2)
+            scroll.transform_from_copy(simplify2_sqrt['sqrt_45'], sqrt_parsing['sqrt_45'], run_time=2)
             scroll.prepare_next(run_time=2)  # Show factorization
 
         with self.voiceover(
