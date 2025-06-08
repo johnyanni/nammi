@@ -266,7 +266,7 @@ class QuadraticFormula(MathTutorialScene):
         # c_in_4ac = self.find_element("13", step_1_exp, nth=0, opacity=0, color=C_COLOR)
         # a_in_denom = self.find_element("1", step_1_exp, nth=1, opacity=0, color=A_COLOR)
         
-        part = self.find_element('-(10^2)', step_1_exp, color=RED, as_group=True)
+        part = self.find_element(r'x=', step_1_exp, color=RED, as_group=True)
         self.add(part)
         
         # print(f"Working example - fill: {b_in_frac.get_fill_opacity()}, stroke: {b_in_frac.get_stroke_opacity()}")
@@ -306,20 +306,20 @@ class QuadraticFormula(MathTutorialScene):
         solution_steps.next_to(mid_solution_steps, DOWN, buff=0.4)
         solution_steps.align_to(mid_solution_steps, LEFT)
 
-        ordered_steps = VGroup(
-            step4_expr2, mid_sol_step_0_label,
-            a_label, b_label, c_label, a_value, b_value, c_value,
-            step_0_label, step_0_exp,
-            step_1_label, step_1_exp,
-            *substitution,
-            step_2_label, step_2_exp,
-            step_3_label, step_3_exp,
-            step_4_label, step_4_exp,
-            step_5_label, step_5_exp
-        )
+        # ordered_steps = VGroup(
+        #     step4_expr2, mid_sol_step_0_label,
+        #     a_label, b_label, c_label, a_value, b_value, c_value,
+        #     step_0_label, step_0_exp,
+        #     step_1_label, step_1_exp,
+        #     *substitution,
+        #     step_2_label, step_2_exp,
+        #     step_3_label, step_3_exp,
+        #     step_4_label, step_4_exp,
+        #     step_5_label, step_5_exp
+        # )
 
-        scroll_mgr = ScrollManager(ordered_steps)
-        scroll_mgr.start_position = ordered_steps[1].copy()
+        # scroll_mgr = ScrollManager(ordered_steps)
+        # scroll_mgr.start_position = ordered_steps[1].copy()
         
         ###############################################################################
         # ANIMATIONS
