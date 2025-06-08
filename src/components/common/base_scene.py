@@ -10,40 +10,53 @@ from .custom_axes import CustomAxes
 
 from functools import partial, partialmethod
 
+# Scale Constants
+MATH_SCALE = 0.80        # Standard math formula scale
+M_MATH_SCALE = 0.70      # Medium math formula scale  
+S_MATH_SCALE = 0.60      # Small math formula scale
+LABEL_SCALE = 0.60       # Labels for steps/sections
+TEXT_SCALE = 0.70        # Regular text scale
+ANNOTATION_SCALE = 0.65  # Annotations above/below formulas
+TEX_SCALE = 0.75        # TeX formula scale
+FOOTNOTE_SCALE = 0.6    # Footnote text scale
 
+# Timing Constants (seconds)
+QUICK_PAUSE = 0.5          # Brief pause between steps
+STANDARD_PAUSE = 1.0       # Normal pause between concepts
+COMPREHENSION_PAUSE = 2.0  # Longer pause for complex ideas
 
-# NEW SCALE VALUES
+# Visual Settings
+BACKGROUND_COLOR = "#121212"  # Dark theme background
 
-MATH_SCALE = 0.80
-M_MATH_SCALE = 0.70
-S_MATH_SCALE = 0.60
+# Common Pattern Groups
+SHARED_MATH_ELEMENTS = [
+    ('equals', '='),
+    ('plus', '+', 0),
+    ('minus', '-', 0),
+]
 
+SHARED_COMPARISON_ELEMENTS = [
+    ('equals', '='),
+    ('less_than', '<'),
+    ('greater_than', '>'),
+    ('leq', r'\leq'),
+    ('geq', r'\geq'),
+]
 
-LABEL_SCALE = 0.60
-TEXT_SCALE = 0.70
+SHARED_ARITHMETIC_OPS = [
+    ('plus', '+', 0),
+    ('minus', '-', 0),
+    ('times', r'\times', 0),
+    ('divide', r'\div', 0),
+]
 
-ANNOTATION_SCALE = 0.65
-
-
-
-
-
-
-
-
-TEX_SCALE = 0.75
-
-
-FOOTNOTE_SCALE = 0.6
-
-
-QUICK_PAUSE = 0.5
-STANDARD_PAUSE = 1.0
-COMPREHENSION_PAUSE = 2.0
-
-
-# Common settings
-BACKGROUND_COLOR = ManimColor("#121212")
+SHARED_EQUATION_ELEMENTS = [
+    ('equals', '='),
+    ('plus', '+', 0),
+    ('minus', '-', 0),
+    ('times', r'\times', 0),
+    ('divide', r'\div', 0),
+]
 
 class MathTutorialScene(VoiceoverScene):
     """Base scene class that handles Azure voiceover setup."""
@@ -173,20 +186,34 @@ class MathTutorialScene(VoiceoverScene):
         for element, color_map in coloring_list:
             SmartColorizeStatic(element, color_map)
 
-    # def create_step(self, title, *content, buff=0.3):
-    #     """Create a vertical group of elements with consistent formatting.
+    def create_step(self, label_text, *elements, spacing=0.3):
+        """Create a step with uniform spacing and optional label.
         
-    #     Args:
-    #         title: Title mobject for the step
-    #         *content: Variable number of content mobjects to include
-    #         buff: Buffer space between elements
+        Args:
+            label_text: Text for the step label (will be scaled to LABEL_SCALE)
+            *elements: Variable number of content mobjects to include
+            spacing: Buffer space between elements (default: 0.3)
             
-    #     Returns:
-    #         VGroup containing the title and content arranged vertically
-    #     """
-    #     return VGroup(title, *content).arrange(DOWN, aligned_edge=LEFT, buff=buff) 
-
-    
+        Returns:
+            VGroup containing the label and content arranged vertically
+            
+        Example:
+            step = self.create_step(
+                "Step 1: Factoring",
+                equation1,
+                equation2,
+                spacing=0.4
+            )
+        """
+        # Create label with consistent styling
+        label = Tex(label_text, color=WHITE).scale(LABEL_SCALE)
+        
+        # Combine label with other elements
+        all_elements = [label]
+        all_elements.extend(elements)
+        
+        # Arrange vertically with consistent spacing
+        return VGroup(*all_elements).arrange(DOWN, aligned_edge=LEFT, buff=spacing)
 
     def create_axes(self, x_range=[-6, 6, 1], y_range=[-6, 6, 1], x_length=6, y_length=6):
         """Create standardized axes with customizable ranges and lengths.
@@ -517,98 +544,97 @@ class MathTutorialScene(VoiceoverScene):
 
         
         
+    def _find_negative_number(self, pattern, tex_obj, nth=0, color=None, opacity=None):
+        """Helper function to find negative numbers in equations.
+        
+        Args:
+            pattern: The negative number pattern (e.g., "-5")
+            tex_obj: The MathTex object to search within
+            nth: Which occurrence to return (0-based)
+            color: Optional color to set
+            opacity: Optional opacity to set
+            
+        Returns:
+            VGroup containing the minus sign and number, or None if not found
+        """
+        # Find minus sign and number separately
+        minus_indices = search_shape_in_text(tex_obj, MathTex("-"))
+        num_indices = search_shape_in_text(tex_obj, MathTex(pattern[1:]))
+        
+        # Look for adjacent pairs
+        for minus_idx in minus_indices:
+            for num_idx in num_indices:
+                if hasattr(minus_idx, 'stop') and hasattr(num_idx, 'start'):
+                    if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
+                        if nth == 0:  # Found our match
+                            minus_element = tex_obj[0][minus_idx]
+                            num_element = tex_obj[0][num_idx]
+                            
+                            # Apply styling
+                            if opacity is not None:
+                                minus_element.set_opacity(opacity)
+                                num_element.set_opacity(opacity)
+                            if color:
+                                minus_element.set_color(color)
+                                num_element.set_color(color)
+                            
+                            return VGroup(minus_element, num_element)
+                        nth -= 1
+        return None
+
+    def _find_single_element(self, pattern, tex_obj, nth=0, color=None, opacity=None):
+        """Helper function to find a single element in equations.
+        
+        Args:
+            pattern: The pattern to search for
+            tex_obj: The MathTex object to search within
+            nth: Which occurrence to return (0-based)
+            color: Optional color to set
+            opacity: Optional opacity to set
+            
+        Returns:
+            The matching element or None if not found
+        """
+        indices = search_shape_in_text(tex_obj, MathTex(pattern))
+        
+        if not indices or nth >= len(indices):
+            return None
+            
+        result = tex_obj[0][indices[nth]]
+        if color: 
+            result.set_color(color)
+        if opacity is not None:
+            result.set_opacity(opacity)
+            
+        return result
+
     def find_element(self, pattern, tex_obj, nth=0, color=None, opacity=None):
-        """Simplified find_element that handles common cases.
+        """Find elements in equations with support for negative numbers.
         
         Args:
             pattern: The text pattern to search for (e.g., "x", "1", "-5", r"\frac{300}{400}")
-            tex_obj: The MathTex or Tex object to search within
-            nth: Which occurrence to return (0-based index)
-            color: Optional color to set for the element
-            opacity: Optional opacity to set for the element
+            tex_obj: The MathTex object to search within
+            nth: Which occurrence to return (0-based)
+            color: Optional color to set
+            opacity: Optional opacity to set
         
         Returns:
             The matching element(s) - single VMobject or VGroup for multi-element patterns
             None if not found
         """
-        
         # Handle negative numbers specially
         if pattern.startswith('-') and len(pattern) > 1:
-            # Find minus sign and number separately
-            minus_indices = search_shape_in_text(tex_obj, MathTex("-"))
-            num_indices = search_shape_in_text(tex_obj, MathTex(pattern[1:]))
+            result = self._find_negative_number(pattern, tex_obj, nth, color, opacity)
+            if result:
+                return result
+        
+        # For everything else
+        result = self._find_single_element(pattern, tex_obj, nth, color, opacity)
+        if result:
+            return result
             
-            # Look for adjacent pairs
-            for minus_idx in minus_indices:
-                for num_idx in num_indices:
-                    # Check if they're next to each other
-                    if hasattr(minus_idx, 'stop') and hasattr(num_idx, 'start'):
-                        if minus_idx.stop == num_idx.start or minus_idx.stop + 1 == num_idx.start:
-                            if nth == 0:  # Found our match
-                                minus_element = tex_obj[0][minus_idx]
-                                num_element = tex_obj[0][num_idx]
-                                
-                                # Set opacity on individual elements FIRST
-                                if opacity is not None:
-                                    minus_element.set_opacity(opacity)
-                                    num_element.set_opacity(opacity)
-                                
-                                # Set color on individual elements
-                                if color:
-                                    minus_element.set_color(color)
-                                    num_element.set_color(color)
-                                
-                                # THEN create the group
-                                result = VGroup(minus_element, num_element)
-                                
-                                return result
-                            nth -= 1
-        
-        # For everything else, use search_shape_in_text
-        indices = search_shape_in_text(tex_obj, MathTex(pattern))
-        
-        if not indices or nth >= len(indices):
-            print(f"Pattern '{pattern}' not found")
-            return None
-            
-        # Return what search_shape_in_text found
-        result = tex_obj[0][indices[nth]]
-        if color: result.set_color(color)
-        if opacity is not None:
-            result.set_opacity(opacity)
-        
-        return result
-        
-    SHARED_MATH_ELEMENTS = [
-        ('equals', '='),
-        ('plus', '+', 0),      # First plus sign
-        ('minus', '-', 0),     # First minus sign
-    ]
-
-    SHARED_COMPARISON_ELEMENTS = [
-        ('equals', '='),
-        ('less_than', '<'),
-        ('greater_than', '>'),
-        ('leq', r'\leq'),
-        ('geq', r'\geq'),
-    ]
-
-    SHARED_ARITHMETIC_OPS = [
-        ('plus', '+', 0),
-        ('minus', '-', 0),
-        ('times', r'\times', 0),
-        ('divide', r'\div', 0),
-    ]
-
-    # For equations with equals and all basic operations
-    SHARED_EQUATION_ELEMENTS = [
-        ('equals', '='),
-        ('plus', '+', 0),
-        ('minus', '-', 0),
-        ('times', r'\times', 0),
-        ('divide', r'\div', 0),
-    ]
-        
+        print(f"Pattern '{pattern}' not found")
+        return None
         
     def parse_elements(self, equation, *patterns):
         """Parse multiple elements from an equation in one call.
@@ -757,32 +783,6 @@ class MathTutorialScene(VoiceoverScene):
         result._has_annotation = True
         
         return result
-    
-    
-    
-    def create_step(self, label_text, *elements, spacing=0.3):
-        """Create a step with uniform spacing."""
-        all_elements = [Tex(label_text).scale(0.6)]  # CREATES a label from the string
-        all_elements.extend(elements)                 # Adds your elements after
-        return VGroup(*all_elements).arrange(DOWN, aligned_edge=LEFT, buff=spacing)
-    
-    
-    # def smart_unpack(self, *items):
-    #     """Unpack VGroups by default, unless flagged to keep together."""
-    #     unpacked = []
-        
-    #     for item in items:
-    #         if isinstance(item, VGroup):
-    #             # Check for keep-together flags
-    #             if (hasattr(item, '_has_annotation') or 
-    #                 hasattr(item, '_keep_together')):
-    #                 unpacked.append(item)  # Keep together
-    #             else:
-    #                 unpacked.extend(item)  # DEFAULT: Unpack VGroups
-    #         else:
-    #             unpacked.append(item)
-        
-    #     return VGroup(*unpacked)
     
     
     
