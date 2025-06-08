@@ -125,6 +125,10 @@ class ExponentsAddition01(MathTutorialScene):
             ('exp4', '4', 0)
         )
         
+        source_exponents_group = VGroup(
+            *source_exponents.values()
+        )
+        
         # Color the rewritten equation
         self.apply_smart_colorize(
             [rewrite_equation],
@@ -160,6 +164,10 @@ class ExponentsAddition01(MathTutorialScene):
             ('target1', '1', 0),
             ('target7', '7', 0),
             ('target4', '4', 0)
+        )
+        
+        target_positions_group = VGroup(
+            *target_positions.values()
         )
         
         # ============================================
@@ -367,6 +375,33 @@ class ExponentsAddition01(MathTutorialScene):
             text="""So we get 2 to the power of 1 plus 7 plus 4."""
         ) as tracker:
             
+            # self.play(self.indicate(source_exponents_group, color=YELLOW, run_time=5))
+            
+            for x in [source_exponents['exp1'], source_exponents['exp7'], source_exponents['exp4']]:
+                self.play(self.indicate(x, color=YELLOW, run_time=2))
+            
+            copies = VGroup(
+                source_exponents['exp1'].copy(),
+                source_exponents['exp7'].copy(),
+                source_exponents['exp4'].copy()
+            )
+
+            # Animate them
+            self.play(
+                copies[0].animate.move_to(target_positions['target1'].get_center()),
+                copies[1].animate.move_to(target_positions['target7'].get_center()),
+                copies[2].animate.move_to(target_positions['target4'].get_center()),
+                run_time=2
+            )
+
+            # Fade out the copies
+            self.play(FadeOut(copies))
+            
+
+            
+            
+            #self.play(source_exponents_group.copy().animate.move_to(target_positions_group.get_center()))
+            
             # self.play(
             #     TransformFromCopy(source_exponents['exp1'], target_positions['target1']),
             #     TransformFromCopy(source_exponents['exp7'], target_positions['target7']),
@@ -374,8 +409,14 @@ class ExponentsAddition01(MathTutorialScene):
             #     run_time=1.5
             # )
             
-            self.play(FadeIn(target_positions['target1'], target_position=source_exponents['exp1']))
+            # self.play(FadeIn(target_positions['target1'], target_position=source_exponents['exp1']))
 
+        
+            # scroll.fade_in_from_target(source_exponents['exp1'], target_positions['target1'])
+            # scroll.fade_in_from_target(source_exponents['exp7'], target_positions['target7'])
+            # scroll.fade_in_from_target(source_exponents['exp4'], target_positions['target4'])
+            
+            
             
             
             # # Create copies of exponents
