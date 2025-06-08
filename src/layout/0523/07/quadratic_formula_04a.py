@@ -146,7 +146,7 @@ class QuadraticFormula04a(MathTutorialScene):
         # SECTION 5: SHOW QUADRATIC FORMULA
         # ============================================
         show_formula_label = Tex("Use the quadratic formula to solve for $x$:").scale(LABEL_SCALE)
-        show_formula_equation = MathTex(r"x \quad = \quad \frac{-b \pm \sqrt{b^2 \ - \ 4ac}}{2a}").scale(MATH_SCALE)
+        show_formula_equation = MathTex(r"x \quad = \quad \frac{-b^2 \pm \sqrt{b^2 \ - \ 4ac}}{2a}").scale(MATH_SCALE)
         
         show_formula_step = VGroup(
             show_formula_label,
@@ -165,6 +165,7 @@ class QuadraticFormula04a(MathTutorialScene):
             substitute_label,
             substitute_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+
         
         # Parse substituted values (opacity 0 for animation)
         coefficient_values_in_formula = self.parse_elements(substitute_equation,
@@ -209,10 +210,13 @@ class QuadraticFormula04a(MathTutorialScene):
             simplify2_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
+        
+        
         simplify2_sqrt = self.parse_elements(simplify2_equation,
             ('sqrt_45', r"\sqrt{45}")
         )
         
+
         
         # ============================================
         # SECTION 9: SIMPLIFY SQUARE ROOT

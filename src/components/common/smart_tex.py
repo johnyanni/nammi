@@ -23,7 +23,7 @@ def get_text_and_shape(text: VMobject, shape: VMobject, textstyle=False):
 
     if hasattr(shape, "tex_string") and not isinstance(shape, Tex):
         if textstyle:
-            shape_copy = MathTex(rf"\textstyle{shape.tex_string}", tex_template=template)
+            shape_copy = MathTex(rf"\textstyle {shape.tex_string}", tex_template=template)
         else:
             shape_copy = MathTex(shape.tex_string, tex_template=template)
     elif hasattr(shape, "tex_strings"):
