@@ -1,6 +1,5 @@
 """Scroll manager for handling scrolling animations in tutorials."""
 
-
 from manim import *
 from src.components.common.base_scene import LABEL_SCALE, MATH_SCALE, ANNOTATION_SCALE
 from src.components.common.base_scene import MathTutorialScene
@@ -113,9 +112,12 @@ class ScrollManager(VGroup):
         return result, label
     
     def arrange_equations(self):
-        """Arrange equations vertically"""
         self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)    
 
+    def add_to_arragement(self, group):
+        self.arranged_equations.add(group)
+        self.arrange_equations()
+        
     def get_arranged_equations(self):
         return self.arranged_equations
         
@@ -149,8 +151,12 @@ class ScrollManager(VGroup):
 
         steps_group = VGroup()
         for step, label in zip(steps, labels):
-            steps_group.add(self.create_step(step, label, arrange))
-
+            steps_group.add(self.create_step(step, label, arrange=False))
+            
+        if arrange:
+            self.arranged_equations.add(steps_group)
+            self.arrange_equations()
+            
         return steps_group
 
     def construct_step(self, *args, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.2, add_to_scroll=True, arrange=True):
@@ -160,14 +166,14 @@ class ScrollManager(VGroup):
         steps = VGroup()
         for step, label in args:
             if add_to_scroll:
-                steps.add(self.create_step(step, label, arrange))
+                steps.add(self.create_step(step, label, arrange=False))
             else:
                 steps.add(step)
 
         steps.arrange(arrange_dir, aligned_edge=aligned_edge, buff=buff)
 
         # If the steps are not a part of the flow yet, but they a part of the arrangement
-        if not add_to_scroll and arrange:
+        if arrange:
             self.arranged_equations.add(steps)
             self.arrange_equations()
             

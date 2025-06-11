@@ -4,7 +4,7 @@ from src.components.common.scroll_manager import ScrollManager
 from src.components.common.smart_tex import SmartColorizeStatic
 
 config.verbosity = "ERROR"
-        
+
 class QuadraticFormula02(MathTutorialScene): 
     def construct(self):
 
@@ -25,7 +25,7 @@ class QuadraticFormula02(MathTutorialScene):
         quadratic_group = VGroup(
             quadratic_form.group,
             quadratic_formula.group
-        ).arrange(RIGHT, aligned_edge=UP, buff=0.2).to_corner(UR, buff=0.5).set_color(LIGHT_GRAY)
+        ).arrange(RIGHT, aligned_edge=UP, buff=0.2).to_corner(UR, buff=0.2).set_color(LIGHT_GRAY)
         
         quadratic_form_coefficients = self.parse_elements(quadratic_form.formula,
             ('a', 'a', 0, A_COLOR),
@@ -39,7 +39,7 @@ class QuadraticFormula02(MathTutorialScene):
             question_text, 
             question_equation
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2).to_edge(UP, buff=0.4).to_edge(LEFT, buff=0.4).set_color(LIGHT_GRAY)
-    
+
         # Steps
         scroll = ScrollManager(scene=self)
         
@@ -59,8 +59,8 @@ class QuadraticFormula02(MathTutorialScene):
         # Step 2: Expand the squared term
         sol1_step2 = scroll.construct_step(
             scroll.create_tex("Expand the squared term"),
-            scroll.create_math_tex("x^2 + 10x + 25 = 12", color=LIGHT_GRAY),
-            scroll.create_math_tex(r"(x+5)^2 = (x+5)(x+5)", label="expand_squared_term")
+            scroll.create_math_tex(r"(x+5)^2 = (x+5)(x+5)", color=LIGHT_GRAY, scale=M_MATH_SCALE),
+            scroll.create_math_tex("x^2 + 10x + 25 = 12", label="expand_squared_term")
         )
         
         # Step 3: Get in standard form
@@ -151,7 +151,7 @@ class QuadraticFormula02(MathTutorialScene):
 
         sol3_step5 = scroll.construct_step(
             scroll.create_tex("Simplify the square root:"),
-            scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}"),
+            scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}", color=LIGHT_GRAY, scale=M_MATH_SCALE),
             scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}"),
             add_to_scroll=False
         )
