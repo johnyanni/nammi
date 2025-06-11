@@ -17,7 +17,7 @@ class MathIndices:
             display_duration: How long to display the visualization (seconds)
             
         Example Usage:
-            self.display_indices(step2_info, "step2_info")
+            self.show_indices(step2_info, "step2_info")
         """
         # Add a header with the label text
         header = None

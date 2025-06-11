@@ -1,0 +1,24 @@
+# Build tools (MUST be first)
+setuptools>=68.0.0
+wheel>=0.40.0
+
+# Manim and voiceover
+manim==0.18.0
+manim-voiceover==0.3.6
+
+# Azure Speech Services
+azure-cognitiveservices-speech>=1.34.0
+pydub>=0.25.1
+python-dotenv>=0.21.0,<0.22.0
+
+# Additional dependencies (compatible with manim 0.18.0)
+numpy>=1.24.0
+Pillow>=9.1,<10.0  # Changed to match manim requirement
+scipy>=1.10.0
+tqdm>=4.65.0
+watchdog>=3.0.0
+pygments>=2.15.0
+rich>=13.0.0
+
+# For pycairo on macOS
+pycairo>=1.24.0; sys_platform == 'darwin'

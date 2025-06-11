@@ -217,6 +217,10 @@ class QuadraticFormula04a(MathTutorialScene):
         )
         
 
+
+
+        
+        
         
         # ============================================
         # SECTION 9: SIMPLIFY SQUARE ROOT
@@ -535,7 +539,7 @@ class QuadraticFormula04a(MathTutorialScene):
         
         self.wait(1)
         scroll.scroll_down(steps=8, run_time=1.5)
-        
+
         # === STEP 7: Square root simplification ===
         with self.voiceover(
             text="""Now we need to simplify the square root of forty-five."""

@@ -102,8 +102,9 @@ class Pythagoras01b(MathTutorialScene):
         # Step 4: Square root - special handling
         calc3_sqrt = step4[1][0][0:2]
         calc3_c2 = step4[1][0][2:4].set_color(YELLOW)
-        calc3_sqrt2 = step4[1][0][5:7]
+        # calc3_sqrt2 = step4[1][0][5:7]
         calc3_parts = self.parse_elements(step4[1],
+            ('calc3_sqrt2', r'\sqrt{125}'),
             ('equals', '='),
             ('value', '125')
         )
@@ -145,7 +146,7 @@ class Pythagoras01b(MathTutorialScene):
             calc3_sqrt,
             calc3_c2,
             calc3_parts['equals'],
-            calc3_sqrt2,
+            calc3_parts['calc3_sqrt2'],
             calc3_parts['value'],
             
             step5[0],

@@ -553,7 +553,7 @@ class QuadraticFormula02a(MathTutorialScene):
                 coefficient_values['c_value'], 
                 run_time=1.5
             )
-            
+        
         self.wait(1)
         scroll.scroll_down(steps=1, run_time=1)
         
@@ -568,7 +568,7 @@ class QuadraticFormula02a(MathTutorialScene):
             text="""Here's the formula with our color-coded coefficients."""
         ) as tracker:
             scroll.prepare_next(run_time=4)  # Show formula
-
+        
         self.wait(1)
         
         # === STEP 6: Substitute values ===
@@ -673,7 +673,7 @@ class QuadraticFormula02a(MathTutorialScene):
         ) as tracker:
             scroll.prepare_next(run_time=2)  # Show label
             scroll.prepare_next(run_time=4)  # Show division steps
-        
+            
         with self.voiceover(
             text="""Negative 10 divided by 2 is negative 5."""
         ) as tracker:

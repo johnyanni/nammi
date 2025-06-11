@@ -3,7 +3,7 @@ from src.components.common.base_scene import *
 from src.components.common.scroll_manager import ScrollManager
 from src.components.common.quick_tip import QuickTip
 
-config.verbosity = "ERROR"
+# config.verbosity = "ERROR"
 
 class ExponentsAddition01(MathTutorialScene):
     def construct(self):
@@ -71,17 +71,17 @@ class ExponentsAddition01(MathTutorialScene):
         )
         
         # Color the rule components
-        self.apply_smart_colorize(
-            [exponent_rule, expanded_example],
-            {
-                "a": BASE_COLOR,
-                "m": EXPONENT_COLOR,
-                "n": EXPONENT_COLOR,
-                "2": BASE_COLOR,
-                "3": EXPONENT_COLOR,
-                r"\times": OPERATION_COLOR
-            }
-        )
+        # self.apply_smart_colorize(
+        #     [exponent_rule, expanded_example],
+        #     {
+        #         "a": BASE_COLOR,
+        #         "m": EXPONENT_COLOR,
+        #         "n": EXPONENT_COLOR,
+        #         "2": BASE_COLOR,
+        #         "3": EXPONENT_COLOR,
+        #         r"\times": OPERATION_COLOR
+        #     }
+        # )
         
         # ============================================
         # SECTION 2: QUESTION
@@ -120,6 +120,7 @@ class ExponentsAddition01(MathTutorialScene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         source_exponents = self.parse_elements(rewrite_equation,
+            ('first_term', '2^1', 0),
             ('exp1', '1', 0),
             ('exp7', '7', 0),
             ('exp4', '4', 0)
@@ -130,16 +131,16 @@ class ExponentsAddition01(MathTutorialScene):
         )
         
         # Color the rewritten equation
-        self.apply_smart_colorize(
-            [rewrite_equation],
-            {
-                "2": BASE_COLOR,
-                "1": EXPONENT_COLOR,
-                "7": EXPONENT_COLOR,
-                "4": EXPONENT_COLOR,
-                r"\times": OPERATION_COLOR
-            }
-        )
+        # self.apply_smart_colorize(
+        #     [rewrite_equation],
+        #     {
+        #         "2": BASE_COLOR,
+        #         "1": EXPONENT_COLOR,
+        #         "7": EXPONENT_COLOR,
+        #         "4": EXPONENT_COLOR,
+        #         r"\times": OPERATION_COLOR
+        #     }
+        # )
         
         # ============================================
         # SECTION 5: APPLY THE RULE
@@ -221,17 +222,17 @@ class ExponentsAddition01(MathTutorialScene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         # Color the answer
-        self.apply_smart_colorize(
-            [answer_original, answer_value[0]],
-            {
-                "2": BASE_COLOR,
-                "7": EXPONENT_COLOR,
-                "4": EXPONENT_COLOR,
-                "12": RESULT_COLOR,
-                "4,096": RESULT_COLOR,
-                r"\times": OPERATION_COLOR
-            }
-        )
+        # self.apply_smart_colorize(
+        #     [answer_original, answer_value[0]],
+        #     {
+        #         "2": BASE_COLOR,
+        #         "7": EXPONENT_COLOR,
+        #         "4": EXPONENT_COLOR,
+        #         "12": RESULT_COLOR,
+        #         "4,096": RESULT_COLOR,
+        #         r"\times": OPERATION_COLOR
+        #     }
+        # )
         
         # ============================================
         # POSITION ALL SOLUTION STEPS
@@ -339,173 +340,171 @@ class ExponentsAddition01(MathTutorialScene):
         
         self.wait(1)
         
-        # === STEP 2: Rewrite with explicit exponents ===
-        with self.voiceover(
-            text="""Any number without an exponent actually has an exponent of 1."""
-        ) as tracker:
-            self.play(FadeIn(tip_1, shift=UP))
-            scroll.prepare_next(run_time=2)
+        # # === STEP 2: Rewrite with explicit exponents ===
+        # with self.voiceover(
+        #     text="""Any number without an exponent actually has an exponent of 1."""
+        # ) as tracker:
+        #     self.play(FadeIn(tip_1, shift=UP))
+        #     scroll.prepare_next(run_time=2)
             
-        with self.voiceover(
-            text="""So we can rewrite our first 2 as 2 to the power of 1."""
-        ) as tracker:
-            scroll.prepare_next(run_time=3)
-            # Highlight the change
-            self.play(self.indicate(rewrite_equation[0][0:2], color=EXPONENT_COLOR, run_time=2))
+        # with self.voiceover(
+        #     text="""So we can rewrite our first 2 as 2 to the power of 1."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=3)
+        #     # Highlight the change
+        #     self.play(self.indicate(source_exponents['first_term'], color=EXPONENT_COLOR, run_time=2))
         
-        self.wait(1)
-        self.play(FadeOut(tip_1, shift=DOWN))
+        # self.wait(1)
+        # self.play(FadeOut(tip_1, shift=DOWN))
         
-        # === STEP 3: Apply the rule ===
-        with self.voiceover(
-            text="""Now we can apply our multiplication rule for same bases."""
-        ) as tracker:
-            scroll.prepare_next(run_time=2)
-            self.play(self.indicate(rule_group, scale_factor=1.2, run_time=2))
+        # # === STEP 3: Apply the rule ===
+        # with self.voiceover(
+        #     text="""Now we can apply our multiplication rule for same bases."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=2)
+        #     self.play(self.indicate(rule_group, scale_factor=1.2, run_time=2))
             
-        with self.voiceover(
-            text="""When we multiply powers with the same base, we keep the base 
-            and add all the exponents together."""
-        ) as tracker:
-            scroll.prepare_next(run_time=2)
-            scroll.prepare_next(run_time=3)
+        # with self.voiceover(
+        #     text="""When we multiply powers with the same base, we keep the base 
+        #     and add all the exponents together."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=2)
+        #     scroll.prepare_next(run_time=3)
             
-        # Animate the exponents coming together
-        with self.voiceover(
-            text="""So we get 2 to the power of 1 plus 7 plus 4."""
-        ) as tracker:
+        # # Animate the exponents coming together
+        # with self.voiceover(
+        #     text="""So we get 2 to the power of 1 plus 7 plus 4."""
+        # ) as tracker:
             
-            # self.play(self.indicate(source_exponents_group, color=YELLOW, run_time=5))
+        #     for x in [source_exponents['exp1'], source_exponents['exp7'], source_exponents['exp4']]:
+        #         self.play(self.indicate(x, color=YELLOW, run_time=2))
             
-            for x in [source_exponents['exp1'], source_exponents['exp7'], source_exponents['exp4']]:
-                self.play(self.indicate(x, color=YELLOW, run_time=2))
-            
-            copies = VGroup(
-                source_exponents['exp1'].copy(),
-                source_exponents['exp7'].copy(),
-                source_exponents['exp4'].copy()
-            )
+        #     copies = VGroup(
+        #         source_exponents['exp1'].copy(),
+        #         source_exponents['exp7'].copy(),
+        #         source_exponents['exp4'].copy()
+        #     )
 
-            # Animate them
-            self.play(
-                copies[0].animate.move_to(target_positions['target1'].get_center()),
-                copies[1].animate.move_to(target_positions['target7'].get_center()),
-                copies[2].animate.move_to(target_positions['target4'].get_center()),
-                run_time=2
-            )
+        #     # Animate them
+        #     self.play(
+        #         copies[0].animate.move_to(target_positions['target1'].get_center()),
+        #         copies[1].animate.move_to(target_positions['target7'].get_center()),
+        #         copies[2].animate.move_to(target_positions['target4'].get_center()),
+        #         run_time=2
+        #     )
 
-            # Fade out the copies
-            self.play(FadeOut(copies))
+        #     # Fade out the copies
+        #     self.play(FadeOut(copies))
             
 
             
             
-            #self.play(source_exponents_group.copy().animate.move_to(target_positions_group.get_center()))
+        #     #self.play(source_exponents_group.copy().animate.move_to(target_positions_group.get_center()))
             
-            # self.play(
-            #     TransformFromCopy(source_exponents['exp1'], target_positions['target1']),
-            #     TransformFromCopy(source_exponents['exp7'], target_positions['target7']),
-            #     TransformFromCopy(source_exponents['exp4'], target_positions['target4']),
-            #     run_time=1.5
-            # )
+        #     # self.play(
+        #     #     TransformFromCopy(source_exponents['exp1'], target_positions['target1']),
+        #     #     TransformFromCopy(source_exponents['exp7'], target_positions['target7']),
+        #     #     TransformFromCopy(source_exponents['exp4'], target_positions['target4']),
+        #     #     run_time=1.5
+        #     # )
             
-            # self.play(FadeIn(target_positions['target1'], target_position=source_exponents['exp1']))
+        #     # self.play(FadeIn(target_positions['target1'], target_position=source_exponents['exp1']))
 
         
-            # scroll.fade_in_from_target(source_exponents['exp1'], target_positions['target1'])
-            # scroll.fade_in_from_target(source_exponents['exp7'], target_positions['target7'])
-            # scroll.fade_in_from_target(source_exponents['exp4'], target_positions['target4'])
+        #     # scroll.fade_in_from_target(source_exponents['exp1'], target_positions['target1'])
+        #     # scroll.fade_in_from_target(source_exponents['exp7'], target_positions['target7'])
+        #     # scroll.fade_in_from_target(source_exponents['exp4'], target_positions['target4'])
             
             
             
             
-            # # Create copies of exponents
-            # exp_copies = VGroup(
-            #     MathTex("1").scale(MATH_SCALE).set_color(EXPONENT_COLOR),
-            #     MathTex("7").scale(MATH_SCALE).set_color(EXPONENT_COLOR),
-            #     MathTex("4").scale(MATH_SCALE).set_color(EXPONENT_COLOR)
-            # )
+        #     # # Create copies of exponents
+        #     # exp_copies = VGroup(
+        #     #     MathTex("1").scale(MATH_SCALE).set_color(EXPONENT_COLOR),
+        #     #     MathTex("7").scale(MATH_SCALE).set_color(EXPONENT_COLOR),
+        #     #     MathTex("4").scale(MATH_SCALE).set_color(EXPONENT_COLOR)
+        #     # )
             
-            # # Position them at original locations
-            # exp_copies[0].move_to(rewrite_equation[0][1])
-            # exp_copies[1].move_to(rewrite_equation[0][4])
-            # exp_copies[2].move_to(rewrite_equation[0][6])
+        #     # # Position them at original locations
+        #     # exp_copies[0].move_to(rewrite_equation[0][1])
+        #     # exp_copies[1].move_to(rewrite_equation[0][4])
+        #     # exp_copies[2].move_to(rewrite_equation[0][6])
             
-            # # # Animate them moving to the sum
-            # # self.play(
-            # #     TransformFromCopy(rewrite_equation[0][1], exp_copies[0]),
-            # #     TransformFromCopy(rewrite_equation[0][4], exp_copies[1]),
-            # #     TransformFromCopy(rewrite_equation[0][6], exp_copies[2]),
-            # #     run_time=1.5
-            # # )
+        #     # # # Animate them moving to the sum
+        #     # # self.play(
+        #     # #     TransformFromCopy(rewrite_equation[0][1], exp_copies[0]),
+        #     # #     TransformFromCopy(rewrite_equation[0][4], exp_copies[1]),
+        #     # #     TransformFromCopy(rewrite_equation[0][6], exp_copies[2]),
+        #     # #     run_time=1.5
+        #     # # )
             
-            # self.play(
-            #     exp_copies[0].animate.move_to(apply_equation[0][1]),
-            #     exp_copies[1].animate.move_to(apply_equation[0][3]),
-            #     exp_copies[2].animate.move_to(apply_equation[0][5]),
-            #     run_time=1.5
-            # )
+        #     # self.play(
+        #     #     exp_copies[0].animate.move_to(apply_equation[0][1]),
+        #     #     exp_copies[1].animate.move_to(apply_equation[0][3]),
+        #     #     exp_copies[2].animate.move_to(apply_equation[0][5]),
+        #     #     run_time=1.5
+        #     # )
             
-            # self.play(FadeOut(exp_copies))
+        #     # self.play(FadeOut(exp_copies))
         
-        self.wait(1)
-        scroll.scroll_down(steps=2, run_time=1)
+        # self.wait(1)
+        # scroll.scroll_down(steps=2, run_time=1)
         
-        # === STEP 4: Calculate the sum ===
-        with self.voiceover(
-            text="""Now let's add the exponents: 1 plus 7 plus 4 equals 12."""
-        ) as tracker:
-            scroll.prepare_next(run_time=2)
-            scroll.prepare_next(run_time=2)
+        # # === STEP 4: Calculate the sum ===
+        # with self.voiceover(
+        #     text="""Now let's add the exponents: 1 plus 7 plus 4 equals 12."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=2)
+        #     scroll.prepare_next(run_time=2)
             
-        with self.voiceover(
-            text="""So our answer is 2 to the power of 12."""
-        ) as tracker:
-            scroll.prepare_next(run_time=2)
-            self.play(final_result['exponent'].animate.set_color(RESULT_COLOR), run_time=1)
+        # with self.voiceover(
+        #     text="""So our answer is 2 to the power of 12."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=2)
+        #     self.play(final_result['exponent'].animate.set_color(RESULT_COLOR), run_time=1)
         
-        self.wait(1)
+        # self.wait(1)
         
-        # === STEP 5: Verification (Optional) ===
-        with self.voiceover(
-            text="""Let's verify this makes sense by thinking about what exponents mean."""
-        ) as tracker:
-            scroll.prepare_next(run_time=2)
+        # # === STEP 5: Verification (Optional) ===
+        # with self.voiceover(
+        #     text="""Let's verify this makes sense by thinking about what exponents mean."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=2)
             
-        with self.voiceover(
-            text="""We have 1 factor of 2, then 7 factors of 2, then 4 factors of 2."""
-        ) as tracker:
-            scroll.prepare_next(run_time=3)
+        # with self.voiceover(
+        #     text="""We have 1 factor of 2, then 7 factors of 2, then 4 factors of 2."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=3)
             
-        with self.voiceover(
-            text="""That's a total of 12 factors of 2, which is 2 to the power of 12."""
-        ) as tracker:
-            scroll.prepare_next(run_time=3)
+        # with self.voiceover(
+        #     text="""That's a total of 12 factors of 2, which is 2 to the power of 12."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=3)
         
-        self.wait(1)
-        scroll.scroll_down(steps=4, run_time=1)
+        # self.wait(1)
+        # scroll.scroll_down(steps=4, run_time=1)
         
-        # === STEP 6: Final answer ===
-        with self.voiceover(
-            text="""Therefore, our final answer is 2 to the power of 12."""
-        ) as tracker:
-            self.play(
-                FadeOut(reference_group),
-                FadeOut(rule_bg),
-                FadeOut(expanded_bg)
-            )
-            scroll.prepare_next(run_time=2)
-            scroll.prepare_next(run_time=3)
+        # # === STEP 6: Final answer ===
+        # with self.voiceover(
+        #     text="""Therefore, our final answer is 2 to the power of 12."""
+        # ) as tracker:
+        #     self.play(
+        #         FadeOut(reference_group),
+        #         FadeOut(rule_bg),
+        #         FadeOut(expanded_bg)
+        #     )
+        #     scroll.prepare_next(run_time=2)
+        #     scroll.prepare_next(run_time=3)
             
-        with self.voiceover(
-            text="""If we calculate this value, 2 to the 12th power equals 4,096."""
-        ) as tracker:
-            scroll.prepare_next(run_time=3)
+        # with self.voiceover(
+        #     text="""If we calculate this value, 2 to the 12th power equals 4,096."""
+        # ) as tracker:
+        #     scroll.prepare_next(run_time=3)
             
-        with self.voiceover(
-            text="""Remember, this method only works when all the bases are the same!"""
-        ) as tracker:
-            self.play(FadeIn(tip_2, shift=UP))
-            self.wait(2)
+        # with self.voiceover(
+        #     text="""Remember, this method only works when all the bases are the same!"""
+        # ) as tracker:
+        #     self.play(FadeIn(tip_2, shift=UP))
+        #     self.wait(2)
             
-        self.wait(3)
+        # self.wait(3)

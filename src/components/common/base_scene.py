@@ -122,6 +122,7 @@ class MathTutorialScene(VoiceoverScene):
         self.play(FadeOut(arrow))
 
     def apply_smart_colorize(self, elements, color_map):
+        
         """Apply SmartColorizeStatic to a list of elements using the given color map.
         
         Args:
