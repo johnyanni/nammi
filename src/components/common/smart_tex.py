@@ -3,17 +3,32 @@
 from manim import *
 from typing import Dict, List, Union, Optional, Tuple
 
-def get_text_and_shape(text: VMobject, shape: VMobject, textstyle=False):
-    """Helper function to convert text and shape into Tex or MathTex objects with specific style"""
+def get_text_and_shape(text: VMobject, shape: VMobject, style=None):
+    """
+    Helper function to convert text and shape into Tex or MathTex objects with specific style
+
+    Styles: text, script, scriptscript, cramped
+    """
+    styles_map = {
+        "text": "textstyle",
+        "script": "scriptstyle",
+        "scriptscript": "scriptscriptstyle",
+        "cramped": "cramped",
+    }
+
+    if style is not None and style not in styles_map:
+        raise ValueError(f"Style '{style}' is not defined.")
+    
     # Define the font template
     template = TexTemplate()
     template.add_to_preamble(
         r"""
         \usepackage[T1]{fontenc}
         \usepackage{txfonts}
+        \usepackage{mathtools}
         """
     )    
-
+    
     if hasattr(text, "tex_string") and not isinstance(text, Tex):
         text_copy = MathTex(text.tex_string, tex_template=template)
     elif hasattr(text, "tex_strings"):
@@ -22,8 +37,8 @@ def get_text_and_shape(text: VMobject, shape: VMobject, textstyle=False):
         text_copy = text
 
     if hasattr(shape, "tex_string") and not isinstance(shape, Tex):
-        if textstyle:
-            shape_copy = MathTex(rf"\textstyle {shape.tex_string}", tex_template=template)
+        if style:
+            shape_copy = MathTex(rf"\{styles_map[style]}{{{shape.tex_string}}}", tex_template=template)
         else:
             shape_copy = MathTex(shape.tex_string, tex_template=template)
     elif hasattr(shape, "tex_strings"):
@@ -66,15 +81,14 @@ def search_shape_in_text(text: VMobject, shape: VMobject, index=0, threshold=100
         self.wait()
     """
     # Perform the shape search
-    text_copy, shape_copy = get_text_and_shape(text, shape)
-    results = _do_shape_search(text_copy, shape_copy, index, threshold)
-
-    # If no results found, try out with textstyle
-    if not results:
-        text_copy, shape_copy = get_text_and_shape(text, shape, textstyle=True)
+    styles = [None, "text", "cramped", "script", "scriptscript"]
+    for style in styles:
+        text_copy, shape_copy = get_text_and_shape(text, shape, style=style)
         results = _do_shape_search(text_copy, shape_copy, index, threshold)
+        if results:
+            return results
 
-    return results
+    return []
 
 
 def _do_shape_search(text: VMobject, shape: VMobject, index=0, threshold=100000):
