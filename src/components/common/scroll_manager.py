@@ -1,13 +1,16 @@
 """Scroll manager for handling scrolling animations in tutorials."""
 
+
 from manim import *
+from src.components.common.base_scene import LABEL_SCALE, MATH_SCALE, ANNOTATION_SCALE
+from src.components.common.base_scene import MathTutorialScene
 
 class ScrollManager(VGroup):
-    def __init__(self, equations, scene=None, *args, **kwargs):
+    def __init__(self, equations=None, scene=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.equations = equations
+        self.equations = equations if equations else VGroup()
         self.scene = scene  # Store scene reference
-        self.start_position = self.equations[0].copy()
+        self.start_position = self.equations[0].copy() if equations else None
         self.current_position = 0
         self.last_in_view = 0
         self.last_steps = 0
@@ -15,6 +18,13 @@ class ScrollManager(VGroup):
         # Store callouts with their target scroll index
         self.callouts_by_scroll_index = {}  # Key: scroll index, Value: list of callout managers
         self.scroll_count = 0  # Track number of scrolls
+
+        # Step management
+        self.steps = {} # Dictionary mapping labels to step indices
+        self.arranged_equations = VGroup() # VGroup to arrange equations
+        
+        # Initialize math scene
+        self.math_scene = MathTutorialScene()  
 
     # Helper methods for common operations
     def _get_scene(self, scene=None):
@@ -59,9 +69,124 @@ class ScrollManager(VGroup):
         self.scene = scene
         return self
 
-    def prepare_next(self, scene=None, target_slice=slice(None), same_item=False, 
-                    animation_type=Write, steps=1, run_time=None, animation_kwargs=None):
+    def update_start_position(self):
+        if not self.start_position:
+            self.start_position = self.equations[0].copy()
+
+    def create_tex(self, text, label=None, color=None, scale=LABEL_SCALE):
+        """Create a Tex object with the given text and scale."""
+        text = Tex(text).scale(scale)
+        if color: text.set_color(color)
+
+        return text, label
+
+    def create_math_tex(self, tex, label=None, color=None, scale=MATH_SCALE):
+        """Create a MathTex object"""
+        expression = MathTex(tex).scale(scale)
+        if color: expression.set_color(color)
+
+        return expression, label
+
+    
+    def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term,
+                                  color=RED, scale=MATH_SCALE, annotation_scale=ANNOTATION_SCALE, 
+                                  nth_from=0, nth_to=0, h_spacing=0, label=None):
+        """Create an equation with annotations as a single VGroup."""
+        equation = MathTex(equation_text).scale(scale)
+        
+        from_element = self.math_scene.find_element(from_term, equation, nth=nth_from)
+        to_element = self.math_scene.find_element(to_term, equation, nth=nth_to)
+
+        if from_element is None or to_element is None:
+            print(f"[WARN] Couldn't find: from='{from_term}' or to='{to_term}'")
+            return equation
+
+        # Use the existing add_annotations with scale parameter
+        annotations = self.math_scene.add_annotations(
+            annotation_text, from_element, to_element, 
+            color=color, h_spacing=h_spacing, scale=annotation_scale
+        )
+
+        result = VGroup(equation, *annotations)
+        result._has_annotation = True
+        
+        return result, label
+    
+    def arrange_equations(self):
+        """Arrange equations vertically"""
+        self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)    
+
+    def get_arranged_equations(self):
+        return self.arranged_equations
+        
+    def create_step(self, step, label=None, arrange=True):
+        # Check if the label already exists
+        if label and label in self.steps:
+            raise ValueError(f"Step label '{label}' already exists.")
+
+        # Current step index
+        step_index = len(self.equations)
+
+        # Use index as default label if none provided
+        label = step_index if not label else label
+
+        self.steps[label] = step_index
+
+        # Add the step to equations
+        self.equations.add(step)
+
+        # Add the equation to the arrangement if required
+        if arrange:
+            self.arranged_equations.add(step)
+            self.arrange_equations()
+        
+        return step
+
+    def create_steps(self, steps, labels=None, arrange=True):
+        """Create multiple steps with optional labels."""
+        if labels is None:
+            labels = [None] * len(steps)
+
+        steps_group = VGroup()
+        for step, label in zip(steps, labels):
+            steps_group.add(self.create_step(step, label, arrange))
+
+        return steps_group
+
+    def construct_step(self, *args, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.2, add_to_scroll=True, arrange=True):
+        """
+        Accepts any number of two-value tuples as arguments - (step, label)
+        """
+        steps = VGroup()
+        for step, label in args:
+            if add_to_scroll:
+                steps.add(self.create_step(step, label, arrange))
+            else:
+                steps.add(step)
+
+        steps.arrange(arrange_dir, aligned_edge=aligned_edge, buff=buff)
+
+        # If the steps are not a part of the flow yet, but they a part of the arrangement
+        if not add_to_scroll and arrange:
+            self.arranged_equations.add(steps)
+            self.arrange_equations()
+            
+        return steps
+            
+    def _resolve_target(self, target):
+        if target in self.steps:
+            return self.steps[target]
+        elif isinstance(target, int):
+            return target
+        else:
+            raise ValueError(f"Target '{target}' is not a valid step label or index")
+        
+    def prepare_next(self, target=None, scene=None, target_slice=slice(None), same_item=False, 
+                     animation_type=Write, steps=1, run_time=None, lag_ratio=1, animation_kwargs=None):
         """Prepare next elements with optional scene override."""
+
+        # Update start_position after arranging the steps
+        self.update_start_position()
         
         # Debug flag - set to True to enable debug output
         DEBUG = False
@@ -71,35 +196,41 @@ class ScrollManager(VGroup):
         
         if same_item:
             self.current_position -= self.last_steps
-                
+
+        # Handle target-based preperation
+        if target:
+            target_index = self._resolve_target(target)
+            
+            if target_index >= self.current_position:
+                steps = target_index - self.current_position + 1
+            else:
+                raise ValueError(f"Target index {target_index} is behind current position {self.current_position}")
+
+            
         steps = self._validate_position(steps, "No more equations to display.")
         if steps == 0:
             return self
         
-        # Handle annotated equations
-        current_item = self.equations[self.current_position]
-        if isinstance(current_item, VGroup) and hasattr(current_item, '_has_annotation'):
-            if DEBUG:
-                print(f"\n[DEBUG] Item {self.current_position}: ANNOTATED EQUATION")
-                print(f"  Type: {type(current_item).__name__}")
-                print(f"  Has annotation: {hasattr(current_item, '_has_annotation')}")
-                
-            scene.play(animation_type(current_item[0], **animation_kwargs))
-            if len(current_item) > 1:
-                scene.play(FadeIn(VGroup(*current_item[1:])))
-            self.last_steps = steps
-            self.current_position += steps
-            return self
-        
-        # Handle regular items
         animations = []
         
         for i in range(steps):
             if self.current_position + i >= len(self.equations):
                 break
-                
-            item = self.equations[self.current_position + i]
             
+            item = self.equations[self.current_position + i]
+
+            # Handle annotated equations
+            if isinstance(item, VGroup) and hasattr(item, '_has_annotation'):
+                if DEBUG:
+                    print(f"\n[DEBUG] Item {self.current_position}: ANNOTATED EQUATION")
+                    print(f"  Type: {type(item).__name__}")
+                    print(f"  Has annotation: {hasattr(item, '_has_annotation')}")
+                
+                animations.append(animation_type(item[0], **animation_kwargs))
+                if len(item) > 1:
+                    animations.append(FadeIn(VGroup(*item[1:])))
+                continue
+                    
             if DEBUG:
                 print(f"\n[DEBUG] Item {self.current_position + i}:")
                 print(f"  Type: {type(item).__name__}")
@@ -121,6 +252,11 @@ class ScrollManager(VGroup):
                 to_animate = item[target_slice]
                 method = "VGROUP (non-text)"
                 details = f"Slicing VGroup with {target_slice}"
+
+            elif isinstance(item, VGroup) and len(item) > 0 and isinstance(item[0], (MathTex, Tex, Text)):
+                to_animate = item
+                method = "VGROUP (text/math)"
+                details = "Animating entire VGroup of text/math elements"
                 
             else:
                 to_animate = item[0][target_slice]
@@ -138,23 +274,28 @@ class ScrollManager(VGroup):
                 print(f"  Result type: {type(to_animate).__name__}")
                 if hasattr(to_animate, '__len__'):
                     print(f"  Result length: {len(to_animate)}")
-            
+                    
             animations.append(animation_type(to_animate, **animation_kwargs))
         
         if animations:
             if run_time:
-                scene.play(*animations, **run_time)
+                scene.play(AnimationGroup(*animations, lag_ratio=lag_ratio), **run_time)
             else:
-                scene.play(*animations)
+                scene.play(AnimationGroup(*animations, lag_ratio=lag_ratio))
 
         self.last_steps = steps
         self.current_position += steps
         return self
 
-    def scroll_down(self, scene=None, steps=1, run_time=None):
+    def scroll_down(self, target=None, scene=None, steps=1, run_time=None):
         """Scrolls equations up and reveals new equations"""
         scene = self._get_scene(scene)
         run_time, _ = self._get_animation_params(run_time)
+
+        # Handle target-based scrolling
+        if target:
+            target_index = self._resolve_target(target)
+            steps = target_index - self.last_in_view
             
         hidden_equations = self.equations[self.last_in_view : self.last_in_view + steps]
         viewed_equations = self.equations[

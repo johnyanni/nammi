@@ -9,6 +9,7 @@ from .smart_tex import *
 from .custom_axes import CustomAxes
 
 from functools import partial, partialmethod
+from typing import NamedTuple
 
 # Scale Constants
 MATH_SCALE = 0.80        # Standard math formula scale
@@ -916,3 +917,87 @@ class MathTutorialScene(VoiceoverScene):
         )
         line.move_to(target_mobject.get_center())
         return line
+
+
+    def create_background_rect(self, group):
+        """Create a standard background rectangle."""
+        return SurroundingRectangle(
+            group,
+            buff=0.25,
+            fill_opacity=0.02,
+            fill_color=WHITE,
+            stroke_color=WHITE,
+            stroke_opacity=0.4,
+            stroke_width=1,
+            corner_radius=0.1
+        )
+
+    def create_labeled_formula(self, title, expression, buff=0.2, color=LIGHT_GRAY):
+        """Creates a labeled mathematical formula with background rectangle.
+         
+        Constructs a VGroup containing a title (Tex) and formula (MathTex) with optional
+         background rectangle, returning all components as a named tuple for easy access.
+         
+        Args:
+         title (str): Text label for the formula
+         expression (str): Mathematical expression 
+         buff (optional): Buffer space between label and formula. 
+         color (optional): Color for the entire group. 
+         
+        Returns:
+         LabeledFormula: Named tuple containing:
+            - label (Tex): The title text object
+            - formula (MathTex): The mathematical expression
+            - background (Rectangle): Background rectangle
+            - group (VGroup): Complete grouped object
+            
+        Example:
+         >>> formula_parts = self.create_labeled_formula("Equation", "x^2 + y^2 = z^2")
+         >>> self.play(Write(formula_parts.group))
+         """
+        class LabeledFormula(NamedTuple):
+            label: Tex
+            formula: MathTex
+            background: Rectangle
+            group: VGroup
+            
+        labeled_formula =  VGroup(
+            Tex(title).scale(LABEL_SCALE),
+            MathTex(expression).scale(MATH_SCALE)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=buff)
+        
+        background = self.create_background_rect(labeled_formula)
+        group = VGroup(labeled_formula, background).set_color(color)
+        
+        return LabeledFormula(
+            label=labeled_formula[0],
+            formula=labeled_formula[1],
+            background=background,
+            group=group
+        )
+   
+    def FadeInThenWrite(self, fadein_list, write_list, run_time=3):
+        """Creates an animation group that fades in objects then writes others.
+    
+        Combines two animation operations into a single AnimationGroup:
+          1. Fades in all objects in fadein_list
+          2. Simultaneously writes all objects in write_list
+        
+        Args:
+          fadein_list (Iterable[Mobject]): Objects to fade in
+          write_list (Iterable[Mobject]): Objects to write
+          run_time (float, optional): Duration for write animation. Defaults to 3.
+        
+        Returns: AnimationGroup
+        
+        Example:
+          >>> self.play(self.FadeInThenWrite(
+          ...     fadein_list=[circle],
+          ...     write_list=[text],
+          ...     run_time=2
+          ... ))
+        """
+        return AnimationGroup(
+            FadeIn(*fadein_list),
+            Write(VGroup(*write_list), run_time=run_time)
+        )
