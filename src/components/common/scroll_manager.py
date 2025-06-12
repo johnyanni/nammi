@@ -130,20 +130,19 @@ class ScrollManager(VGroup):
     
     def arrange_equations(self):
         self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
-        
-        # Auto-position if target is set
-        if self.position_target:
+    
+        # Only reposition to target if we haven't scrolled
+        if self.position_target and self.scroll_count == 0:
             self.arranged_equations.next_to(
                 self.position_target, 
                 self.position_config.get('direction', DOWN),
                 buff=self.position_config.get('buff', 0.4)
             )
-            align_edge = self.position_config.get('align_edge')
-            if align_edge is not None:
+            if 'align_edge' in self.position_config:
                 self.arranged_equations.align_to(
                     self.position_target,
-                    align_edge
-                ) 
+                    self.position_config['align_edge']
+                )
 
     def add_to_arragement(self, group):
         self.arranged_equations.add(group)
@@ -210,6 +209,14 @@ class ScrollManager(VGroup):
             self.arrange_equations()
             
         return steps
+    
+    def get_by_label(self, label):
+        """Get an element by its label."""
+        if label not in self.steps:
+            raise KeyError(f"No element with label '{label}' found")
+        
+        index = self.steps[label]
+        return self.equations[index]
             
     def _resolve_target(self, target):
         if target in self.steps:

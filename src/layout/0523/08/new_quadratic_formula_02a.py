@@ -53,11 +53,11 @@ class NEWQuadraticFormula01(MathTutorialScene):
         ).arrange(DOWN, aligned_edge=RIGHT, buff=0.5).to_corner(DR, buff=0.3).set_color(LIGHT_GRAY)
         
         # DEV MODE        
-        quadratic_form_coefficients = self.parse_elements(quadratic_form.formula,
-            ('a', 'a', 0, A_COLOR),
-            ('b', 'b', 0, B_COLOR),
-            ('c', 'c', 0, C_COLOR)
-        )
+        # quadratic_form_coefficients = self.parse_elements(quadratic_form.formula,
+        #     ('a', 'a', 0, A_COLOR),
+        #     ('b', 'b', 0, B_COLOR),
+        #     ('c', 'c', 0, C_COLOR)
+        # )
         
         
         self.play(
@@ -138,10 +138,11 @@ class NEWQuadraticFormula01(MathTutorialScene):
         scroll.prepare_next("m_expand_squared_term")
         scroll.prepare_next("m_expand_squared_term_result")
         
-        
         # >>>>>>>>>> SCROLL DOWN <<<<<<<<<<
         scroll.scroll_down("ae_divide_both_sides_by_4")
+        
         self.wait(1)
+            
             
         # ======== Step 3: Get in standard form (subtract 12) ========
 
@@ -162,60 +163,47 @@ class NEWQuadraticFormula01(MathTutorialScene):
         scroll.prepare_next("m_subtract_12_from_both_sides_result")
         self.play(self.indicate(quadratic_form.group, scale_factor=1.2))
         
-        
         self.wait(1)
-        # >>>>>>>>>> SCROLL DOWN <<<<<<<<<<
-        scroll.scroll_down("m_subtract_12_from_both_sides_result")
             
         
         # ======== Step 4: Standard form: Identify coefficients ========
         
         identify_coefficients_step = scroll.construct_step(
-            scroll.create_tex("Now, identify the coefficients:", label="ig_l_identify_coefficients"),
-            scroll.create_math_tex(r"x^2 + 10x + 13 = 0", label="ig_m_standard_form_equation"),
-            scroll.create_math_tex(r"a = 1 \quad b = 10 \quad c = 13", label="ig_m_coefficients", scale=1.0),
-            add_to_scroll=False
+            scroll.create_tex("Now, identify the coefficients:", label="l_identify_coefficients"),
+            scroll.create_math_tex(r"x^2 + 10x + 13 = 0", label="m_standard_form_equation")
         )
         
         coefficient_values_in_equation = self.parse_elements(
-            identify_coefficients_step[1],
+            scroll.get_by_label("m_standard_form_equation"),
             ('a_value', 'x', 0, A_COLOR),  
             ('b_value', '10', 0, B_COLOR),
-            ('c_value', '13', 0, C_COLOR)
+            ('c_value', '13', 0, C_COLOR),
         )
         
-        coefficient_labels = self.parse_elements(
-            identify_coefficients_step[2],
+        
+        
+        
+        
+           
+        sol2_step2 = scroll.construct_step(
+            scroll.create_math_tex(r"a = 1 \quad b = 10 \quad c = 13"),
+            add_to_scroll=False
+        )
+        
+        coefficient_labels = self.parse_elements(sol2_step2[0],
             ('a_label', 'a =', 0, A_COLOR),
             ('b_label', 'b =', 0, B_COLOR),
             ('c_label', 'c =', 0, C_COLOR)
         )
                 
-        coefficient_values = self.parse_elements(
-            identify_coefficients_step[2],
+        coefficient_values = self.parse_elements(sol2_step2[0],
             ('a_value', '1', 0, A_COLOR),
             ('b_value', '10', 0, B_COLOR),
             ('c_value', '13', 0, C_COLOR)
         )
-        
-        scroll.create_steps(identify_coefficients_step[:-1], ["l_identify_coefficients", "m_standard_form_equation"], arrange=False)
-        scroll.create_steps(coefficient_labels.values(), ["coefficient_a_label", "coefficient_b_label", "coefficient_c_label"], arrange=False)
+
+        scroll.create_steps(coefficient_labels.values(), [None, None, "coefficient_c_label"], arrange=False)
         scroll.create_steps(coefficient_values.values(), arrange=False)
-        
-        
-        scroll.prepare_next("l_identify_coefficients")
-        scroll.prepare_next("m_standard_form_equation")
-        
-        scroll.prepare_next(steps=3, run_time=3)
-        
-        self.play(self.indicate(quadratic_form_coefficients['a']))
-        scroll.fade_in_from_target(coefficient_values_in_equation['a_value'], coefficient_values['a_value'])
-        
-        self.play(self.indicate(quadratic_form_coefficients['b']))
-        scroll.fade_in_from_target(coefficient_values_in_equation['b_value'], coefficient_values['b_value'])
-        
-        self.play(self.indicate(quadratic_form_coefficients['c']))
-        scroll.fade_in_from_target(coefficient_values_in_equation['c_value'], coefficient_values['c_value'])
         
         
         
@@ -239,7 +227,6 @@ class NEWQuadraticFormula01(MathTutorialScene):
         sol3_step2 = scroll.construct_step(
             scroll.create_tex("Substitute the coefficients into the formula:"),
             scroll.create_math_tex(r"x = \frac{-(10) \pm \sqrt{(10)^2 - 4(1)(13)}}{2(1)}"),
-            scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}"),
             add_to_scroll=False,
             arrange=False
         )
