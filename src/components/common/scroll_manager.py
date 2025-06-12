@@ -151,6 +151,7 @@ class ScrollManager(VGroup):
         
     def get_arranged_equations(self):
         return self.arranged_equations
+
         
     def create_step(self, step, label=None, arrange=True):
         # Check if the label already exists
