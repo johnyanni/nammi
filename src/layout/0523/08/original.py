@@ -1,6 +1,6 @@
 from manim import *
 from src.components.common.base_scene import *
-from src.components.common.scroll_manager_saved_1 import ScrollManager
+from components.common.scroll_manager_original import ScrollManager
 from src.components.common.smart_tex import SmartColorizeStatic
 
 config.verbosity = "ERROR"

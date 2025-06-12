@@ -7,6 +7,7 @@ from src.components.common.base_scene import MathTutorialScene
 class ScrollManager(VGroup):
     def __init__(self, equations=None, scene=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.last_positioned_step = None
         self.equations = equations if equations else VGroup()
         self.scene = scene  # Store scene reference
         self.start_position = self.equations[0].copy() if equations else None
@@ -119,8 +120,30 @@ class ScrollManager(VGroup):
         
         return result, label
     
+    def set_position_target(self, target, direction=DOWN, buff=0.4, align_edge=LEFT):
+        """Set the target for automatic positioning."""
+        self.position_target = target
+        self.position_config = {
+            'direction': direction,
+            'buff': buff,
+            'align_edge': align_edge
+        }
+    
     def arrange_equations(self):
-        self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)    
+        self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+    
+        # Only reposition to target if we haven't scrolled
+        if self.position_target and self.scroll_count == 0:
+            self.arranged_equations.next_to(
+                self.position_target, 
+                self.position_config.get('direction', DOWN),
+                buff=self.position_config.get('buff', 0.4)
+            )
+            if 'align_edge' in self.position_config:
+                self.arranged_equations.align_to(
+                    self.position_target,
+                    self.position_config['align_edge']
+                )
 
     def add_to_arragement(self, group):
         self.arranged_equations.add(group)
@@ -128,7 +151,7 @@ class ScrollManager(VGroup):
         
     def get_arranged_equations(self):
         return self.arranged_equations
-        return self.arranged_equations
+
         
     def create_step(self, step, label=None, arrange=True):
         # Check if the label already exists
@@ -186,6 +209,49 @@ class ScrollManager(VGroup):
             self.arranged_equations.add(steps)
             self.arrange_equations()
             
+        return steps
+    
+    def get_by_label(self, label):
+        """Get an element by its label."""
+        if label not in self.steps:
+            raise KeyError(f"No element with label '{label}' found")
+        
+        index = self.steps[label]
+        return self.equations[index]
+    
+    
+    def create_and_position_step(self, *args, reference=None, direction=DOWN, buff=0.4, 
+                               add_to_scroll=True, internal_buff=0.2, **kwargs):
+        """Create and position a step - replaces construct_step."""
+        steps = VGroup()
+        
+        # Build the step (similar to construct_step)
+        for step, label in args:
+            if add_to_scroll:
+                steps.add(self.create_step(step, label, arrange=False))
+            else:
+                steps.add(step)
+        
+        # Internal arrangement
+        steps.arrange(DOWN, aligned_edge=LEFT, buff=internal_buff)
+        
+        # Determine reference point
+        if reference is None:
+            if hasattr(self, 'last_positioned_step') and self.last_positioned_step:
+                reference = self.last_positioned_step
+            elif self.position_target:
+                reference = self.position_target
+                direction = self.position_config.get('direction', DOWN)
+                buff = self.position_config.get('buff', 0.4)
+        
+        # Position the step
+        if reference:
+            steps.next_to(reference, direction, buff=buff)
+            steps.align_to(reference, LEFT)
+        
+        # Track for next step
+        self.last_positioned_step = steps
+        
         return steps
             
     def _resolve_target(self, target):
