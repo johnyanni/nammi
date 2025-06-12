@@ -72,17 +72,25 @@ class ScrollManager(VGroup):
         if not self.start_position:
             self.start_position = self.equations[0].copy()
 
-    def create_tex(self, text, label=None, color=None, scale=LABEL_SCALE):
-        """Create a Tex object with the given text and scale."""
-        text = Tex(text).scale(scale)
-        if color: text.set_color(color)
+    def create_tex(self, text, label=None, scale=LABEL_SCALE, **kwargs):
+        """Create a Tex object with the given text and scale.
+        
+        Example usage:
+            create_tex("Hello", color=RED, font_size=48)
+            create_tex("World", tex_template=my_template)
+        """
+        text = Tex(text, **kwargs).scale(scale)
 
         return text, label
 
-    def create_math_tex(self, tex, label=None, color=None, scale=MATH_SCALE):
-        """Create a MathTex object"""
-        expression = MathTex(tex).scale(scale)
-        if color: expression.set_color(color)
+    def create_math_tex(self, tex, label=None, scale=MATH_SCALE, **kwargs):
+        """Create a MathTex object
+        
+        Example usage:
+            create_math_tex("x^2 + y^2", color=BLUE)
+            create_math_tex("\\frac{a}{b}", tex_to_color_map={"a": RED, "b": GREEN})
+        """
+        expression = MathTex(tex, **kwargs).scale(scale)
 
         return expression, label
 
