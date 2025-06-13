@@ -5,7 +5,7 @@ from src.components.common.base_scene import LABEL_SCALE, MATH_SCALE, ANNOTATION
 from src.components.common.base_scene import MathTutorialScene
 
 class ScrollManager(VGroup):
-    def __init__(self, equations=None, scene=None, *args, **kwargs):
+    def __init__(self, equations=None, scene=None, global_arrangement=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.equations = equations if equations else VGroup()
         self.scene = scene  # Store scene reference
@@ -21,6 +21,9 @@ class ScrollManager(VGroup):
         # Step management
         self.steps = {} # Dictionary mapping labels to step indices
         self.arranged_equations = VGroup() # VGroup to arrange equations
+        
+        # Global arrangement flag
+        self.global_arrangement = global_arrangement
         
         # Initialize math scene
         self.math_scene = MathTutorialScene()  
@@ -68,6 +71,12 @@ class ScrollManager(VGroup):
         self.scene = scene
         return self
 
+    def set_position_target(self, target, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.3):
+        self.target_position = target
+        self.target_position_dir = arrange_dir
+        self.target_position_edge = aligned_edge
+        self.target_position_buff = buff
+    
     def update_start_position(self):
         if not self.start_position:
             self.start_position = self.equations[0].copy()
@@ -120,16 +129,27 @@ class ScrollManager(VGroup):
         return result, label
     
     def arrange_equations(self):
-        self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)    
-
-    def add_to_arragement(self, group):
-        self.arranged_equations.add(group)
-        self.arrange_equations()
+        self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        
+    def add_to_arrangement(self, group, first_step=False):
+        if self.global_arrangement:
+            self.arranged_equations.add(group)
+            self.arrange_equations()
+        else:
+            target = self.get_current_visible_eqn() if not first_step else self.target_position
+            group.next_to(
+                target,
+                self.target_position_dir,
+                buff=self.target_position_buff,
+                aligned_edge=self.target_position_edge
+            ).align_to(self.target_position, LEFT)
         
     def get_arranged_equations(self):
         return self.arranged_equations
-        return self.arranged_equations
-        
+
+    def get_current_visible_eqn(self):
+        return self.equations[self.current_position - 1]
+    
     def create_step(self, step, label=None, arrange=True):
         # Check if the label already exists
         if label and label in self.steps:
@@ -143,35 +163,40 @@ class ScrollManager(VGroup):
 
         self.steps[label] = step_index
 
+        # Check if this is the first step
+        first_step = len(self.equations) == 0
+        
         # Add the step to equations
         self.equations.add(step)
 
         # Add the equation to the arrangement if required
-        if arrange:
-            self.arranged_equations.add(step)
-            self.arrange_equations()
+        if arrange: self.add_to_arrangement(step, first_step)
         
         return step
 
     def create_steps(self, steps, labels=None, arrange=True):
         """Create multiple steps with optional labels."""
+        # Check if this is the first step
+        first_step = len(self.equations) == 0
+
         if labels is None:
             labels = [None] * len(steps)
 
         steps_group = VGroup()
         for step, label in zip(steps, labels):
             steps_group.add(self.create_step(step, label, arrange=False))
-            
-        if arrange:
-            self.arranged_equations.add(steps_group)
-            self.arrange_equations()
-            
+
+        if arrange: self.add_to_arrangement(steps_group, first_step)
+        
         return steps_group
 
     def construct_step(self, *args, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.2, add_to_scroll=True, arrange=True):
         """
         Accepts any number of two-value tuples as arguments - (step, label)
         """
+        # Check if this is the first step
+        first_step = len(self.equations) == 0
+        
         steps = VGroup()
         for step, label in args:
             if add_to_scroll:
@@ -181,11 +206,9 @@ class ScrollManager(VGroup):
 
         steps.arrange(arrange_dir, aligned_edge=aligned_edge, buff=buff)
 
-        # If the steps are not a part of the flow yet, but they a part of the arrangement
-        if arrange:
-            self.arranged_equations.add(steps)
-            self.arrange_equations()
-            
+        if arrange: 
+            self.add_to_arrangement(steps, first_step)
+        
         return steps
     
     ### NEW (JOHN) ###
@@ -355,6 +378,7 @@ class ScrollManager(VGroup):
             *callout_animations,
             **run_time,
         )
+                        
         self.remove(hidden_equations)
         self.last_in_view += steps
         
