@@ -127,6 +127,8 @@ class QuadraticFormula01a(MathTutorialScene):
             MathTex(r"x \quad = \quad \frac{-b \pm \sqrt{b^2 \ - \ 4ac}}{2a}").scale(MATH_SCALE)
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
+        SmartColorizeStatic(sol3_step1[0], {"quad": B_COLOR, "x": C_COLOR, "e": YELLOW})
+        
         sol3_step2 = VGroup(
             Tex("Substitute the coefficients into the formula:").scale(LABEL_SCALE),
             MathTex(r"x = \frac{-(-3) \pm \sqrt{(-3)^2 - 4(-1)(9)}}{2(-1)}").scale(MATH_SCALE)
