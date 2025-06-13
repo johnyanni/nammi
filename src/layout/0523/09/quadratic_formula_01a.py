@@ -5,7 +5,9 @@ from src.components.common.smart_tex import SmartColorizeStatic
 
 config.verbosity = "ERROR"
 
-class NEWQuadraticFormula01(MathTutorialScene): 
+MATH_SCALE = 1.20
+
+class QuadraticFormula01(MathTutorialScene): 
     def construct(self):
 
         A_COLOR = "#47e66c"
@@ -59,6 +61,15 @@ class NEWQuadraticFormula01(MathTutorialScene):
             ('c', 'c', 0, C_COLOR)
         )
         
+        self.apply_smart_colorize(
+            [quadratic_formula.formula],
+            {
+                "a": A_COLOR,
+                "b": B_COLOR,
+                "c": C_COLOR
+            }
+        )
+        
         
         self.play(
             self.FadeInThenWrite(
@@ -108,8 +119,6 @@ class NEWQuadraticFormula01(MathTutorialScene):
             scroll.create_math_tex(r"(x+5)^2 = 12", label="m_divide_by_4_result")
         )
         
-        
-
         
         
         
@@ -174,12 +183,60 @@ class NEWQuadraticFormula01(MathTutorialScene):
         
         scroll.create_steps(s4_identify_coefficients_step[:-1], ["l_identify_coefficients", "m_standard_form_equation"], arrange=False)
         scroll.create_steps(coefficient_labels.values(), ["coefficient_a_label", "coefficient_b_label", "coefficient_c_label"], arrange=False)
-        scroll.create_steps(coefficient_values.values(), arrange=False)
+        scroll.create_steps(coefficient_values.values(), ["coefficient_a_value", "coefficient_b_value", "coefficient_c_value"], arrange=False)
+        
+        
+        
+        # ======== Step 5: Use the quadratic formula ========
+        
+        s5_quadratic_formula_step = scroll.construct_step(
+            scroll.create_tex(r"Use the \textbf{quadratic formula} to solve for $x$:", label="l_quadratic_formula"),
+            scroll.create_math_tex(r"x \quad = \quad \frac{-b \pm \sqrt{b^2 \ - \ 4ac}}{2a}", label="m_quadratic_formula")
+        )
+        
+        coefficient_values_in_formula = self.parse_elements(
+            s5_quadratic_formula_step[1],
+            ('b', 'b', B_COLOR),
+            ('a1', 'a', 0, A_COLOR),
+            ('c', 'c', C_COLOR),
+            ('a2', 'a', 1, A_COLOR)
+        )
+        
+        
+        
+        # ======== Step 6: Substitute values ========
+        
+        s6_substitute_values_step = scroll.construct_step(
+            scroll.create_tex(r"Substitute the coefficients into the formula:"),
+            scroll.create_math_tex(r"x = \frac{-(10) \pm \sqrt{(10)^2 - 4(1)(13)}}{2(1)}"),
+            add_to_scroll=False
+        )
+        
+        substituted_values = self.parse_elements(
+            s6_substitute_values_step[1],
+            ('b_in_frac', '10', 0, B_COLOR, 0),
+            ('b_in_sqrt', '10', 1, B_COLOR, 0),
+            ('a_in_4ac', '1', 2, A_COLOR, 0),
+            ('c_in_4ac', '13', 0, C_COLOR, 0),
+            ('a_in_denom', '1', -1, A_COLOR, 0)
+        )
+        
+        visible_copies = VGroup()
+
+        for name, element in substituted_values.items():
+            visible_copy = element.copy().set_opacity(1)
+            setattr(visible_copies, name, visible_copy)
+            visible_copies.add(visible_copy)
+        
+        s6_substitute_values_step[1].add(visible_copies)
+        
+        scroll.create_steps(s6_substitute_values_step, ["l_substitute_values", "m_empty_formula"], arrange=False)
+        scroll.create_steps(visible_copies, arrange=False)
         
         
         
         
-        
+       
         
         
         
@@ -223,6 +280,9 @@ class NEWQuadraticFormula01(MathTutorialScene):
         
         
         
+        
+        
+        
         # ===============================================================
         # Animation: Step 2: Expand the squared term (FOIL) 
         # ===============================================================
@@ -235,6 +295,11 @@ class NEWQuadraticFormula01(MathTutorialScene):
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         scroll.scroll_down("ae_divide_both_sides_by_4")
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        
+        
+        
+        
+        
         
         
         
@@ -258,6 +323,9 @@ class NEWQuadraticFormula01(MathTutorialScene):
         
         
         
+        
+        
+        
         # ===============================================================
         # Animation: Step 4: Standard form: Identify coefficients 
         # ===============================================================
@@ -265,7 +333,9 @@ class NEWQuadraticFormula01(MathTutorialScene):
         scroll.prepare_next("l_identify_coefficients")
         scroll.prepare_next("m_standard_form_equation")
         
-        scroll.prepare_next(steps=3, run_time=3)
+        scroll.prepare_next("coefficient_a_label")
+        scroll.prepare_next("coefficient_b_label")
+        scroll.prepare_next("coefficient_c_label")
         
         self.play(self.indicate(quadratic_form_coefficients['a']))
         scroll.fade_in_from_target(coefficient_values_in_equation['a_value'], coefficient_values['a_value'])
@@ -276,136 +346,76 @@ class NEWQuadraticFormula01(MathTutorialScene):
         self.play(self.indicate(quadratic_form_coefficients['c']))
         scroll.fade_in_from_target(coefficient_values_in_equation['c_value'], coefficient_values['c_value'])
         
+        self.wait(1)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        scroll.scroll_down("m_standard_form_equation")
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         
         
         
         
         
         
-        # sol3_step1 = scroll.create_and_position_step(
-        #     scroll.create_tex("Use the quadratic formula to solve for $x$:"),
-        #     scroll.create_math_tex(r"x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}", label="quadratic_formula")
-        # )
         
-        # sol3_step2 = scroll.create_and_position_step(
-        #     scroll.create_tex("Substitute the coefficients into the formula:"),
-        #     scroll.create_math_tex(r"x = \frac{-(10) \pm \sqrt{(10)^2 - 4(1)(13)}}{2(1)}"),
-        #     scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}"),
-        #     add_to_scroll=False,
-        #     arrange=False
-        # )
         
-        # coefficient_values_in_formula = self.parse_elements(sol3_step2[1],
-        #     ('b_in_frac', '10', 0, B_COLOR, 0),
-        #     ('b_in_sqrt', '10', 1, B_COLOR, 0),
-        #     ('a_in_4ac', '1', 2, A_COLOR, 0),
-        #     ('c_in_4ac', '13', 0, C_COLOR, 0),
-        #     ('a_in_denom', '1', -1, A_COLOR, 0)
-        # )
+        # ===============================================================
+        # Animation: Step 5: The quadratic formula 
+        # ===============================================================
         
-        # visible_copies = VGroup()
-
-        # for name, element in coefficient_values_in_formula.items():
-        #     visible_copy = element.copy().set_opacity(1)
-        #     setattr(visible_copies, name, visible_copy)
-        #     visible_copies.add(visible_copy)
+        scroll.prepare_next("l_quadratic_formula")
+        self.play(self.indicate(quadratic_formula.group, scale_factor=1.2))
+        scroll.prepare_next("m_quadratic_formula")
+        
+        self.wait(1)
+        
+        
+        
+        
+        
+        # ===============================================================
+        # Animation: Step 6: Substitute values 
+        # ===============================================================
+       
+        scroll.prepare_next("l_substitute_values")
+        scroll.prepare_next("m_empty_formula")
+        
+        self.play(
+            self.indicate(coefficient_values['b_value'], color=None),
+            self.indicate(coefficient_values_in_formula['b'], color=None)
+        )
+        scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_frac)
+        scroll.fade_in_from_target(coefficient_values['b_value'], visible_copies.b_in_sqrt)
+        
+        
+        self.play(
+            self.indicate(coefficient_values['a_value'], color=None),
+            self.indicate(coefficient_values_in_formula['a1'], color=None),
+        )
+        scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_4ac)
+    
             
-        # sol3_step2[1].add(visible_copies)
-        # scroll.create_steps(sol3_step2, [None, "empty_formula"])
-        # scroll.create_steps(visible_copies, arrange=False)
-        
-        # sol3_step3 = scroll.create_and_position_step(
-        #     scroll.create_tex("Simplify the expression:"),
-        #     scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}", label="simplified_expression")
-        # )
-        
-        # sol3_step4 = scroll.create_and_position_step(
-        #     scroll.create_tex("Continue simplifying:"),
-        #     scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{48}}{2}")
-        # )
-        
-        # sol3_step4_sqrt = sol3_step4[1][0][6:10]
-
-        # sol3_step5 = scroll.create_and_position_step(
-        #     scroll.create_tex("Simplify the square root:"),
-        #     scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}", color=LIGHT_GRAY, scale=M_MATH_SCALE),
-        #     scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}"),
-        #     add_to_scroll=False
-        # )
-        
-        # sol3_step5_solving = self.parse_elements(sol3_step5[1],
-        #     ('sqrt_48', r'\sqrt{48}'),
-        #     ('sqrt_48_solve', r'= \sqrt{16 \times 3} ='),
-        #     ('sqrt_48_solved', r'4\sqrt{3}', 0, YELLOW),
-        # )
-        
-        # SmartColorizeStatic(sol3_step5[2], {r"4\sqrt{3}": YELLOW})
-                
-        # scroll.create_step(sol3_step5[0], arrange=False)
-        # scroll.create_steps(sol3_step5_solving.values(), ["sqrt_48", "sqrt_48_solve", "sqrt_48_solved"], arrange=False)
-        # scroll.create_step(sol3_step5[2], "x_simplified_sqrt", arrange=False)
-        
-        # sol3_step6 = scroll.create_and_position_step(
-        #     scroll.create_tex(r"\raggedright We can further simplify \\ by dividing throughout by 2"),
-        #     scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2} = \frac{-10}{2} \pm \frac{4\sqrt{3}}{2}"),
-        #     scroll.create_math_tex(r"x = -5 \pm 2\sqrt{3}"),
-        #     add_to_scroll=False
-        # )
-        # scroll.create_steps(sol3_step6[:-1], arrange=False)
-        
-        # sol3_step6_solving = self.parse_elements(sol3_step6[1],
-        #     ('first_frac', r'\frac{-10}{2}', 0, LIGHT_GRAY),  
-        #     ('second_frac', r'\frac{4\sqrt{3}}{2}', 0, LIGHT_GRAY), 
-        # )
-        
-        # sol3_step6_solved = self.parse_elements(sol3_step6[2],
-        #     ('x=', 'x ='),
-        #     ('first_frac_solved', '-5'), 
-        #     ('plus_minus', r'\pm'),
-        #     ('second_frac_solved', r'2\sqrt{3}'),  
-        # )
-        # scroll.create_steps(sol3_step6_solved.values(), ["x=", None, "plus_minus", None], arrange=False)
-        
-        # answer1_group = VGroup(
-        #     Tex("Solve for $x$:").scale(LABEL_SCALE),
-        #     MathTex(r"x = -5 - 2\sqrt{3}").scale(MATH_SCALE),
-        #     self.create_rect_group(
-        #         MathTex(r"x = -8.464").scale(MATH_SCALE),
-        #         buff=0.15
-        #     )
-        # ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
-        
-        # answer2_group = VGroup(
-        #     Tex("Solve for $x$:").scale(LABEL_SCALE),
-        #     MathTex(r"x = -5 + 2\sqrt{3}").scale(MATH_SCALE),
-        #     self.create_rect_group(
-        #         MathTex(r"x = -1.536").scale(MATH_SCALE),
-        #         buff=0.15
-        #     )
-        # ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        self.play(
+            self.indicate(coefficient_values['c_value'], color=None),
+            self.indicate(coefficient_values_in_formula['c'], color=None)
+        )
+        scroll.fade_in_from_target(coefficient_values['c_value'], visible_copies.c_in_4ac)
         
         
-        # answer_group = VGroup(
-        #     answer1_group,
-        #     answer2_group
-        # ).arrange(RIGHT, aligned_edge=UP, buff=1.4)
+        self.play(
+            self.indicate(coefficient_values['a_value'], color=None),
+            self.indicate(coefficient_values_in_formula['a2'], color=None)
+        )
+        scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_denom)
+       
+        self.wait(1)
         
-        # answer_group.next_to(quadratic_group, DOWN, buff=1)
-                
-        # self.apply_smart_colorize(
-        #     [quadratic_formula.formula, sol3_step1[1]],
-        #     {
-        #         "a": A_COLOR, 
-        #         "b": B_COLOR, 
-        #         "c": C_COLOR,
-        #     }
-        # )
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
+        
 
 
         
