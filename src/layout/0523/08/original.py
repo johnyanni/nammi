@@ -1,6 +1,6 @@
 from manim import *
 from src.components.common.base_scene import *
-from components.common.scroll_manager_original import ScrollManager
+from src.components.common.scroll_manager import ScrollManager
 from src.components.common.smart_tex import SmartColorizeStatic
 
 config.verbosity = "ERROR"
@@ -216,11 +216,13 @@ class QuadraticFormula02(MathTutorialScene):
         answer_group.next_to(quadratic_group, DOWN, buff=1)
                 
         self.apply_smart_colorize(
-            [quadratic_formula.formula, sol3_step1[1]],
+            [quadratic_formula.formula, sol3_step1[1], sol3_step1[0]],
             {
                 "a": A_COLOR, 
                 "b": B_COLOR, 
                 "c": C_COLOR,
+                "y": RED,
+                "e": YELLOW,
             }
         )
 

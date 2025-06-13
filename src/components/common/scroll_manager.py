@@ -187,6 +187,15 @@ class ScrollManager(VGroup):
             self.arrange_equations()
             
         return steps
+    
+    ### NEW (JOHN) ###
+    def get_by_label(self, label):
+        """Get an element by its label."""
+        if label not in self.steps:
+            raise KeyError(f"No element with label '{label}' found")
+        
+        index = self.steps[label]
+        return self.equations[index]
             
     def _resolve_target(self, target):
         if target in self.steps:
