@@ -150,7 +150,7 @@ class QuadraticFormula02(MathTutorialScene):
         sol3_step4_sqrt = sol3_step4[1][0][6:10]
 
         sol3_step5 = scroll.construct_step(
-            scroll.create_tex("Simplify the square root:"),
+            scroll.create_tex("Simplify the square root:", label="l_simplify_sqrt"),
             scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}", color=LIGHT_GRAY, scale=M_MATH_SCALE),
             scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}"),
             add_to_scroll=False

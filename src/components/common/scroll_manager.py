@@ -644,13 +644,59 @@ class ScrollManager(VGroup):
         
         return self
 
+    # def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
+    #     """
+    #     Transform a copy of source to a target element.
+        
+    #     Args:
+    #         source: Source mobject to copy and transform from
+    #         target: Target mobject to transform to (if None, uses next element in queue)
+    #         scene: The manim scene to animate on (if None, uses stored scene)
+    #         run_time: Animation duration in seconds (optional)
+    #         animation_kwargs: Additional keyword arguments for animation (optional)
+            
+    #     Returns:
+    #         self: For method chaining
+    #     """
+    #     scene = self._get_scene(scene)
+    #     run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
+        
+    #     # If no target specified, use the next element in queue
+    #     if target is None:
+    #         steps = self._validate_position(1, "No more equations to display.")
+    #         if steps == 0:
+    #             return self
+    #         target = self.equations[self.current_position]
+    #         self.current_position += 1
+    #     else:
+    #         # If target is specified, check if it's in our equations
+    #         target_index = None
+    #         for i, eq in enumerate(self.equations):
+    #             if eq is target:  # Use 'is' for object identity
+    #                 target_index = i
+    #                 break
+            
+    #         # Only update position if target is ahead of current position
+    #         if target_index is not None and target_index >= self.current_position:
+    #             self.current_position = target_index + 1
+        
+    #     # Perform TransformFromCopy
+    #     scene.play(
+    #         TransformFromCopy(source, target, **animation_kwargs),
+    #         **run_time
+    #     )
+        
+    #     return self
+    
+    
+    
     def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
         """
         Transform a copy of source to a target element.
         
         Args:
-            source: Source mobject to copy and transform from
-            target: Target mobject to transform to (if None, uses next element in queue)
+            source: Source mobject or label string to copy and transform from
+            target: Target mobject or label string to transform to (if None, uses next element in queue)
             scene: The manim scene to animate on (if None, uses stored scene)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
@@ -661,6 +707,14 @@ class ScrollManager(VGroup):
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
+        # Handle string labels for source
+        if isinstance(source, str):
+            if source in self.steps:
+                source_index = self.steps[source]
+                source = self.equations[source_index]
+            else:
+                raise ValueError(f"Source label '{source}' not found in steps")
+        
         # If no target specified, use the next element in queue
         if target is None:
             steps = self._validate_position(1, "No more equations to display.")
@@ -669,16 +723,27 @@ class ScrollManager(VGroup):
             target = self.equations[self.current_position]
             self.current_position += 1
         else:
-            # If target is specified, check if it's in our equations
-            target_index = None
-            for i, eq in enumerate(self.equations):
-                if eq is target:  # Use 'is' for object identity
-                    target_index = i
-                    break
-            
-            # Only update position if target is ahead of current position
-            if target_index is not None and target_index >= self.current_position:
-                self.current_position = target_index + 1
+            # Handle string labels for target
+            if isinstance(target, str):
+                if target in self.steps:
+                    target_index = self.steps[target]
+                    target = self.equations[target_index]
+                    # Update position if target is ahead
+                    if target_index >= self.current_position:
+                        self.current_position = target_index + 1
+                else:
+                    raise ValueError(f"Target label '{target}' not found in steps")
+            else:
+                # If target is a mobject, check if it's in our equations
+                target_index = None
+                for i, eq in enumerate(self.equations):
+                    if eq is target:  # Use 'is' for object identity
+                        target_index = i
+                        break
+                
+                # Only update position if target is ahead of current position
+                if target_index is not None and target_index >= self.current_position:
+                    self.current_position = target_index + 1
         
         # Perform TransformFromCopy
         scene.play(

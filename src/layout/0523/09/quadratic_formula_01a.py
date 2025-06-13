@@ -235,6 +235,58 @@ class QuadraticFormula01(MathTutorialScene):
         
         
         
+        # ======== Step 7: Simplify ========
+        
+        s7_simplify_step = scroll.construct_step(
+            scroll.create_tex(r"Simplify the expression:", label="l_simplify_expression"),
+            scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}", label="m_simplify_expression")
+        )
+        
+
+        # ======== Step 8: Continue simplifying ========
+        
+        s8_simplify2_step = scroll.construct_step(
+            scroll.create_tex(r"Continue simplifying:", label="l_simplify_expression2"),
+            scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{48}}{2}", label="m_simplify_expression2")
+        )
+        
+        s8_sqrt_48 = self.parse_elements(
+            s8_simplify2_step[1],
+            ('sqrt_48', r'\sqrt{48}')
+        )
+        
+        
+        # ======== Step 9: Simplify the square root ========
+        
+        s9_simplify_sqrt_step = scroll.construct_step(
+            scroll.create_tex(r"Simplify the square root:"),
+            scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}", color=LIGHT_GRAY, scale=M_MATH_SCALE),
+            scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}"),
+            add_to_scroll=False
+        )
+        
+        sqrt_48_parts = self.parse_elements(
+            s9_simplify_sqrt_step[1],
+            ('sqrt_48', r'\sqrt{48}'),
+            ('sqrt_48_solve', r'= \sqrt{16 \times 3} ='),
+            ('sqrt_48_result', r'4\sqrt{3}', 0, YELLOW),
+        )
+        
+        SmartColorizeStatic(s9_simplify_sqrt_step[2], {r"4\sqrt{3}": YELLOW})
+        
+        scroll.create_step(s9_simplify_sqrt_step[0], "l_simplify_sqrt", arrange=False)
+        scroll.create_steps(sqrt_48_parts.values(), ["sqrt_48", "sqrt_48_solve", "sqrt_48_result"], arrange=False)
+        scroll.create_step(s9_simplify_sqrt_step[2], "m_simplify_sqrt_result", arrange=False)
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
         
        
         
@@ -408,22 +460,57 @@ class QuadraticFormula01(MathTutorialScene):
         scroll.fade_in_from_target(coefficient_values['a_value'], visible_copies.a_in_denom)
        
         self.wait(1)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        scroll.scroll_down("m_quadratic_formula")
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         
         
         
         
         
         
+        # ===============================================================
+        # Animation: Step 7: Simplify 
+        # ===============================================================
+
+        scroll.prepare_next("l_simplify_expression")
+        scroll.transform_from_copy("m_empty_formula", "m_simplify_expression", run_time=2)
         
+        self.wait(1)
         
 
 
-        
+        # ===============================================================
+        # Animation: Step 8: Continue simplifying 
+        # ===============================================================
 
+        scroll.prepare_next("l_simplify_expression2")
+        scroll.transform_from_copy("m_simplify_expression", "m_simplify_expression2", run_time=2)
+        
+        self.wait(1)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        scroll.scroll_down("m_simplify_expression")
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         
         
-
         
+        
+        # ===============================================================
+        # Animation: Step 9: Simplify the square root 
+        # ===============================================================
+        
+        scroll.prepare_next("l_simplify_sqrt")
+        self.play(self.indicate(s8_sqrt_48['sqrt_48']))
+        
+        scroll.transform_from_copy(s8_sqrt_48['sqrt_48'], sqrt_48_parts['sqrt_48'], run_time=2)
+        scroll.prepare_next("sqrt_48_solve")
+        scroll.prepare_next("sqrt_48_result")
+        scroll.prepare_next("m_simplify_sqrt_result")
+        
+        self.wait(1)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        scroll.scroll_down("m_simplify_expression2")
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         
         
         
