@@ -11,7 +11,6 @@ class QuadraticFormula02(MathTutorialScene):
         A_COLOR = "#47e66c"
         B_COLOR = "#ff79c6"
         C_COLOR = "#00bfff"
-
                
         quadratic_form = self.create_labeled_formula(
             "Standard Form",
@@ -127,7 +126,7 @@ class QuadraticFormula02(MathTutorialScene):
             ('a_in_denom', '1', -1, A_COLOR, 0)
         )
         
-        # visible_copies = VGroup()
+        visible_copies = VGroup()
 
         for name, element in coefficient_values_in_formula.items():
             visible_copy = element.copy().set_opacity(1)
@@ -217,11 +216,13 @@ class QuadraticFormula02(MathTutorialScene):
         answer_group.next_to(quadratic_group, DOWN, buff=1)
                 
         self.apply_smart_colorize(
-            [quadratic_formula.formula, sol3_step1[1]],
+            [quadratic_formula.formula, sol3_step1[1], sol3_step1[0]],
             {
                 "a": A_COLOR, 
                 "b": B_COLOR, 
                 "c": C_COLOR,
+                "y": RED,
+                "e": YELLOW,
             }
         )
 

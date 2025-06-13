@@ -21,6 +21,7 @@ ANNOTATION_SCALE = 0.65  # Annotations above/below formulas
 TEX_SCALE = 0.75        # TeX formula scale
 FOOTNOTE_SCALE = 0.6    # Footnote text scale
 
+
 # Timing Constants (seconds)
 QUICK_PAUSE = 0.5          # Brief pause between steps
 STANDARD_PAUSE = 1.0       # Normal pause between concepts
@@ -609,62 +610,20 @@ class MathTutorialScene(VoiceoverScene):
             
         return result
 
-    def _find_all_occurrences(self, pattern, tex_obj, color=None, opacity=None):
-        """Helper function to find all occurrences of a pattern.
-        
-        Args:
-            pattern: The pattern to search for
-            tex_obj: The MathTex object to search within
-            color: Optional color to set
-            opacity: Optional opacity to set
-            
-        Returns:
-            VGroup containing all occurrences (empty if none found)
-        """
-        from src.components.common.smart_tex import group_shapes_in_text
-        
-        # Handle negative numbers specially
-        if pattern.startswith('-') and len(pattern) > 1:
-            all_results = VGroup()
-            nth = 0
-            while True:
-                result = self._find_negative_number(pattern, tex_obj, nth, color, opacity)
-                if result is None:
-                    break
-                all_results.add(result)
-                nth += 1
-            return all_results
-        
-        # For everything else, use group_shapes_in_text
-        all_occurrences = group_shapes_in_text(tex_obj, MathTex(pattern))
-        
-        # Apply styling
-        if color:
-            all_occurrences.set_color(color)
-        if opacity is not None:
-            all_occurrences.set_opacity(opacity)
-        
-        return all_occurrences
-
-    def find_element(self, pattern, tex_obj, nth=None, color=None, opacity=None):
+    def find_element(self, pattern, tex_obj, nth=0, color=None, opacity=None):
         """Find elements in equations with support for negative numbers.
         
         Args:
             pattern: The text pattern to search for (e.g., "x", "1", "-5", r"\frac{300}{400}")
             tex_obj: The MathTex object to search within
-            nth: Which occurrence to return (0-based). If None, returns ALL occurrences
+            nth: Which occurrence to return (0-based)
             color: Optional color to set
             opacity: Optional opacity to set
         
         Returns:
-            If nth is specified: Single VMobject or VGroup for multi-element patterns, None if not found
-            If nth is None: VGroup containing all occurrences (empty VGroup if none found)
+            The matching element(s) - single VMobject or VGroup for multi-element patterns
+            None if not found
         """
-        # If nth is None, find all occurrences
-        if nth is None:
-            return self._find_all_occurrences(pattern, tex_obj, color, opacity)
-        
-        # Otherwise, find specific occurrence (original behavior)
         # Handle negative numbers specially
         if pattern.startswith('-') and len(pattern) > 1:
             result = self._find_negative_number(pattern, tex_obj, nth, color, opacity)
@@ -676,58 +635,79 @@ class MathTutorialScene(VoiceoverScene):
         if result:
             return result
             
-        print(f"Pattern '{pattern}' (occurrence {nth}) not found")
+        print(f"Pattern '{pattern}' not found")
         return None
-
+        
     def parse_elements(self, equation, *patterns):
         """Parse multiple elements from an equation in one call.
         
         Args:
             equation: The MathTex object to parse
             *patterns: Variable number of tuples defining what to find:
-                - (name, pattern): Find ALL occurrences
-                - (name, pattern, nth): Pattern with nth occurrence (nth must be int)
-                - (name, pattern, color): Find ALL with color (color is not int)
-                - (name, pattern, nth, color): Specific occurrence with color
+                - (name, pattern): Basic pattern search
+                - (name, pattern, nth): Pattern with nth occurrence (0-indexed)
+                - (name, pattern, nth, color): Pattern with nth occurrence and color
                 - (name, pattern, nth, color, opacity): Full options
+            
+        Returns:
+            Dict of extracted elements with given names as keys
+            
+        Example:
+            # Basic usage
+            parts = self.parse_elements(equation,
+                ('x', 'x'),
+                ('equals', '='),
+                ('zero', '0')
+            )
+            # Access as: parts['x'], parts['equals'], etc.
+            
+            # With shared elements
+            parts = self.parse_elements(equation,
+                ('x', 'x'),
+                ('y', 'y'),
+                *SHARED_MATH_ELEMENTS  # Adds equals, plus, minus
+            )
+            
+            # With nth occurrence
+            parts = self.parse_elements(equation,
+                ('first_x', 'x', 0),   # First x
+                ('second_x', 'x', 1),  # Second x
+                ('squared', '^2', 1),  # Second ^2
+            )
+            
+            # With color
+            parts = self.parse_elements(equation,
+                ('result', '42', 0, YELLOW),
+                ('x', 'x', 0, BLUE, 0.5),  # With opacity
+            )
         """
         results = {}
         
         for pattern_info in patterns:
+            # Skip None patterns (allows conditional patterns)
             if pattern_info is None:
                 continue
                 
             name = pattern_info[0]
             pattern = pattern_info[1]
             
-            # Default values
-            nth = None  # None means find all
-            color = None
-            opacity = None
-            
-            # Parse arguments based on type and position
-            if len(pattern_info) >= 3:
-                third_arg = pattern_info[2]
+            # Build kwargs based on tuple length
+            kwargs = {}
+            if len(pattern_info) > 2:
+                kwargs['nth'] = pattern_info[2]
+            if len(pattern_info) > 3:
+                kwargs['color'] = pattern_info[3]
+            if len(pattern_info) > 4:
+                kwargs['opacity'] = pattern_info[4]
                 
-                # Check if third argument is nth (integer) or color
-                if isinstance(third_arg, int):
-                    nth = third_arg
-                    # Look for color and opacity after nth
-                    if len(pattern_info) > 3:
-                        color = pattern_info[3]
-                    if len(pattern_info) > 4:
-                        opacity = pattern_info[4]
-                else:
-                    # Third arg is not int, so it must be color (find all)
-                    color = third_arg
-                    if len(pattern_info) > 3:
-                        opacity = pattern_info[3]
-            
-            # Find the element(s)
-            element = self.find_element(pattern, equation, nth=nth, color=color, opacity=opacity)
-            
-            if element is not None and (not isinstance(element, VGroup) or len(element) > 0):
+            # Find the element
+            element = self.find_element(pattern, equation, **kwargs)
+            if element is not None:
                 results[name] = element
+            else:
+                # Only warn for non-optional patterns
+                if len(pattern_info) <= 2 or pattern_info[2] == 0:
+                    print(f"Warning: Could not find pattern '{pattern}' for '{name}' in equation")
                 
         return results
         

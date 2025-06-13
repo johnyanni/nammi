@@ -5,8 +5,9 @@ from src.components.common.base_scene import LABEL_SCALE, MATH_SCALE, ANNOTATION
 from src.components.common.base_scene import MathTutorialScene
 
 class ScrollManager(VGroup):
-    def __init__(self, equations=None, scene=None, global_arrangement=True, *args, **kwargs):
+    def __init__(self, equations=None, scene=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.last_positioned_step = None
         self.equations = equations if equations else VGroup()
         self.scene = scene  # Store scene reference
         self.start_position = self.equations[0].copy() if equations else None
@@ -21,9 +22,6 @@ class ScrollManager(VGroup):
         # Step management
         self.steps = {} # Dictionary mapping labels to step indices
         self.arranged_equations = VGroup() # VGroup to arrange equations
-        
-        # Global arrangement flag
-        self.global_arrangement = global_arrangement
         
         # Initialize math scene
         self.math_scene = MathTutorialScene()  
@@ -71,12 +69,6 @@ class ScrollManager(VGroup):
         self.scene = scene
         return self
 
-    def set_position_target(self, target, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.3):
-        self.target_position = target
-        self.target_position_dir = arrange_dir
-        self.target_position_edge = aligned_edge
-        self.target_position_buff = buff
-    
     def update_start_position(self):
         if not self.start_position:
             self.start_position = self.equations[0].copy()
@@ -128,28 +120,39 @@ class ScrollManager(VGroup):
         
         return result, label
     
+    def set_position_target(self, target, direction=DOWN, buff=0.4, align_edge=LEFT):
+        """Set the target for automatic positioning."""
+        self.position_target = target
+        self.position_config = {
+            'direction': direction,
+            'buff': buff,
+            'align_edge': align_edge
+        }
+    
     def arrange_equations(self):
         self.arranged_equations.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
-        
-    def add_to_arrangement(self, group, first_step=False):
-        if self.global_arrangement:
-            self.arranged_equations.add(group)
-            self.arrange_equations()
-        else:
-            target = self.get_current_visible_eqn() if not first_step else self.target_position
-            group.next_to(
-                target,
-                self.target_position_dir,
-                buff=self.target_position_buff,
-                aligned_edge=self.target_position_edge
-            ).align_to(self.target_position, LEFT)
+    
+        # Only reposition to target if we haven't scrolled
+        if self.position_target and self.scroll_count == 0:
+            self.arranged_equations.next_to(
+                self.position_target, 
+                self.position_config.get('direction', DOWN),
+                buff=self.position_config.get('buff', 0.4)
+            )
+            if 'align_edge' in self.position_config:
+                self.arranged_equations.align_to(
+                    self.position_target,
+                    self.position_config['align_edge']
+                )
+
+    def add_to_arragement(self, group):
+        self.arranged_equations.add(group)
+        self.arrange_equations()
         
     def get_arranged_equations(self):
         return self.arranged_equations
 
-    def get_current_visible_eqn(self):
-        return self.equations[self.current_position - 1]
-    
+        
     def create_step(self, step, label=None, arrange=True):
         # Check if the label already exists
         if label and label in self.steps:
@@ -163,40 +166,35 @@ class ScrollManager(VGroup):
 
         self.steps[label] = step_index
 
-        # Check if this is the first step
-        first_step = len(self.equations) == 0
-        
         # Add the step to equations
         self.equations.add(step)
 
         # Add the equation to the arrangement if required
-        if arrange: self.add_to_arrangement(step, first_step)
+        if arrange:
+            self.arranged_equations.add(step)
+            self.arrange_equations()
         
         return step
 
     def create_steps(self, steps, labels=None, arrange=True):
         """Create multiple steps with optional labels."""
-        # Check if this is the first step
-        first_step = len(self.equations) == 0
-
         if labels is None:
             labels = [None] * len(steps)
 
         steps_group = VGroup()
         for step, label in zip(steps, labels):
             steps_group.add(self.create_step(step, label, arrange=False))
-
-        if arrange: self.add_to_arrangement(steps_group, first_step)
-        
+            
+        if arrange:
+            self.arranged_equations.add(steps_group)
+            self.arrange_equations()
+            
         return steps_group
 
     def construct_step(self, *args, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.2, add_to_scroll=True, arrange=True):
         """
         Accepts any number of two-value tuples as arguments - (step, label)
         """
-        # Check if this is the first step
-        first_step = len(self.equations) == 0
-        
         steps = VGroup()
         for step, label in args:
             if add_to_scroll:
@@ -206,12 +204,13 @@ class ScrollManager(VGroup):
 
         steps.arrange(arrange_dir, aligned_edge=aligned_edge, buff=buff)
 
-        if arrange: 
-            self.add_to_arrangement(steps, first_step)
-        
+        # If the steps are not a part of the flow yet, but they a part of the arrangement
+        if arrange:
+            self.arranged_equations.add(steps)
+            self.arrange_equations()
+            
         return steps
     
-    ### NEW (JOHN) ###
     def get_by_label(self, label):
         """Get an element by its label."""
         if label not in self.steps:
@@ -219,6 +218,41 @@ class ScrollManager(VGroup):
         
         index = self.steps[label]
         return self.equations[index]
+    
+    
+    def create_and_position_step(self, *args, reference=None, direction=DOWN, buff=0.4, 
+                               add_to_scroll=True, internal_buff=0.2, **kwargs):
+        """Create and position a step - replaces construct_step."""
+        steps = VGroup()
+        
+        # Build the step (similar to construct_step)
+        for step, label in args:
+            if add_to_scroll:
+                steps.add(self.create_step(step, label, arrange=False))
+            else:
+                steps.add(step)
+        
+        # Internal arrangement
+        steps.arrange(DOWN, aligned_edge=LEFT, buff=internal_buff)
+        
+        # Determine reference point
+        if reference is None:
+            if hasattr(self, 'last_positioned_step') and self.last_positioned_step:
+                reference = self.last_positioned_step
+            elif self.position_target:
+                reference = self.position_target
+                direction = self.position_config.get('direction', DOWN)
+                buff = self.position_config.get('buff', 0.4)
+        
+        # Position the step
+        if reference:
+            steps.next_to(reference, direction, buff=buff)
+            steps.align_to(reference, LEFT)
+        
+        # Track for next step
+        self.last_positioned_step = steps
+        
+        return steps
             
     def _resolve_target(self, target):
         if target in self.steps:
@@ -378,7 +412,6 @@ class ScrollManager(VGroup):
             *callout_animations,
             **run_time,
         )
-                        
         self.remove(hidden_equations)
         self.last_in_view += steps
         
@@ -615,7 +648,8 @@ class ScrollManager(VGroup):
 
     def fade_in_from_target(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
         """
-        Fades in from a source position.        
+        Fades in from a source position.
+        
         Can be called two ways:
         1. fade_in_from_target(source_position) - fades in next element from source
         2. fade_in_from_target(source_position, target_element) - fades in specific target from source
@@ -667,59 +701,13 @@ class ScrollManager(VGroup):
         
         return self
 
-    # def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
-    #     """
-    #     Transform a copy of source to a target element.
-        
-    #     Args:
-    #         source: Source mobject to copy and transform from
-    #         target: Target mobject to transform to (if None, uses next element in queue)
-    #         scene: The manim scene to animate on (if None, uses stored scene)
-    #         run_time: Animation duration in seconds (optional)
-    #         animation_kwargs: Additional keyword arguments for animation (optional)
-            
-    #     Returns:
-    #         self: For method chaining
-    #     """
-    #     scene = self._get_scene(scene)
-    #     run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
-        
-    #     # If no target specified, use the next element in queue
-    #     if target is None:
-    #         steps = self._validate_position(1, "No more equations to display.")
-    #         if steps == 0:
-    #             return self
-    #         target = self.equations[self.current_position]
-    #         self.current_position += 1
-    #     else:
-    #         # If target is specified, check if it's in our equations
-    #         target_index = None
-    #         for i, eq in enumerate(self.equations):
-    #             if eq is target:  # Use 'is' for object identity
-    #                 target_index = i
-    #                 break
-            
-    #         # Only update position if target is ahead of current position
-    #         if target_index is not None and target_index >= self.current_position:
-    #             self.current_position = target_index + 1
-        
-    #     # Perform TransformFromCopy
-    #     scene.play(
-    #         TransformFromCopy(source, target, **animation_kwargs),
-    #         **run_time
-    #     )
-        
-    #     return self
-    
-    
-    
     def transform_from_copy(self, source, target=None, scene=None, run_time=None, animation_kwargs=None):
         """
         Transform a copy of source to a target element.
         
         Args:
-            source: Source mobject or label string to copy and transform from
-            target: Target mobject or label string to transform to (if None, uses next element in queue)
+            source: Source mobject to copy and transform from
+            target: Target mobject to transform to (if None, uses next element in queue)
             scene: The manim scene to animate on (if None, uses stored scene)
             run_time: Animation duration in seconds (optional)
             animation_kwargs: Additional keyword arguments for animation (optional)
@@ -730,14 +718,6 @@ class ScrollManager(VGroup):
         scene = self._get_scene(scene)
         run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
         
-        # Handle string labels for source
-        if isinstance(source, str):
-            if source in self.steps:
-                source_index = self.steps[source]
-                source = self.equations[source_index]
-            else:
-                raise ValueError(f"Source label '{source}' not found in steps")
-        
         # If no target specified, use the next element in queue
         if target is None:
             steps = self._validate_position(1, "No more equations to display.")
@@ -746,27 +726,16 @@ class ScrollManager(VGroup):
             target = self.equations[self.current_position]
             self.current_position += 1
         else:
-            # Handle string labels for target
-            if isinstance(target, str):
-                if target in self.steps:
-                    target_index = self.steps[target]
-                    target = self.equations[target_index]
-                    # Update position if target is ahead
-                    if target_index >= self.current_position:
-                        self.current_position = target_index + 1
-                else:
-                    raise ValueError(f"Target label '{target}' not found in steps")
-            else:
-                # If target is a mobject, check if it's in our equations
-                target_index = None
-                for i, eq in enumerate(self.equations):
-                    if eq is target:  # Use 'is' for object identity
-                        target_index = i
-                        break
-                
-                # Only update position if target is ahead of current position
-                if target_index is not None and target_index >= self.current_position:
-                    self.current_position = target_index + 1
+            # If target is specified, check if it's in our equations
+            target_index = None
+            for i, eq in enumerate(self.equations):
+                if eq is target:  # Use 'is' for object identity
+                    target_index = i
+                    break
+            
+            # Only update position if target is ahead of current position
+            if target_index is not None and target_index >= self.current_position:
+                self.current_position = target_index + 1
         
         # Perform TransformFromCopy
         scene.play(

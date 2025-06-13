@@ -3,6 +3,51 @@
 from manim import *
 from typing import Dict, List, Union, Optional, Tuple
 
+def get_text_and_shape(text: VMobject, shape: VMobject, style=None):
+    """
+    Helper function to convert text and shape into Tex or MathTex objects with specific style
+
+    Styles: text, script, scriptscript, cramped
+    """
+    styles_map = {
+        "text": "textstyle",
+        "script": "scriptstyle",
+        "scriptscript": "scriptscriptstyle",
+        "cramped": "cramped",
+    }
+
+    if style is not None and style not in styles_map:
+        raise ValueError(f"Style '{style}' is not defined.")
+    
+    # Define the font template
+    template = TexTemplate()
+    template.add_to_preamble(
+        r"""
+        \usepackage[T1]{fontenc}
+        \usepackage{txfonts}
+        \usepackage{mathtools}
+        """
+    )    
+    
+    if hasattr(text, "tex_string") and not isinstance(text, Tex):
+        text_copy = MathTex(text.tex_string, tex_template=template)
+    elif hasattr(text, "tex_strings"):
+        text_copy = Tex(text.tex_strings, tex_template=template)
+    else:
+        text_copy = text
+
+    if hasattr(shape, "tex_string") and not isinstance(shape, Tex):
+        if style:
+            shape_copy = MathTex(rf"\{styles_map[style]}{{{shape.tex_string}}}", tex_template=template)
+        else:
+            shape_copy = MathTex(shape.tex_string, tex_template=template)
+    elif hasattr(shape, "tex_strings"):
+        shape_copy = Tex(shape.tex_strings, tex_template=template)
+    else:
+        shape_copy = shape
+
+    return text_copy, shape_copy
+
 def search_shape_in_text(text: VMobject, shape: VMobject, index=0, threshold=100000):
     r"""Receives two VMobjects resulting from rendering text (either by Tex, Text
     or MathTex) and looks for occurrences of the second in the first, but comparing
@@ -35,34 +80,15 @@ def search_shape_in_text(text: VMobject, shape: VMobject, index=0, threshold=100
         ])
         self.wait()
     """
-
-    # Define the font template
-    template = TexTemplate()
-    template.add_to_preamble(
-        r"""
-        \usepackage[T1]{fontenc}
-        \usepackage{txfonts}
-        """
-    )
-
-    if hasattr(text, "tex_string") and not isinstance(text, Tex):
-        text_copy = MathTex(text.tex_string, tex_template=template)
-    elif hasattr(text, "tex_strings"):
-        text_copy = Tex(*text.tex_strings, tex_template=template)
-    else:
-        text_copy = text
-
-    if hasattr(shape, "tex_string") and not isinstance(shape, Tex):
-        shape_copy = MathTex(shape.tex_string, tex_template=template)
-    elif hasattr(shape, "tex_strings"):
-        shape_copy = Tex(*shape.tex_strings, tex_template=template)
-    else:
-        shape_copy = shape
-
     # Perform the shape search
-    results = _do_shape_search(text_copy, shape_copy, index, threshold)
+    styles = [None, "text", "cramped", "script", "scriptscript"]
+    for style in styles:
+        text_copy, shape_copy = get_text_and_shape(text, shape, style=style)
+        results = _do_shape_search(text_copy, shape_copy, index, threshold)
+        if results:
+            return results
 
-    return results
+    return []
 
 
 def _do_shape_search(text: VMobject, shape: VMobject, index=0, threshold=100000):

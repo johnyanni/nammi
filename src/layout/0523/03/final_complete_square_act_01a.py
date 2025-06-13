@@ -57,24 +57,6 @@ class Square1(MathTutorialScene):
         ).to_edge(UP, buff=0.3).to_edge(LEFT, buff=1)
 
         
-        # # Find elements - Step 1
-        # formula_k2 = self.find_element("k^2", step1[1])
-        # formula_minus = self.find_element("-", step1[1])
-        # formula_4k = self.find_element("4k", step1[1])
-        # formula_equals = self.find_element("=", step1[1])
-        # formula_2k = self.find_element("2k", step1[1])
-        # formula_plus = self.find_element("+", step1[1])
-        # formula_18 = self.find_element("18", step1[1])
-        
-        # # Step 2
-        # rearr_k2 = self.find_element("k^2", step2[1])
-        # rearr_minus1 = self.find_element("-", step2[1], nth=1)
-        # rearr_4k = self.find_element("4k", step2[1])
-        # rearr_minus2 = self.find_element("-", step2[1], nth=2)
-        # rearr_2k = self.find_element("2k", step2[1])
-        # rearr_equals = self.find_element("=", step2[1])
-        # rearr_18 = self.find_element("18", step2[1])
-        
         # Create elements for ScrollManager
         elements = VGroup(
             # Step 1 - Original equation
