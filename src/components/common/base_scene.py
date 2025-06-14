@@ -583,7 +583,7 @@ class MathTutorialScene(VoiceoverScene):
                         nth -= 1
         return None
 
-    def _find_single_element(self, pattern, tex_obj, nth=0, color=None, opacity=None):
+    def _find_single_element(self, pattern, tex_obj, nth=0, color=None, opacity=None, idx_slice=None):
         """Helper function to find a single element in equations.
         
         Args:
@@ -600,13 +600,16 @@ class MathTutorialScene(VoiceoverScene):
         
         if not indices or nth >= len(indices):
             return None
-            
+
         result = tex_obj[0][indices[nth]]
+        if idx_slice: 
+            result = result[idx_slice]
+        
         if color: 
             result.set_color(color)
         if opacity is not None:
-            result.set_opacity(opacity)
-            
+            result.set_opacity(opacity)            
+
         return result
 
     def _find_all_occurrences(self, pattern, tex_obj, color=None, opacity=None):
@@ -646,7 +649,7 @@ class MathTutorialScene(VoiceoverScene):
         
         return all_occurrences
 
-    def find_element(self, pattern, tex_obj, nth=None, color=None, opacity=None):
+    def find_element(self, pattern, tex_obj, nth=None, color=None, opacity=None, idx_slice=None):
         """Find elements in equations with support for negative numbers.
         
         Args:
@@ -656,7 +659,7 @@ class MathTutorialScene(VoiceoverScene):
             color: Optional color to set
             opacity: Optional opacity to set
         
-        Returns:
+       Returns:
             If nth is specified: Single VMobject or VGroup for multi-element patterns, None if not found
             If nth is None: VGroup containing all occurrences (empty VGroup if none found)
         """
@@ -672,7 +675,7 @@ class MathTutorialScene(VoiceoverScene):
                 return result
         
         # For everything else
-        result = self._find_single_element(pattern, tex_obj, nth, color, opacity)
+        result = self._find_single_element(pattern, tex_obj, nth, color, opacity, idx_slice)
         if result:
             return result
             
