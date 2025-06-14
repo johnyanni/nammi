@@ -299,6 +299,8 @@ class OQuadraticFormula01(MathTutorialScene):
         # >>>>>>>>>> SCROLL DOWN <<<<<<<<<<
         scroll.scroll_down("sqrt_48")
         
+        
+        
         # ======== Step 10: Third simplification: divide by 2 ========
         divide_by_2_step = scroll.construct_step(
             scroll.create_tex(r"\raggedright We can further simplify \\ by dividing throughout by 2"),

@@ -71,7 +71,7 @@ class ScrollManager(VGroup):
         self.scene = scene
         return self
 
-    def set_position_target(self, target, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.3):
+    def set_position_target(self, target, arrange_dir=DOWN, aligned_edge=LEFT, buff=1.0):
         self.target_position = target
         self.target_position_dir = arrange_dir
         self.target_position_edge = aligned_edge
@@ -189,6 +189,8 @@ class ScrollManager(VGroup):
         if arrange: self.add_to_arrangement(steps_group, first_step)
         
         return steps_group
+    
+    
 
     def construct_step(self, *args, arrange_dir=DOWN, aligned_edge=LEFT, buff=0.2, add_to_scroll=True, arrange=True):
         """
@@ -210,6 +212,24 @@ class ScrollManager(VGroup):
             self.add_to_arrangement(steps, first_step)
         
         return steps
+    
+    
+    
+    # Without arrangement 
+    def construct_step_2(self, *args, add_to_scroll=True):
+        """
+        Creates a VGroup of steps and registers them with scroll manager.
+        No arrangement or positioning - that's handled manually in scene.
+        """
+        steps = VGroup()
+        for step, label in args:
+            if add_to_scroll:
+                steps.add(self.create_step(step, label, arrange=False))
+            else:
+                steps.add(step)
+        
+        return steps
+
     
     ### NEW (JOHN) ###
     def get_by_label(self, label):

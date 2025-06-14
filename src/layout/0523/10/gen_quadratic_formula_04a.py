@@ -6,7 +6,7 @@ from src.components.common.smart_tex import SmartColorizeStatic
 config.verbosity = "ERROR"
 
 
-class RQuadraticFormula01(MathTutorialScene): 
+class RQuadraticFormula04(MathTutorialScene): 
     def construct(self):
         
         
@@ -29,9 +29,9 @@ class RQuadraticFormula01(MathTutorialScene):
         # SECTION 1: QUESTION
         # =================================================================================
         
-        question_text = MathTex(r"\text{Solve using the quadratic formula:} \; 4(x+5)^2 = 48").scale(LABEL_SCALE).set_color(LIGHT_GRAY).to_edge(UP, buff=0.4).to_edge(LEFT, buff=0.4)
+        question_text = MathTex(r"\text{Solve using the quadratic formula:} \; 2(x-1)^2 + 3x = x^2 + 4x + 5").scale(LABEL_SCALE).set_color(LIGHT_GRAY).to_edge(UP, buff=0.4).to_edge(LEFT, buff=0.4)
 
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # ===========================================================
 
         self.play(
             Write(question_text, run_time=3),  
@@ -81,7 +81,7 @@ class RQuadraticFormula01(MathTutorialScene):
             }
         )
         
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # ===========================================================
         
         self.play(
             self.FadeInThenWrite(
@@ -117,7 +117,7 @@ class RQuadraticFormula01(MathTutorialScene):
         # =================================================================================
         
         scroll = ScrollManager(scene=self, global_arrangement=False)
-        scroll.set_position_target(question_text, DOWN, buff=0.3, aligned_edge=LEFT) 
+        scroll.set_position_target(question_text, DOWN, buff=0.5, aligned_edge=LEFT) 
         
         
         
@@ -125,29 +125,20 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 1: DIVIDE BOTH SIDES BY 4
+        # STEP 1: EXPAND THE SQUARED TERM
         # ===========================================================
         
-        s1_divide_step = scroll.construct_step(
-            scroll.create_tex(r"First, get the equation in \textbf{standard form}:", label="l_convert_to_standard_form"),
-            scroll.create_tex(r"Divide both sides by 4", label="l_divide_both_sides_by_4"),
-            scroll.create_annotated_equation(
-                r"4(x+5)^2 = 48",
-                r"\div 4",
-                "4",
-                "48",
-                label="ae_divide_both_sides_by_4"
-            ),
-            scroll.create_math_tex(r"(x+5)^2 = 12", label="m_divide_by_4_result")
+        s1_expand_step = scroll.construct_step(
+            scroll.create_tex(r"First, expand $(x-1)^2$:", label="l_expand_squared"),
+            scroll.create_math_tex(r"(x-1)^2 = (x-1)(x-1) = x^2 - 2x + 1", color=LIGHT_GRAY, scale=M_MATH_SCALE, label="m_expand_detail"),
+            scroll.create_math_tex(r"2(x^2 - 2x + 1) + 3x = x^2 + 4x + 5", label="m_expand_result")
         )
         
         # ===========================================================
         
-        scroll.prepare_next("l_convert_to_standard_form")
-        self.play(self.indicate(quadratic_form.group, scale_factor=1.2))
-        scroll.prepare_next("l_divide_both_sides_by_4")
-        scroll.prepare_next("ae_divide_both_sides_by_4")
-        scroll.prepare_next("m_divide_by_4_result")
+        scroll.prepare_next("l_expand_squared")
+        scroll.prepare_next("m_expand_detail")
+        scroll.prepare_next("m_expand_result")
         
         self.wait(1)
         
@@ -158,24 +149,22 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 2: EXPAND THE SQUARED TERM
+        # STEP 2: DISTRIBUTE THE 2
         # ===========================================================
         
-        s2_expand_step = scroll.construct_step(
-            scroll.create_tex("Expand the squared term:", label="l_expand_squared_term"),
-            scroll.create_math_tex(r"(x+5)^2 = (x+5)(x+5)", label="m_expand_squared_term", color=LIGHT_GRAY, scale=M_MATH_SCALE),
-            scroll.create_math_tex("x^2 + 10x + 25 = 12", label="m_expand_squared_term_result")
+        s2_distribute_step = scroll.construct_step(
+            scroll.create_tex("Distribute the 2:", label="l_distribute_2"),
+            scroll.create_math_tex(r"2x^2 - 4x + 2 + 3x = x^2 + 4x + 5", label="m_distribute_result")
         )
         
         # ===========================================================
         
-        scroll.prepare_next("l_expand_squared_term")
-        scroll.prepare_next("m_expand_squared_term")
-        scroll.prepare_next("m_expand_squared_term_result")
+        scroll.prepare_next("l_distribute_2")
+        scroll.prepare_next("m_distribute_result")
         
         self.wait(1)
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        scroll.scroll_down("ae_divide_both_sides_by_4")
+        scroll.scroll_down("m_expand_detail")
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         
         
@@ -186,31 +175,80 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 3: SUBTRACT 12 FROM BOTH SIDES
+        # STEP 3: COMBINE LIKE TERMS ON LEFT SIDE
         # ===========================================================
     
-        subtract_step = scroll.construct_step(
-            scroll.create_tex("Subtract 12 from both sides:", label="l_subtract_12_from_both_sides"),
-            scroll.create_annotated_equation(
-                r"x^2 + 10x + 25 = 12",
-                "-12",
-                "25",
-                "12",
-                label="ae_subtract_12_from_both_sides"
-            ),
-            scroll.create_math_tex(r"x^2 + 10x + 13 = 0", label="m_subtract_12_from_both_sides_result")
+        s3_combine_left_step = scroll.construct_step(
+            scroll.create_tex("Combine like terms on the left side:", label="l_combine_left"),
+            scroll.create_math_tex(r"2x^2 - x + 2 = x^2 + 4x + 5", label="m_combine_left_result")
         )
         
         # ===========================================================
         
-        scroll.prepare_next("l_subtract_12_from_both_sides")
-        scroll.prepare_next("ae_subtract_12_from_both_sides")
-        scroll.prepare_next("m_subtract_12_from_both_sides_result")
+        scroll.prepare_next("l_combine_left")
+        scroll.prepare_next("m_combine_left_result")
+        
+        self.wait(1)
+        
+        
+        
+        
+        
+        
+        
+        
+        # ===========================================================
+        # STEP 4: MOVE ALL TERMS TO LEFT SIDE
+        # ===========================================================
+    
+        s4_move_terms_step = scroll.construct_step(
+            scroll.create_tex("Move all terms to the left side:", label="l_move_terms"),
+            scroll.create_annotated_equation(
+                r"2x^2 - x + 2 = x^2 + 4x + 5",
+                r"-x^2 - 4x - 5",
+                "2",
+                "5",
+                label="ae_move_terms"
+            ),
+            scroll.create_math_tex(r"2x^2 - x + 2 - x^2 - 4x - 5 = 0", label="m_move_terms_result")
+        )
+        
+        # ===========================================================
+        
+        scroll.prepare_next("l_move_terms")
+        scroll.prepare_next("ae_move_terms")
+        scroll.prepare_next("m_move_terms_result")
+        
+        self.wait(1)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        scroll.scroll_down("m_combine_left_result")
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        
+        
+        
+        
+        
+        
+        
+        
+        # ===========================================================
+        # STEP 5: COMBINE ALL LIKE TERMS
+        # ===========================================================
+    
+        s5_final_combine_step = scroll.construct_step(
+            scroll.create_tex("Combine all like terms:", label="l_final_combine"),
+            scroll.create_math_tex(r"x^2 - 5x - 3 = 0", label="m_standard_form")
+        )
+        
+        # ===========================================================
+        
+        scroll.prepare_next("l_final_combine")
+        scroll.prepare_next("m_standard_form")
         self.play(self.indicate(quadratic_form.group, scale_factor=1.2))
         
         self.wait(1)
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        scroll.scroll_down("m_subtract_12_from_both_sides_result")
+        scroll.scroll_down("m_standard_form")
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
@@ -221,36 +259,36 @@ class RQuadraticFormula01(MathTutorialScene):
 
 
         # ===========================================================
-        # STEP 4: IDENTIFY COEFFICIENTS
+        # STEP 6: IDENTIFY COEFFICIENTS
         # ===========================================================
 
-        s4_identify_coefficients_step = scroll.construct_step(
+        s6_identify_coefficients_step = scroll.construct_step(
             scroll.create_tex("Now, identify the coefficients:"),
-            scroll.create_math_tex(r"x^2 + 10x + 13 = 0"),
-            scroll.create_math_tex(r"a = 1 \quad b = 10 \quad c = 13", scale=1.0),
+            scroll.create_math_tex(r"x^2 - 5x - 3 = 0"),
+            scroll.create_math_tex(r"a = 1 \quad b = -5 \quad c = -3", scale=1.0),
             add_to_scroll=False,
             buff=0.3
         )
         
-        coefficient_values_in_equation = self.parse_elements(s4_identify_coefficients_step[1],
+        coefficient_values_in_equation = self.parse_elements(s6_identify_coefficients_step[1],
             ('a_value', 'x', 0, A_COLOR),  
-            ('b_value', '10', 0, B_COLOR),
-            ('c_value', '13', 0, C_COLOR)
+            ('b_value', '-5', 0, B_COLOR),
+            ('c_value', '-3', 0, C_COLOR)
         )
         
-        coefficient_labels = self.parse_elements(s4_identify_coefficients_step[2],
+        coefficient_labels = self.parse_elements(s6_identify_coefficients_step[2],
             ('a_label', 'a =', 0, A_COLOR),
             ('b_label', 'b =', 0, B_COLOR),
             ('c_label', 'c =', 0, C_COLOR)
         )
                 
-        coefficient_values = self.parse_elements(s4_identify_coefficients_step[2],
+        coefficient_values = self.parse_elements(s6_identify_coefficients_step[2],
             ('a_value', '1', 0, A_COLOR),
-            ('b_value', '10', 0, B_COLOR),
-            ('c_value', '13', 0, C_COLOR)
+            ('b_value', '-5', 0, B_COLOR),
+            ('c_value', '-3', 0, C_COLOR)
         )
         
-        scroll.create_steps(s4_identify_coefficients_step[:-1], ["l_identify_coefficients", "m_standard_form_equation"], arrange=False)
+        scroll.create_steps(s6_identify_coefficients_step[:-1], ["l_identify_coefficients", "m_standard_form_equation"], arrange=False)
         scroll.create_steps(coefficient_labels.values(), ["coefficient_a_label", "coefficient_b_label", "coefficient_c_label"], arrange=False)
         scroll.create_steps(coefficient_values.values(), ["coefficient_a_value", "coefficient_b_value", "coefficient_c_value"], arrange=False)
         
@@ -288,15 +326,15 @@ class RQuadraticFormula01(MathTutorialScene):
 
 
         # ===========================================================
-        # STEP 5: USE THE QUADRATIC FORMULA
+        # STEP 7: USE THE QUADRATIC FORMULA
         # ===========================================================
         
-        s5_quadratic_formula_step = scroll.construct_step(
+        s7_quadratic_formula_step = scroll.construct_step(
             scroll.create_tex(r"Use the \textbf{quadratic formula} to solve for $x$:", label="l_quadratic_formula"),
             scroll.create_math_tex(r"x \quad = \quad \frac{-b \pm \sqrt{b^2 \ - \ 4ac}}{2a}", label="m_quadratic_formula")
         )
         
-        coefficient_values_in_formula = self.parse_elements(s5_quadratic_formula_step[1],
+        coefficient_values_in_formula = self.parse_elements(s7_quadratic_formula_step[1],
             ('b', 'b', B_COLOR),
             ('a1', 'a', 0, A_COLOR),
             ('c', 'c', C_COLOR),
@@ -321,20 +359,20 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 6: SUBSTITUTE VALUES
+        # STEP 8: SUBSTITUTE VALUES
         # ===========================================================
         
-        s6_substitute_values_step = scroll.construct_step(
+        s8_substitute_values_step = scroll.construct_step(
             scroll.create_tex(r"Substitute the coefficients into the formula:"),
-            scroll.create_math_tex(r"x = \frac{-(10) \pm \sqrt{(10)^2 - 4(1)(13)}}{2(1)}"),
+            scroll.create_math_tex(r"x = \frac{-(-5) \pm \sqrt{(-5)^2 - 4(1)(-3)}}{2(1)}"),
             add_to_scroll=False
         )
         
-        substituted_values = self.parse_elements(s6_substitute_values_step[1],
-            ('b_in_frac', '10', 0, B_COLOR, 0),
-            ('b_in_sqrt', '10', 1, B_COLOR, 0),
-            ('a_in_4ac', '1', 2, A_COLOR, 0),
-            ('c_in_4ac', '13', 0, C_COLOR, 0),
+        substituted_values = self.parse_elements(s8_substitute_values_step[1],
+            ('b_in_frac', '-5', 0, B_COLOR, 0),
+            ('b_in_sqrt', '-5', 1, B_COLOR, 0),
+            ('a_in_4ac', '1', 0, A_COLOR, 0),
+            ('c_in_4ac', '-3', 0, C_COLOR, 0),
             ('a_in_denom', '1', -1, A_COLOR, 0)
         )
         
@@ -345,9 +383,9 @@ class RQuadraticFormula01(MathTutorialScene):
             setattr(visible_copies, name, visible_copy)
             visible_copies.add(visible_copy)
         
-        s6_substitute_values_step[1].add(visible_copies)
+        s8_substitute_values_step[1].add(visible_copies)
         
-        scroll.create_steps(s6_substitute_values_step, ["l_substitute_values", "m_empty_formula"], arrange=False)
+        scroll.create_steps(s8_substitute_values_step, ["l_substitute_values", "m_empty_formula"], arrange=False)
         scroll.create_steps(visible_copies, arrange=False)
         
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -397,12 +435,12 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 7: SIMPLIFY THE EXPRESSION
+        # STEP 9: SIMPLIFY THE EXPRESSION
         # ===========================================================
         
-        s7_simplify_step = scroll.construct_step(
+        s9_simplify_step = scroll.construct_step(
             scroll.create_tex(r"Simplify the expression:", label="l_simplify_expression"),
-            scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{100 - 52}}{2}", label="m_simplify_expression")
+            scroll.create_math_tex(r"x = \frac{5 \pm \sqrt{25 + 12}}{2}", label="m_simplify_expression")
         )
         
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -421,16 +459,12 @@ class RQuadraticFormula01(MathTutorialScene):
         
         
         # ===========================================================
-        # STEP 8: CONTINUE SIMPLIFYING
+        # STEP 10: CONTINUE SIMPLIFYING
         # ===========================================================
         
-        s8_simplify2_step = scroll.construct_step(
+        s10_simplify2_step = scroll.construct_step(
             scroll.create_tex(r"Continue simplifying:", label="l_simplify_expression_2"),
-            scroll.create_math_tex(r"x = \frac{-10 \pm \sqrt{48}}{2}", label="m_simplify_expression_2")
-        )
-        
-        s8_sqrt_48 = self.parse_elements(s8_simplify2_step[1],
-            ('sqrt_48', r'\sqrt{48}')
+            scroll.create_math_tex(r"x = \frac{5 \pm \sqrt{37}}{2}", label="m_simplify_expression_2")
         )
         
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -439,103 +473,6 @@ class RQuadraticFormula01(MathTutorialScene):
         scroll.transform_from_copy("m_simplify_expression", "m_simplify_expression_2", run_time=2)
         
         self.wait(1)
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        scroll.scroll_down("m_simplify_expression")
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        # ===========================================================
-        # STEP 9: SIMPLIFY THE SQUARE ROOT
-        # ===========================================================
-        
-        s9_simplify_sqrt_step = scroll.construct_step(
-            scroll.create_tex(r"Simplify the square root:"),
-            scroll.create_math_tex(r"\sqrt{48} = \sqrt{16 \times 3} = 4\sqrt{3}", color=LIGHT_GRAY, scale=M_MATH_SCALE),
-            scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2}"),
-            add_to_scroll=False
-        )
-        
-        sqrt_48_parts = self.parse_elements(s9_simplify_sqrt_step[1],
-            ('sqrt_48', r'\sqrt{48}'),
-            ('sqrt_48_factor', r'= \sqrt{16 \times 3} ='),
-            ('sqrt_48_result', r'4\sqrt{3}', 0, YELLOW),
-        )
-        
-        SmartColorizeStatic(s9_simplify_sqrt_step[2], {r"4\sqrt{3}": YELLOW})
-        
-        scroll.create_step(s9_simplify_sqrt_step[0], "l_simplify_sqrt", arrange=False)
-        scroll.create_steps(sqrt_48_parts.values(), ["sqrt_48", "sqrt_48_factor", "sqrt_48_result"], arrange=False)
-        scroll.create_step(s9_simplify_sqrt_step[2], "m_simplify_sqrt_result_expression", arrange=False)
-        
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-        scroll.prepare_next("l_simplify_sqrt")
-        self.play(self.indicate(s8_sqrt_48['sqrt_48']))
-        scroll.transform_from_copy(s8_sqrt_48['sqrt_48'], sqrt_48_parts['sqrt_48'])
-        scroll.prepare_next("sqrt_48_factor")
-        scroll.prepare_next("sqrt_48_result")
-        scroll.prepare_next("m_simplify_sqrt_result_expression")
-        
-        self.wait(1)
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        scroll.scroll_down("m_simplify_expression_2")
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        
-        
-        
-        
-        
-        # ===========================================================
-        # STEP 10: COMMON FACTORS
-        # ===========================================================
-        
-        s10_factor_step = scroll.construct_step(
-            scroll.create_tex(r"Factor out the common factor of 2:"),
-            scroll.create_math_tex(r"x = \frac{-10 \pm 4\sqrt{3}}{2} = \frac{-10}{2} \pm \frac{4\sqrt{3}}{2}"),
-            scroll.create_math_tex(r"x = -5 \pm 2\sqrt{3}"),
-            add_to_scroll=False
-        )
-        
-        factor_parts = self.parse_elements(s10_factor_step[1],
-            ('first_frac', r'\frac{-10}{2}', 0, "#4af0ff"),
-            ('second_frac', r'\frac{4\sqrt{3}}{2}', 0, "#03fc9d"),
-        )
-        
-        factor_result_parts = self.parse_elements(s10_factor_step[2],
-            ('x=', 'x ='),
-            ('first_frac_solved', '-5', 0, "#4af0ff"),
-            ('plus_minus', r'\pm'),
-            ('second_frac_solved', r'2\sqrt{3}', 0, "#03fc9d"),
-        )
-        
-        scroll.create_steps(s10_factor_step[:-1], ["l_factor_out_2", "m_factor_out_2"], arrange=False)
-        scroll.create_steps(factor_result_parts.values(), ["x=", "first_frac_solved", "plus_minus", "second_frac_solved"], arrange=False)
-        
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-        scroll.prepare_next("l_factor_out_2")
-        scroll.prepare_next("m_factor_out_2")
-        
-        scroll.prepare_next("x=")
-        scroll.transform_from_copy(factor_parts['first_frac'], factor_result_parts['first_frac_solved'])
-        scroll.prepare_next("plus_minus")
-        scroll.transform_from_copy(factor_parts['second_frac'], factor_result_parts['second_frac_solved'])
-        
-        self.wait(1)
-        
-        self.play(s10_factor_step[2].animate.set_color(WHITE), run_time=1)
-        
-        self.wait(1)
-        
-        
         
         
         
@@ -547,18 +484,18 @@ class RQuadraticFormula01(MathTutorialScene):
         
         answer1_group = VGroup(
             Tex("Solve for $x$:").scale(LABEL_SCALE),
-            MathTex(r"x = -5 - 2\sqrt{3}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{5 + \sqrt{37}}{2}").scale(MATH_SCALE),
             self.create_rect_group(
-                MathTex(r"x = -8.464").scale(MATH_SCALE),
+                MathTex(r"x = 5.541").scale(MATH_SCALE),
                 buff=0.15
             )
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
         
         answer2_group = VGroup(
             Tex("Solve for $x$:").scale(LABEL_SCALE),
-            MathTex(r"x = -5 + 2\sqrt{3}").scale(MATH_SCALE),
+            MathTex(r"x = \frac{5 - \sqrt{37}}{2}").scale(MATH_SCALE),
             self.create_rect_group(
-                MathTex(r"x = -1.536").scale(MATH_SCALE),
+                MathTex(r"x = -0.541").scale(MATH_SCALE),
                 buff=0.15
             )
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
@@ -579,8 +516,8 @@ class RQuadraticFormula01(MathTutorialScene):
         )
         
         self.play(
-            TransformFromCopy(s10_factor_step[2], answer1_group[1]),
-            TransformFromCopy(s10_factor_step[2], answer2_group[1])
+            TransformFromCopy(s10_simplify2_step[1], answer1_group[1]),
+            TransformFromCopy(s10_simplify2_step[1], answer2_group[1])
         )
 
         self.play(Write(answer1_group[2]))
