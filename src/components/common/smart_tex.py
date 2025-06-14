@@ -31,7 +31,7 @@ def get_text_and_shape(text: VMobject, shape: VMobject, style=None):
     
     if hasattr(text, "tex_string") and not isinstance(text, Tex):
         text_copy = MathTex(text.tex_string, tex_template=template)
-    elif hasattr(text, "tex_strings"):
+    elif hasattr(text, "tex_string"):
         text_copy = Tex(text.tex_string, tex_template=template)
     else:
         text_copy = text
@@ -41,7 +41,7 @@ def get_text_and_shape(text: VMobject, shape: VMobject, style=None):
             shape_copy = MathTex(rf"\{styles_map[style]}{{{shape.tex_string}}}", tex_template=template)
         else:
             shape_copy = MathTex(shape.tex_string, tex_template=template)
-    elif hasattr(shape, "tex_strings"):
+    elif hasattr(shape, "tex_string"):
         shape_copy = Tex(shape.tex_string, tex_template=template)
     else:
         shape_copy = shape
