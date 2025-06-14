@@ -215,7 +215,7 @@ class ScrollManager(VGroup):
     
     
     
-    # Without arrangement 
+    # Without arrangement [temp]
     def construct_step_2(self, *args, add_to_scroll=True):
         """
         Creates a VGroup of steps and registers them with scroll manager.
