@@ -611,7 +611,7 @@ class MathTutorialScene(VoiceoverScene):
             result.set_opacity(opacity)            
 
         return result
-
+    
     def _find_all_occurrences(self, pattern, tex_obj, color=None, opacity=None):
         """Helper function to find all occurrences of a pattern.
         
@@ -648,7 +648,7 @@ class MathTutorialScene(VoiceoverScene):
             all_occurrences.set_opacity(opacity)
         
         return all_occurrences
-
+    
     def find_element(self, pattern, tex_obj, nth=None, color=None, opacity=None, idx_slice=None):
         """Find elements in equations with support for negative numbers.
         
@@ -681,7 +681,7 @@ class MathTutorialScene(VoiceoverScene):
             
         print(f"Pattern '{pattern}' (occurrence {nth}) not found")
         return None
-
+        
     def parse_elements(self, equation, *patterns):
         """Parse multiple elements from an equation in one call.
         
@@ -693,6 +693,7 @@ class MathTutorialScene(VoiceoverScene):
                 - (name, pattern, color): Find ALL with color (color is not int)
                 - (name, pattern, nth, color): Specific occurrence with color
                 - (name, pattern, nth, color, opacity): Full options
+                - (name, pattern, nth, color, opacity, idx_slice): Full options with slice
         """
         results = {}
         
@@ -707,11 +708,12 @@ class MathTutorialScene(VoiceoverScene):
             nth = None  # None means find all
             color = None
             opacity = None
+            idx_slice = None
             
             # Parse arguments based on type and position
             if len(pattern_info) >= 3:
                 third_arg = pattern_info[2]
-                
+
                 # Check if third argument is nth (integer) or color
                 if isinstance(third_arg, int):
                     nth = third_arg
@@ -720,20 +722,23 @@ class MathTutorialScene(VoiceoverScene):
                         color = pattern_info[3]
                     if len(pattern_info) > 4:
                         opacity = pattern_info[4]
+                    if len(pattern_info) > 5:
+                        idx_slice = pattern_info[5]
                 else:
                     # Third arg is not int, so it must be color (find all)
                     color = third_arg
                     if len(pattern_info) > 3:
                         opacity = pattern_info[3]
-            
-            # Find the element(s)
-            element = self.find_element(pattern, equation, nth=nth, color=color, opacity=opacity)
+                    if len(pattern_info) > 4:
+                        idx_slice = pattern_info[4]
+                
+            # Find the element
+            element = self.find_element(pattern, equation, nth=nth, color=color, opacity=opacity, idx_slice=idx_slice)
             
             if element is not None and (not isinstance(element, VGroup) or len(element) > 0):
                 results[name] = element
-                
+                    
         return results
-        
         
     def create_labeled_step(
                 self,
