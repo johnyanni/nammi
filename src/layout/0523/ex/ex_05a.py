@@ -55,11 +55,11 @@ class ProblematicExample(MathTutorialScene):
         step2.arrange(DOWN, aligned_edge=LEFT, buff=0.2)
 
         step2.next_to(
-            scroll.get_current_visible_eqn(),  # This returns the last equation added
+            scroll.get_current_visible_eqn(),  
             DOWN, 
             buff=0.8,
             aligned_edge=LEFT
-        ).align_to(step5, LEFT)  # Maintain left alignment
+        ).align_to(step5, LEFT)  
 
         scroll.prepare_next("l_distribute_2")
         scroll.prepare_next("m_distribute_result")
