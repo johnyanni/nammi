@@ -361,86 +361,86 @@ class QuadraticFormula(MathTutorialScene):
         self.play(FadeOut(tip_1, shift=DOWN))
 
         # Step 2: Simplifying
-        with self.voiceover(
-                text="""
-                Next, we simplify step by step: 11 squared <bookmark mark='b_squared' /> equals 121.
-                negative 4 times 1 times 20 <bookmark mark='four_ac' /> equals negative 80.
-                Finally, 2 times 1 <bookmark mark='den' /> equals 2. 
-                """
-        ) as tracker:
-            self.play(Write(step_2_label))
+        # with self.voiceover(
+        #         text="""
+        #         Next, we simplify step by step: 11 squared <bookmark mark='b_squared' /> equals 121.
+        #         negative 4 times 1 times 20 <bookmark mark='four_ac' /> equals negative 80.
+        #         Finally, 2 times 1 <bookmark mark='den' /> equals 2. 
+        #         """
+        # ) as tracker:
+        #     self.play(Write(step_2_label))
             
-            # Write the full equation
-            self.play(FadeIn(step_2_exp))
+        #     # Write the full equation
+        #     self.play(FadeIn(step_2_exp))
             
-            # Highlight specific parts
-            self.wait_until_bookmark("b_squared")
-            self.play(Indicate(step_2_exp[0][step_2_121_index]))
+        #     # Highlight specific parts
+        #     self.wait_until_bookmark("b_squared")
+        #     self.play(Indicate(step_2_exp[0][step_2_121_index]))
                 
-            self.wait_until_bookmark("four_ac")
-            self.play(Indicate(step_2_exp[0][step_2_80_index]))
+        #     self.wait_until_bookmark("four_ac")
+        #     self.play(Indicate(step_2_exp[0][step_2_80_index]))
             
-            self.wait_until_bookmark("den")
-            self.play(Indicate(step_2_exp[0][step_2_2_index]))
+        #     self.wait_until_bookmark("den")
+        #     self.play(Indicate(step_2_exp[0][step_2_2_index]))
 
-            self.wait(COMPREHENSION_PAUSE)
+        #     self.wait(COMPREHENSION_PAUSE)
             
-        # Step 3: Final simplification
-        with self.voiceover(
-                text="""
-                And finally, 121 minus 80 <bookmark mark='equation' /> gives us 41.
-                """
-        ) as tracker:
-            self.play(Write(step_3_label))
+        # # Step 3: Final simplification
+        # with self.voiceover(
+        #         text="""
+        #         And finally, 121 minus 80 <bookmark mark='equation' /> gives us 41.
+        #         """
+        # ) as tracker:
+        #     self.play(Write(step_3_label))
             
-            # Write the full equation
-            self.play(FadeIn(step_3_exp))
+        #     # Write the full equation
+        #     self.play(FadeIn(step_3_exp))
             
-            # Highlight the 41
-            self.wait_until_bookmark("equation")
-            self.play(Indicate(step_3_exp[0][step_3_41_index]))
+        #     # Highlight the 41
+        #     self.wait_until_bookmark("equation")
+        #     self.play(Indicate(step_3_exp[0][step_3_41_index]))
 
-            self.wait(COMPREHENSION_PAUSE)
+        #     self.wait(COMPREHENSION_PAUSE)
 
-        # Solution forms
-        with self.voiceover(
-                text="""
-                Since we can't simplify the square root of 41 further, we'll keep it exact.
-                But we'll write both solutions;
-                one <bookmark mark='roots' /> with a plus and one with a minus.
-                """
-        ) as tracker:
-            self.wait_until_bookmark("roots")
-            self.play(
-                ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
-                ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
-                run_time=2
-            )
-            self.wait(STANDARD_PAUSE)
+        # # Solution forms
+        # with self.voiceover(
+        #         text="""
+        #         Since we can't simplify the square root of 41 further, we'll keep it exact.
+        #         But we'll write both solutions;
+        #         one <bookmark mark='roots' /> with a plus and one with a minus.
+        #         """
+        # ) as tracker:
+        #     self.wait_until_bookmark("roots")
+        #     self.play(
+        #         ReplacementTransform(step_3_exp[0].copy(), first_root[0]),
+        #         ReplacementTransform(step_3_exp[0].copy(), second_root[0]),
+        #         run_time=2
+        #     )
+        #     self.wait(STANDARD_PAUSE)
 
-        # Decimal approximations
-        with self.voiceover(
-                text="""
-                Finally, if we want decimal approximations: the first solution, with the plus, is <bookmark mark='root_1' /> about -2.298.
+        # # Decimal approximations
+        # with self.voiceover(
+        #         text="""
+        #         Finally, if we want decimal approximations: the first solution, with the plus, is <bookmark mark='root_1' /> about -2.298.
 
-                The second solution, using the minus, is <bookmark mark='root_2' /> about -8.702.
-                """
-        ) as tracker:
-            self.wait_until_bookmark("root_1")
-            self.play(Write(first_root_dec))
-            self.play(FadeIn(tip_2, shift=UP))
+        #         The second solution, using the minus, is <bookmark mark='root_2' /> about -8.702.
+        #         """
+        # ) as tracker:
+        #     self.wait_until_bookmark("root_1")
+        #     self.play(Write(first_root_dec))
+        #     self.play(FadeIn(tip_2, shift=UP))
 
-            self.wait_until_bookmark("root_2")
-            self.play(Write(second_root_dec))
-            self.wait(QUICK_PAUSE)
-        self.play(FadeOut(tip_2, shift=DOWN))
+        #     self.wait_until_bookmark("root_2")
+        #     self.play(Write(second_root_dec))
+        #     self.wait(QUICK_PAUSE)
+        # self.play(FadeOut(tip_2, shift=DOWN))
             
-        # Conclusion
-        with self.voiceover(
-                text="""
-                So these are the actual solutions using the quadratic formula.
-                """
-        ) as tracker:
-            self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
+        # # Conclusion
+        # with self.voiceover(
+        #         text="""
+        #         So these are the actual solutions using the quadratic formula.
+        #         """
+        # ) as tracker:
+        #     self.play(Create(first_root_rec), Create(second_root_rec), run_time=2)
             
-        self.wait(5)
+        # self.wait(5)
