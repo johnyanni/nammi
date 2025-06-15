@@ -182,7 +182,7 @@ class ScrollManager(VGroup):
             target = self.target_position if first_step else self.get_current_visible_eqn()
             direction = self.target_position_dir if first_step else kwargs.get("arrangement_dir", DOWN)
             aligned_edge = self.target_position_edge if first_step else kwargs.get('arrangement_aligned_edge', LEFT)
-            buff = self.target_position_buff if first_step else kwargs.get('arrangement_buff', 0.4)
+            buff = self.target_position_buff if first_step else kwargs.get('arrangement_buff', 0.8)
 
             group.next_to(
                 target,

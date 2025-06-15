@@ -576,7 +576,7 @@ class SQuadraticFormula01(MathTutorialScene):
         answer_group = VGroup(
             answer1_group,
             answer2_group
-        ).arrange(RIGHT, aligned_edge=UP, buff=1.4)
+        ).arrange(RIGHT, aligned_edge=UP, buff=0.4)
         
         answer_group.to_edge(UP, buff=1.2).to_edge(RIGHT, buff=0.8)
         
