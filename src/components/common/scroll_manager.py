@@ -838,3 +838,54 @@ class ScrollManager(VGroup):
         )
         
         return self
+    
+    
+    
+    def replacement_transform_copy(self, source, target, scene=None, run_time=None, animation_kwargs=None):
+        """
+        Performs ReplacementTransform using a copy of the source.
+        This avoids issues with scroll tracking affecting the source.
+        """
+        scene = self._get_scene(scene)
+        run_time, animation_kwargs = self._get_animation_params(run_time, animation_kwargs)
+        
+        # Handle string labels for source
+        if isinstance(source, str):
+            if source in self.steps:
+                source_index = self.steps[source]
+                source = self.equations[source_index]
+            else:
+                raise ValueError(f"Source label '{source}' not found in steps")
+        
+        # Handle string labels for target
+        if isinstance(target, str):
+            if target in self.steps:
+                target_index = self.steps[target]
+                target = self.equations[target_index]
+                # Update position if target is ahead
+                if target_index >= self.current_position:
+                    self.current_position = target_index + 1
+            else:
+                raise ValueError(f"Target label '{target}' not found in steps")
+        else:
+            # If target is a mobject, check if it's in our equations
+            target_index = None
+            for i, eq in enumerate(self.equations):
+                if eq is target:  # Use 'is' for object identity
+                    target_index = i
+                    break
+            
+            # Only update position if target is ahead of current position
+            if target_index is not None and target_index >= self.current_position:
+                self.current_position = target_index + 1
+        
+        # Create an independent copy that won't be affected by scroll tracking
+        source_copy = source.copy()
+        
+        # Perform ReplacementTransform with the copy
+        scene.play(
+            ReplacementTransform(source_copy, target, **animation_kwargs),
+            **run_time
+        )
+        
+        return self
