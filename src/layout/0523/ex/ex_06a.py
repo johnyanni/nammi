@@ -33,7 +33,9 @@ class ProblematicExample(MathTutorialScene):
         step1 = scroll.construct_step(
             scroll.create_tex(r"First, expand $(x-1)^2$:", label="l_expand_squared"),
             scroll.create_math_tex(r"(x-1)^2 = (x-1)(x-1) = x^2 - 2x + 1", label="m_expand_detail"),
-            scroll.create_math_tex(r"2(x^2 - 2x + 1) + 3x = x^2 + 4x + 5", label="m_expand_result")
+            scroll.create_math_tex(r"2(x^2 - 2x + 1) + 3x = x^2 + 4x + 5", label="m_expand_result"),
+            scroll.create_math_tex(r"2(x^2 - 2x + 1) + 3x = x^2 + 4x + 5", label="m_expand_result2"),
+            scroll.create_math_tex(r"2(x^2 - 2x + 1) + 3x = x^2 + 4x + 5", label="m_expand_result3")
         )
 
        
@@ -41,15 +43,17 @@ class ProblematicExample(MathTutorialScene):
         scroll.prepare_next("l_expand_squared")
         scroll.prepare_next("m_expand_detail")
         scroll.prepare_next("m_expand_result")
-
+        scroll.prepare_next("m_expand_result2")
+        scroll.prepare_next("m_expand_result3")
 
 
         step2 = scroll.construct_step(
             scroll.create_tex("Distribute the 2:", label="l_distribute_2"),
             scroll.create_math_tex(r"2x^2 - 4x + 2 + 3x = x^2 + 4x + 5", label="m_distribute_result"),
-        )
+            arrange=False
+        ).next_to(step1, DOWN, buff=1).set_x(0)
 
-        step2.next_to(step1, RIGHT, buff=2)
+        # step2.next_to(step1, RIGHT, buff=2)
         
 
         scroll.prepare_next("l_distribute_2")
@@ -67,7 +71,6 @@ class ProblematicExample(MathTutorialScene):
             scroll.create_math_tex(r"a = 1 \quad b = -5 \quad c = -3", scale=1.0),
             add_to_scroll=False
         )
-        # .next_to(step2, RIGHT, buff=1, aligned_edge=LEFT).align_to(step2, UP)
         
         coefficient_values_in_equation = self.parse_elements(s6_identify_coefficients_step[1],
             ('a_value', 'x', 0, A_COLOR),  
@@ -91,7 +94,7 @@ class ProblematicExample(MathTutorialScene):
         scroll.create_steps(coefficient_labels.values(), ["coefficient_a_label", "coefficient_b_label", "coefficient_c_label"], arrange=False)
         scroll.create_steps(coefficient_values.values(), ["coefficient_a_value", "coefficient_b_value", "coefficient_c_value"], arrange=False)
         
-        s6_identify_coefficients_step.next_to(step2, RIGHT, buff=2)
+        # s6_identify_coefficients_step.next_to(step2, RIGHT, buff=2)
         
         # s6_identify_coefficients_step.arrange(DOWN, aligned_edge=LEFT, buff=0.5)
         # # Use the scroll manager's tracking - this is what add_to_arrangement does!
