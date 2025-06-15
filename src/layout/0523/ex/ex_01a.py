@@ -28,7 +28,7 @@ class Example01a(MathTutorialScene):
         # Parse square root simplification elements
         sqrt_parsing = self.parse_elements(sqrt_intermediate,
             ('sqrt_45', r'\sqrt{45}'),
-            ('sqrt', r'\sqrt{', 1, BLUE),
+            ('sqrt', r'\sqrt{45}', 0, BLUE, 1, slice(0, 2)),
             ('sqrt_num', r'9', 0, GREEN),
             ('sqrt_power', r'2', 0, RED),
             ('sqrt_45_solved', r'3\sqrt{5}', 0, YELLOW),
@@ -39,6 +39,7 @@ class Example01a(MathTutorialScene):
         
         self.add(sqrt_label)
         self.add(sqrt_parsing['sqrt_45'])
+        self.add(sqrt_parsing['sqrt'])
         self.add(sqrt_parsing['sqrt_num'])
         self.add(sqrt_parsing['sqrt_power'])
         self.add(sqrt_parsing['sqrt_45_solved'])

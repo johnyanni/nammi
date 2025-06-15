@@ -3,6 +3,7 @@
 from manim import *
 from src.components.common.base_scene import LABEL_SCALE, MATH_SCALE, ANNOTATION_SCALE
 from src.components.common.base_scene import MathTutorialScene
+from src.components.common.smart_tex import SmartColorizeStatic
 
 class ScrollManager(VGroup):
     def __init__(self, equations=None, scene=None, global_arrangement=True, *args, **kwargs):
@@ -103,6 +104,47 @@ class ScrollManager(VGroup):
 
         return expression, label
 
+    
+    def create_tex(self, text, label=None, scale=LABEL_SCALE, color_map=None, **kwargs):
+        """Create a Tex object with the given text and scale.
+        
+        Args:
+            text: The text to display
+            label: Optional label for scroll tracking
+            scale: Scale factor (default: LABEL_SCALE)
+            color_map: Optional dictionary mapping text patterns to colors
+            **kwargs: Additional arguments passed to Tex
+        
+        Example usage:
+            create_tex("Hello x and y", color_map={"x": RED, "y": BLUE})
+        """
+        tex_obj = Tex(text, **kwargs).scale(scale)
+        
+        if color_map:
+            SmartColorizeStatic(tex_obj, color_map)
+        
+        return tex_obj, label
+
+    def create_math_tex(self, tex, label=None, scale=MATH_SCALE, color_map=None, **kwargs):
+        """Create a MathTex object
+        
+        Args:
+            tex: The LaTeX expression
+            label: Optional label for scroll tracking
+            scale: Scale factor (default: MATH_SCALE)
+            color_map: Optional dictionary mapping patterns to colors
+            **kwargs: Additional arguments passed to MathTex
+            
+        Example usage:
+            create_math_tex("x^2 + y^2", color_map={"x": RED, "y": BLUE})
+        """
+        expression = MathTex(tex, **kwargs).scale(scale)
+        
+        if color_map:
+            SmartColorizeStatic(expression, color_map)
+        
+        return expression, label
+    
     
     def create_annotated_equation(self, equation_text, annotation_text, from_term, to_term,
                                   color=RED, scale=MATH_SCALE, annotation_scale=ANNOTATION_SCALE, 

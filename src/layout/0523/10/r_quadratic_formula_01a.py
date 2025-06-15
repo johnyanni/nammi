@@ -117,7 +117,7 @@ class RQuadraticFormula01(MathTutorialScene):
         # =================================================================================
         
         scroll = ScrollManager(scene=self, global_arrangement=False)
-        scroll.set_position_target(question_text, DOWN, buff=0.3, aligned_edge=LEFT) 
+        scroll.set_position_target(question_text, DOWN, buff=0.5, aligned_edge=LEFT) 
         
         
         
@@ -130,7 +130,7 @@ class RQuadraticFormula01(MathTutorialScene):
         
         s1_divide_step = scroll.construct_step(
             scroll.create_tex(r"First, get the equation in \textbf{standard form}:", label="l_convert_to_standard_form"),
-            scroll.create_tex(r"Divide both sides by 4", label="l_divide_both_sides_by_4"),
+            scroll.create_tex(r"\textbf{Divide} both sides by 4", label="l_divide_both_sides_by_4", color_map={"4": RED}),
             scroll.create_annotated_equation(
                 r"4(x+5)^2 = 48",
                 r"\div 4",
@@ -488,6 +488,15 @@ class RQuadraticFormula01(MathTutorialScene):
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         scroll.scroll_down("m_simplify_expression_2")
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
